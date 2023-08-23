@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.trade.mapper.UserCashMapper">
+
+	<!-- 查询用户取现信息列表 -->
+	<select id="getUserCashList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.order_id,
+			t.user_id,
+			t.cash_type,
+			t.account_type,
+			t.cash_money,
+			t.feet_money,
+			t.arrival_money,
+			t.charge_rate,
+			t.charge_min,
+			t.account,
+			t.account_name,
+			t.legal_id_card,
+			t.legal_crad_photo,
+			t.bank_name,
+			t.bank_branch_name,
+			t.account_img,
+			t.cash_status,
+			t.remark,
+			t.update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_cash t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.id != null and map.id != ''">
+				t.id = #{map.id}
+			</if>
+			<if test="map.order_id != null and map.order_id != ''">
+				AND t.order_id = #{map.order_id}
+			</if>
+			<if test="map.user_id != null and map.user_id != ''">
+				AND t.user_id = #{map.user_id}
+			</if>
+			<if test="map.account != null and map.account != ''">
+				AND t.account = #{map.account}
+			</if>
+			<if test="map.account_name != null and map.account_name != ''">
+				AND t.account_name like concat('%', #{map.account_name}, '%')
+			</if>
+			<if test="map.bank_name != null and map.bank_name != ''">
+				AND t.bank_name like concat('%', #{map.bank_name}, '%')
+			</if>
+			<if test="map.cash_status != null and map.cash_status != ''">
+				AND t.cash_status = #{map.cash_status}
+			</if>
+			<if test="map.cash_type != null and map.cash_type != ''">
+				AND t.cash_type = #{map.cash_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 汇总取现记录数据 -->
+	<select id="summaryUserCashList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			IFNULL(sum(t.cash_money),0.00) AS sum_cash_money,
+			IFNULL(sum(t.feet_money),0.00) AS sum_feet_money,
+			IFNULL(sum(t.arrival_money),0.00) AS sum_arrival_money
+		FROM
+			t_user_cash t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.id != null and map.id != ''">
+				t.id = #{map.id}
+			</if>
+			<if test="map.order_id != null and map.order_id != ''">
+				AND t.order_id = #{map.order_id}
+			</if>
+			<if test="map.user_id != null and map.user_id != ''">
+				AND t.user_id = #{map.user_id}
+			</if>
+			<if test="map.account != null and map.account != ''">
+				AND t.account = #{map.account}
+			</if>
+			<if test="map.account_name != null and map.account_name != ''">
+				AND t.account_name like concat('%', #{map.account_name}, '%')
+			</if>
+			<if test="map.bank_name != null and map.bank_name != ''">
+				AND t.bank_name like concat('%', #{map.bank_name}, '%')
+			</if>
+			<if test="map.cash_status != null and map.cash_status != ''">
+				AND t.cash_status = #{map.cash_status}
+			</if>
+			<if test="map.cash_type != null and map.cash_type != ''">
+				AND t.cash_type = #{map.cash_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 导出用户取现信息 -->
+	<select id="selectUserCashList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.trade.domain.UserCash" >
+		SELECT
+			t.id,
+			t.order_id,
+			t.user_id,
+			t.cash_type,
+			t.account_type,
+			t.cash_money,
+			t.feet_money,
+			t.arrival_money,
+			t.charge_rate,
+			t.charge_min,
+			t.account,
+			t.account_name,
+			t.legal_id_card,
+			t.legal_crad_photo,
+			t.bank_name,
+			t.bank_branch_name,
+			t.account_img,
+			t.cash_status,
+			t.remark,
+			t.update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_cash t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.id != null and map.id != ''">
+				t.id = #{map.id}
+			</if>
+			<if test="map.order_id != null and map.order_id != ''">
+				AND t.order_id = #{map.order_id}
+			</if>
+			<if test="map.user_id != null and map.user_id != ''">
+				AND t.user_id = #{map.user_id}
+			</if>
+			<if test="map.account != null and map.account != ''">
+				AND t.account = #{map.account}
+			</if>
+			<if test="map.account_name != null and map.account_name != ''">
+				AND t.account_name like concat('%', #{map.account_name}, '%')
+			</if>
+			<if test="map.bank_name != null and map.bank_name != ''">
+				AND t.bank_name like concat('%', #{map.bank_name}, '%')
+			</if>
+			<if test="map.cash_status != null and map.cash_status != ''">
+				AND t.cash_status = #{map.cash_status}
+			</if>
+			<if test="map.cash_type != null and map.cash_type != ''">
+				AND t.cash_type = #{map.cash_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 查询用户取现记录详情列表 -->
+	<select id="getUserCashDetailList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			cash_id,
+			cash_detail_status,
+			note,
+			remark,
+			create_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date
+		FROM
+			t_user_cash_detail
+		<where>
+			<if test="map.id != null and map.id != ''">
+				id = #{map.id}
+			</if>
+			<if test="map.cash_id != null and map.cash_id != ''">
+				AND cash_id = #{map.cash_id}
+			</if>
+			<if test="map.cash_detail_status != null and map.cash_detail_status != ''">
+				AND cash_detail_status = #{map.cash_detail_status}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 查询用户待处理提现记录列表 -->
+	<select id="selectWaitUserCashList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.trade.domain.UserCash" >
+		SELECT
+			t.id,
+			t.order_id,
+			t.user_id,
+			t.cash_type,
+			t.account_type,
+			t.cash_money,
+			t.feet_money,
+			t.arrival_money,
+			t.charge_rate,
+			t.charge_min,
+			t.account,
+			t.account_name,
+			t.legal_id_card,
+			t.legal_crad_photo,
+			t.bank_name,
+			t.bank_branch_name,
+			t.account_img,
+			t.cash_status,
+			t.remark,
+			t.update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_cash t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			t.cash_status='00'
+			<if test="map.id != null and map.id != ''">
+				AND t.id = #{map.id}
+			</if>
+			<if test="map.order_id != null and map.order_id != ''">
+				AND t.order_id = #{map.order_id}
+			</if>
+			<if test="map.user_id != null and map.user_id != ''">
+				AND t.user_id = #{map.user_id}
+			</if>
+			<if test="map.account != null and map.account != ''">
+				AND t.account = #{map.account}
+			</if>
+			<if test="map.account_name != null and map.account_name != ''">
+				AND t.account_name like concat('%', #{map.account_name}, '%')
+			</if>
+			<if test="map.bank_name != null and map.bank_name != ''">
+				AND t.bank_name like concat('%', #{map.bank_name}, '%')
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 更新提现状态 -->
+	<update id="updateUserCashStatus" parameterType="java.util.Map" >
+		update t_user_cash set 
+			<if test="map.overflow_usufruct_num != null and map.overflow_usufruct_num != ''">
+				overflow_usufruct_num=#{map.overflow_usufruct_num},
+			</if>
+			<if test="map.cash_account_num != null and map.cash_account_num != ''">
+				cash_account_num=#{map.cash_account_num},
+			</if>
+			<if test="map.remark != null and map.remark != ''">
+				remark=#{map.remark},
+			</if>
+			cash_status=#{map.new_cash_status},up_date=#{map.cre_date},
+			up_time=#{map.cre_time},update_by=#{map.create_by}
+		where id=#{map.cash_id} and cash_status=#{map.old_cash_status}
+	</update>
+	
+	<!-- 更新提现状态 -->
+	<update id="updateUserCashTaskStatus" parameterType="java.util.Map" >
+		update t_user_cash set 
+			<if test="map.trade_no != null and map.trade_no != ''">
+				trade_no=#{map.trade_no},
+			</if>
+			<if test="map.complete_time != null and map.complete_time != ''">
+				complete_time=#{map.complete_time},
+			</if>
+			<if test="map.message != null and map.message != ''">
+				message=#{map.message},
+			</if>
+			cash_status=#{map.new_cash_status},
+			task_status=#{map.new_task_status},
+			up_date=#{map.cre_date},
+			up_time=#{map.cre_time},update_by=#{map.create_by}
+		where id=#{map.cash_id} and cash_status=#{map.old_cash_status}
+		      and task_status=#{map.old_task_status}
+	</update>
+	
+	<!-- 保存用户提现记录详情-->
+	<insert id="addUserCashDetail" parameterType="java.util.Map" >
+		insert into t_user_cash_detail (
+			cash_id, cash_detail_status, note, remark, cre_date, cre_time, create_by)
+		values (
+			#{map.cash_id}, #{map.cash_detail_status}, #{map.note}, #{map.remark}, #{map.cre_date}, #{map.cre_time}, #{map.create_by})
+	</insert>
+	
+	
+	<!-- 根据提现id查询提现详情 -->
+	<select id="getUserCashById" parameterType="java.lang.String" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.order_id,
+			t.user_id,
+			t.cash_type,
+			t.account_type,
+			t.cash_money,
+			t.feet_money,
+			t.arrival_money,
+			t.charge_rate,
+			t.charge_min,
+			t.account,
+			t.account_name,
+			t.legal_id_card,
+			t.legal_crad_photo,
+			t.bank_name,
+			t.bank_branch_name,
+			t.account_img,
+			t.cash_status,
+			t.remark,
+			t.update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_cash t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		where
+			t.id = #{cash_id}
+	</select>
+	
+	
+	<!-- 用户余额汇总统计 -->
+	<select id="chartUserCash" resultType="java.util.Map" >
+		SELECT
+			cash_status,
+			count(*) AS num,
+			SUM(cash_money) AS cash_money,
+			SUM(feet_money) AS feet_money,
+			SUM(arrival_money) AS arrival_money
+		FROM
+			t_user_cash
+		GROUP BY
+			cash_status
+	</select>
+	
+</mapper>

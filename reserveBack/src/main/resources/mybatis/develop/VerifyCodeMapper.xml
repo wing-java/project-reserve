@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.develop.email.mapper.VerifyCodeMapper">
+
+	<!-- 查询验证码发送列表 -->
+	<select id="getVerifyCodeList" resultType="java.util.HashMap" parameterType="java.util.HashMap" >
+		SELECT
+			id,
+			user_id,
+			user_name,
+			bus_type,
+			acc_type,
+			account,
+			status,
+			create_time,
+			send_time,
+			invalid_time,
+			verify_time,
+			msg_template
+		FROM
+			t_verify_record
+		<where>
+			<if test='map.id !=null and map.id !=""'>
+				id = #{map.id}
+			</if>
+			<if test='map.user_id !=null and map.user_id !=""'>
+				and user_id = #{map.user_id}
+			</if>
+			<if test='map.user_name !=null and map.user_name !=""'>
+				and user_name = #{map.user_name}
+			</if>
+			<if test='map.bus_type !=null and map.bus_type !=""'>
+				and bus_type = #{map.bus_type}
+			</if>
+			<if test='map.acc_type !=null and map.acc_type !=""'>
+				and acc_type = #{map.acc_type}
+			</if>
+			<if test='map.account !=null and map.account !=""'>
+				and account = #{map.account}
+			</if>
+			<if test='map.status !=null and map.status !=""'>
+				and status = #{map.status}
+			</if>
+			<if test='map.msg_template !=null and map.msg_template !=""'>
+				and msg_template = #{map.msg_template}
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 导出验证码发送列表 -->
+	<select id="selectVerifyCodeList" resultType="com.ruoyi.project.develop.email.domain.VerifyCode" parameterType="java.util.HashMap" >
+		SELECT
+			id,
+			user_id,
+			user_name,
+			bus_type,
+			acc_type,
+			account,
+			status,
+			create_time,
+			send_time,
+			invalid_time,
+			verify_time,
+			msg_template
+		FROM
+			t_verify_record
+		<where>
+			<if test='map.id !=null and map.id !=""'>
+				id = #{map.id}
+			</if>
+			<if test='map.user_id !=null and map.user_id !=""'>
+				and user_id = #{map.user_id}
+			</if>
+			<if test='map.user_name !=null and map.user_name !=""'>
+				and user_name = #{map.user_name}
+			</if>
+			<if test='map.bus_type !=null and map.bus_type !=""'>
+				and bus_type = #{map.bus_type}
+			</if>
+			<if test='map.acc_type !=null and map.acc_type !=""'>
+				and acc_type = #{map.acc_type}
+			</if>
+			<if test='map.account !=null and map.account !=""'>
+				and account = #{map.account}
+			</if>
+			<if test='map.status !=null and map.status !=""'>
+				and status = #{map.status}
+			</if>
+			<if test='map.msg_template !=null and map.msg_template !=""'>
+				and msg_template = #{map.msg_template}
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+</mapper>

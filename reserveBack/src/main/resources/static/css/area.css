@@ -1,0 +1,108 @@
+
+/*
+*quu..__
+ $$$b  `---.__
+  "$$b        `--.                          ___.---uuudP
+   `$$b           `.__.------.__     __.---'      $$$$"              .
+     "$b          -'            `-.-'            $$$"              .'|
+       ".                                       d$"             _.'  |
+         `.   /                              ..."             .'     |
+           `./                           ..::-'            _.'       |
+            /                         .:::-'            .-'         .'
+           :                          ::''\          _.'            |
+          .' .-.             .-.           `.      .'               |
+          : /'$$|           .@"$\           `.   .'              _.-'
+         .'|$u$$|          |$$,$$|           |  <            _.-'
+         | `:$$:'          :$$$$$:           `.  `.       .-'
+         :                  `"--'             |    `-.     \
+        :##.       ==             .###.       `.      `.    `\
+        |##:                      :###:        |        >     >
+        |#'     `..'`..'          `###'        x:      /     /
+         \                                   xXX|     /    ./
+          \                                xXXX'|    /   ./
+          /`-.                                  `.  /   /
+         :    `-  ...........,                   | /  .'
+         |         ``:::::::'       .            |<    `.
+         |             ```          |           x| \ `.:``.
+         |                         .'    /'   xXX|  `:`M`M':.
+         |    |                    ;    /:' xXXX'|  -'MMMMM:'
+         `.  .'                   :    /:'       |-'MMMM.-'
+          |  |                   .'   /'        .'MMM.-'
+          `'`'                   :  ,'          |MMM<
+            |                     `'            |tbap\
+             \                                  :MM.-'
+              \                 |              .''
+               \.               `.            /
+                /     .:::::::.. :           /
+               |     .:::::::::::`.         /
+               |   .:::------------\       /
+              /   .''               >::'  /
+              `',:                 :    .'
+                                   `:.:'
+
+ 
+*/
+ul,p,li{
+    margin:0;padding:0;
+}
+ul{list-style: none;}
+#super_citys{width: 100%;}
+#super_citys>div{
+	display: flex;
+    height:33px;
+    width:49%;
+    border:1px solid #e5e6e7;
+	box-sizing: border-box;
+    display:inline-block;
+    vertical-align: top;
+    text-indent: 10px;
+    position:relative;
+    cursor:pointer;
+    border-radius: 5px;
+    background:url(../img/select_bg_img.png) no-repeat right center;
+    -webkit-touch-callout: none; 
+    -webkit-user-select: none;
+    -khtml-user-select: none; 
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none;
+}
+#super_citys>div>div{
+    overflow: hidden;
+    font-size:13px;
+}
+.shadow{
+    border:1.5px solid #1E90FF!important;
+}
+#super_citys>div>ul{
+    width:100%;
+    border:2px solid #1E90FF!important;
+    position:absolute;
+    left:0;
+    z-index: 99;
+    overflow-y: scroll;
+    height:0px;
+    display:none;
+    box-sizing: border-box;
+    background:#fff;
+}
+#super_citys>div>ul>li{
+    font-size:15px;
+    text-indent: 10px;
+    cursor:pointer;
+    overflow: hidden;
+}
+#super_citys>div>ul>li:hover{
+    background:#1E90FF;
+    color:#fff;
+}
+.btn{
+    width:90px;
+    height:33px;
+    color:#fff;
+    font-weight: 600;
+    font-size:18px;
+    background:#1E90FF;
+    border-radius: 5px;
+    
+}

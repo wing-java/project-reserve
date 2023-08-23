@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('参数修改记录详细')" />
+	<th:block th:include="include :: jsonview-css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	
+	<form class="form-horizontal m-t" id="form-userFeedBack-edit">
+		
+		<div class="form-group">
+			<input type="hidden" name="feed_back_id" id="feed_back_id" th:value="${userFeedBack.id}" >
+			<label class="col-sm-2 control-label">用户编号：</label>
+			<div class="form-control-static" th:text="${userFeedBack.user_id}">
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">用户账号：</label>
+			<div class="form-control-static" th:text="${userFeedBack.sys_user_account}">
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">用户UID：</label>
+			<div class="form-control-static" th:text="${userFeedBack.uid}">
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">反馈标题：</label>
+			<div class="form-control-static"><pre th:text="${userFeedBack.feedback_title}"></pre></div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">反馈内容：</label>
+			<div class="form-control-static"><pre th:text="${userFeedBack.feedback_content}" ></pre></div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">反馈图片：</label>
+			<div class="form-control-static">
+				<pre id="feedback_img">
+				</pre>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">反馈回复：</label>
+			<div class="col-sm-10 form-control-static">
+				<textarea rows="15" class="form-control" name="feedback_answer" id="feedback_answer" th:text="${userFeedBack.feedback_answer}" placeholder="请输入反馈回复" ></textarea>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">创建时间：</label>
+			<div class="form-control-static" th:text="${userFeedBack.cre_date}" >
+			</div>
+		</div>
+		
+	</form>
+</div>
+
+
+<div class="row" style="margin-bottom: 100px">
+	<div class="col-sm-offset-5 col-sm-10">
+	    <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+	    <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+	</div>
+</div>
+
+
+<th:block th:include="include :: footer" />
+<script th:inline="javascript">
+ 	$(function() {
+ 		var feedback_img = [[${userFeedBack.feedback_img}]];
+ 		if(feedback_img!=null&&feedback_img!=''){
+ 			var feedback_imgs = feedback_img.split(",");
+  			var feedback_img_str = "";
+  			for(var i=0;i<feedback_imgs.length;i++){
+  				feedback_img_str = feedback_img_str
+  					+'<a href="'+qiniu_domain+feedback_imgs[i]+'" target="blank"><img src="'+qiniu_domain+feedback_imgs[i]+'" width="100px" height="100px" style="margin-left: 10px"></a>'
+  			}
+  			$("#feedback_img").html(feedback_img_str);
+ 		}
+ 	});
+ 	
+ 	$("#form-userFeedBack-edit").validate({
+ 		rules:{
+ 			feedback_answer:{
+ 				required:true
+ 			}
+ 		},
+ 		messages: {
+ 			feedback_answer: {
+ 	            required: "请输入返回回复内容"
+ 	        }
+ 	 	},
+ 		focusCleanup: true
+ 	});
+
+ 	function submitHandler() {
+ 	   if ($.validate.form()) {
+ 	   		$.operate.saveTab("/develop/userFeedBack/edit", $('#form-userFeedBack-edit').serialize());
+ 	   }
+ 	}
+</script>
+</body>
+</html>

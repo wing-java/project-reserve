@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.develop.email.mapper.SysEmailAccountMapper">
+
+	<!-- 查询邮箱账号列表 -->
+	<select id="getSysEmailAccountList" resultType="java.util.HashMap" parameterType="java.util.HashMap" >
+		SELECT
+			id,
+			num,
+			account,
+			password,
+			login_pass,
+			remark,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_email_account
+		<where>
+			<if test='map.account !=null and map.account !=""'>
+				account = #{map.account}
+			</if>
+			<if test='map.num !=null and map.num !=""'>
+				AND num = #{map.num}
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 导出邮箱账号列表 -->
+	<select id="selectSysEmailAccountList" resultType="com.ruoyi.project.develop.email.domain.SysEmailAccount" parameterType="java.util.HashMap" >
+		SELECT
+			id,
+			num,
+			account,
+			password,
+			login_pass,
+			remark,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_email_account
+		<where>
+			<if test='map.account !=null and map.account !=""'>
+				account = #{map.account}
+			</if>
+			<if test='map.num !=null and map.num !=""'>
+				AND num = #{map.num}
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 查询详情 -->
+	<select id="getSysEmailAccountById" resultType="java.util.HashMap" parameterType="java.lang.String">
+		SELECT
+			id,
+			num,
+			account,
+			password,
+			login_pass,
+			remark,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_email_account
+		WHERE num=#{email_account_num}
+	</select>
+	
+	
+	<!-- 更新邮箱账号 -->
+	<update id="updateSysEmailAccount" parameterType="java.util.HashMap" >
+		update t_sys_email_account
+ 		<set>
+ 			<if test="map.account != null and map.account != ''">account = #{map.account},</if>
+ 			<if test="map.password != null and map.password != ''">password = #{map.password},</if>
+ 			<if test="map.login_pass != null and map.login_pass != ''">login_pass = #{map.login_pass},</if>
+ 			<if test="map.remark != null and map.remark != ''">remark = #{map.remark},</if>
+ 			<if test="map.update_by != null and map.update_by != ''">update_by = #{map.update_by},</if>
+ 			<if test="map.up_date != null and map.up_date != ''">up_date = #{map.up_date},</if>
+ 			<if test="map.up_time != null and map.up_time != ''">up_time = #{map.up_time},</if>
+ 		</set>
+ 		where num=#{map.num}
+	</update>
+	
+	
+	<!-- 新增邮箱账号 -->
+	<insert id="addSysEmailAccount" parameterType="java.util.HashMap" >
+		insert into t_sys_email_account (
+			<if test="map.num != null and map.num != '' ">num, </if>
+			<if test="map.account != null and map.account != '' ">account, </if>
+			<if test="map.password != null and map.password != '' ">password, </if>
+			<if test="map.login_pass != null and map.login_pass != '' ">login_pass, </if>
+			<if test="map.remark != null and map.remark != ''">remark,</if>
+ 			<if test="map.create_by != null and map.create_by != ''">create_by,</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">cre_date,</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">cre_time</if>
+ 		)values(
+			<if test="map.num != null and map.num != ''">#{map.num}, </if>
+			<if test="map.account != null and map.account != ''">#{map.account}, </if>
+			<if test="map.password != null and map.password != ''">#{map.password}, </if>
+			<if test="map.login_pass != null and map.login_pass != ''">#{map.login_pass}, </if>
+			<if test="map.remark != null and map.remark != ''">#{map.remark},</if>
+ 			<if test="map.create_by != null and map.create_by != ''">#{map.create_by},</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">#{map.cre_date},</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">#{map.cre_time}</if>
+		)
+	</insert>
+	
+	
+	<!-- 根据邮箱账号编号删除 -->
+	<delete id="deleteSysEmailAccount" parameterType="java.lang.String" >
+		delete from t_sys_email_account where num=#{email_account_num}
+	</delete>
+	
+	
+	<!-- 查询大于当前编号的邮箱编号信息 -->
+	<select id="getLagerEmailAccountList" resultType="java.util.HashMap" parameterType="java.util.HashMap" >
+		SELECT
+			id,
+			num,
+			account,
+			password,
+			login_pass,
+			remark,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_email_account
+		WHERE num>#{email_account_num}
+	</select>
+	
+	
+	<!-- 更新大于当前邮箱邮箱编号的邮箱编号（编号=编号-1） -->
+	<update id="updateLagerEmailAccount" parameterType="java.util.HashMap" >
+		update t_sys_email_account set num=num-1 where num>#{email_account_num}
+	</update>
+	
+	
+	<!-- 查询当前剩余邮箱个数 -->
+	<select id="selectRemainEmailNum" resultType="java.lang.Integer" >
+		select count(*) from t_sys_email_account
+	</select>
+	
+	
+</mapper>

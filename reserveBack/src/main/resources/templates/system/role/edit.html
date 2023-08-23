@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改角色')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: ztree-css" />
+</head>
+<body class="white-bg">
+	
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		
+		<form class="form-horizontal m" id="form-role-edit" th:object="${role}">
+			
+			<!-- 角色id -->
+			<input id="roleId" name="roleId" type="hidden" th:field="*{roleId}"/>
+			
+			<!-- 角色名称 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">角色名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="roleName" id="roleName" th:field="*{roleName}" required>
+				</div>
+			</div>
+			
+			<!-- 权限字符 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">权限字符：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="roleKey" id="roleKey" th:field="*{roleKey}" required>
+				</div>
+			</div>
+			
+			<!-- 显示顺序 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">显示顺序：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="roleSort" id="roleSort" th:field="*{roleSort}" required>
+				</div>
+			</div>
+			
+			<!-- 状态 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">状态：</label>
+				<div class="col-sm-8">
+					<label class="toggle-switch switch-solid">
+                        <input type="checkbox" id="status" th:checked="${role.status == '0' ? true : false}">
+                        <span></span>
+                    </label>
+				</div>
+			</div>
+			
+			<!-- 备注 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<input id="remark" name="remark" class="form-control" type="text" th:field="*{remark}">
+				</div>
+			</div>
+			
+			<!-- 菜单权限====》树图 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单权限</label>
+				<div class="col-sm-8">
+					<div id="menuTrees" class="ztree"></div>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+	
+	
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: ztree-js" />
+	
+	<script type="text/javascript">
+		//初始化加载角色菜单列表树
+	     $(function() {
+			var url = ctx + "system/menu/roleMenuTreeData?roleId=" + $("#roleId").val();
+			var options = {
+				id: "menuTrees",//URL列表路径
+		        url: url,
+		        check: { enable: true },
+		        expandLevel: 0//扩展级别
+		    };
+			$.tree.init(options);
+		});
+	
+		
+	     /*角色基本信息校验 */
+		$("#form-role-edit").validate({
+			onkeyup: false,
+			rules:{
+				/* 角色名称校验：角色名称唯一 */
+				roleName:{
+					remote: {
+		                url: ctx + "system/role/checkRoleNameUnique",
+		                type: "post",
+		                dataType: "json",
+		                data: {
+							"roleId": function() {
+							    return $("#roleId").val();
+							},
+							"roleName": function() {
+							    return $.common.trim($("#roleName").val());
+							}
+		                },
+		                dataFilter: function(data, type) {
+		                	return $.validate.unique(data);
+		                }
+		            }
+				},
+				/* 权限字符校验：权限字符唯一 */
+				roleKey:{
+					remote: {
+		                url: ctx + "system/role/checkRoleKeyUnique",
+		                type: "post",
+		                dataType: "json",
+		                data: {
+							"roleId": function() {
+								return $("#roleId").val();
+							},
+							"roleKey": function() {
+							    return $.common.trim($("#roleKey").val());
+							}
+		                },
+		                dataFilter: function(data, type) {
+		                	return $.validate.unique(data);
+		                }
+		            }
+				},
+				roleSort:{
+					digits:true
+				},
+			},
+			messages: {
+		        "roleName": {
+		            remote: "角色名称已经存在"
+		        },
+		        "roleKey": {
+		            remote: "角色权限已经存在"
+		        }
+		    },
+		    focusCleanup: true
+		});
+
+	     
+	    //编辑角色
+		function edit() {
+			//角色id
+			var roleId = $("input[name='roleId']").val();
+			//角色名称
+			var roleName = $("input[name='roleName']").val();
+			//权限字符
+			var roleKey = $("input[name='roleKey']").val();
+			//角色排序
+			var roleSort = $("input[name='roleSort']").val();
+			//如果status选中则为0，否则为1
+			var status = $("input[name='status']").is(':checked') == true ? 0 : 1;
+			//备注
+			var remark = $("input[name='remark']").val();
+			//获取当前被勾选集合
+			var menuIds = $.tree.getCheckedNodes();
+			$.ajax({
+				cache : true,
+				type : "POST",
+				url : ctx + "system/role/edit",
+				data : {
+					"roleId": roleId,
+					"roleName": roleName,
+					"roleKey": roleKey,
+					"roleSort": roleSort,
+					"status": status,
+					"remark": remark,
+					"menuIds": menuIds
+				},
+				async : false,
+				error : function(request) {
+					$.modal.alertError("系统错误");
+				},
+				success : function(data) {
+					$.operate.successCallback(data);
+				}
+			});
+		}
+		
+	    
+		//保存提交
+		function submitHandler() {
+			//校验通过
+	        if ($.validate.form()) {
+	        	//编辑角色
+	        	edit();
+	        }
+	    }
+	</script>
+</body>
+</html>

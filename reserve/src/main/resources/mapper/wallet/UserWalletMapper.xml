@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.longecological.mapper.wallet.UserWalletMapper">
+	
+	<!-- 更新钱包数量 -->
+	<update id="updateUserWalletNum" parameterType="java.util.Map">
+		update t_user_wallet 
+			set 
+				<if test="map.balance_num != null and map.balance_num != '' " >balance_num=balance_num+#{map.balance_num},</if>
+				<if test="map.sharestock_num != null and map.sharestock_num != '' " >sharestock_num=sharestock_num+#{map.sharestock_num},</if>
+				<if test="map.total_benefit != null and map.total_benefit != '' " >total_benefit=total_benefit+#{map.total_benefit},</if>
+				<if test="map.first_benefit != null and map.first_benefit != '' " >first_benefit=first_benefit+#{map.first_benefit},</if>
+				<if test="map.second_benefit != null and map.second_benefit != '' " >second_benefit=second_benefit+#{map.second_benefit},</if>
+				<if test="map.third_benefit != null and map.third_benefit != '' " >third_benefit=third_benefit+#{map.third_benefit},</if>
+				<if test="map.op_type != null and map.op_type != '' " >op_type=#{map.op_type},</if>
+				<if test="map.op_order_no != null and map.op_order_no != '' " >op_order_no=#{map.op_order_no},</if>
+				up_date=#{map.up_date},up_time=#{map.up_time}
+			where user_id = #{map.user_id} 
+				<if test="map.balance_num != null and map.balance_num != '' " >and balance_num+#{map.balance_num} >= 0</if>
+				<if test="map.sharestock_num != null and map.sharestock_num != '' " >and sharestock_num=sharestock_num+#{map.sharestock_num} >= 0</if>
+				<if test="map.total_benefit != null and map.total_benefit != '' " >and total_benefit=total_benefit+#{map.total_benefit} >= 0</if>
+	</update>
+	
+	<!-- 查询钱包信息 -->
+	<select id="getUserWalletInfo" parameterType="java.lang.String" resultType="java.util.Map">
+		select balance_num, sharestock_num, total_benefit from t_user_wallet where user_id = #{user_id}
+	</select>
+	
+</mapper>

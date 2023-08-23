@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ruoyi.project.develop.trade.mapper.UserRechargeOfflineMapper">
+
+	<!-- 查询用户线下充值列表 -->
+	<select id="getUserRechargeOfflineList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.order_id,
+			t.recharge_type,
+			t.account_type,
+			t.recharge_num,
+			t.recharge_voucher,
+			t.user_id,
+			t.status,
+			t.remark,
+			t.update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_recharge_offline t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.order_id != null and map.order_id != ''">
+				AND t.order_id = #{map.order_id}
+			</if>
+			<if test="map.recharge_type != null and map.recharge_type != ''">
+				AND t.recharge_type = #{map.recharge_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 导出用户线下充值信息 -->
+	<select id="selectUserRechargeOfflineList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.trade.domain.UserRechargeOffline" >
+		SELECT
+			t.id,
+			t.order_id,
+			t.recharge_type,
+			t.account_type,
+			t.recharge_num,
+			t.recharge_voucher,
+			t.user_id,
+			t.status,
+			t.remark,
+			t.update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_recharge_offline t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.order_id != null and map.order_id != ''">
+				AND t.order_id = #{map.order_id}
+			</if>
+			<if test="map.recharge_type != null and map.recharge_type != ''">
+				AND t.recharge_type = #{map.recharge_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 汇总充值记录数据 -->
+	<select id="summaryUserRechargeOfflineList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			IFNULL(sum(t.recharge_num),0.00) AS sum_recharge_num
+		FROM
+			t_user_recharge_offline t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.order_id != null and map.order_id != ''">
+				AND t.order_id = #{map.order_id}
+			</if>
+			<if test="map.recharge_type != null and map.recharge_type != ''">
+				AND t.recharge_type = #{map.recharge_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	
+	<!-- 根据充值编号查询线下充值信息 -->
+	<select id="getUserRechargeOfflineById" parameterType="java.lang.String" resultType="java.util.Map" >
+		select * from t_user_recharge_offline where id=#{recharge_id}
+	</select>
+	<!-- 更新用户线下充值状态 -->
+	<update id="updateUserRechargeOfflineStatus" parameterType="java.util.Map" >
+		update t_user_recharge_offline set status=#{map.new_status},remark=#{map.remark},
+			update_by=#{map.update_by},up_date=#{map.up_date},up_time=#{map.up_time},
+			note=#{map.remark}
+			where id=#{map.recharge_id} and status=#{map.old_status}
+	</update>
+	
+</mapper>

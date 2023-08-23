@@ -1,0 +1,165 @@
+*{
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+}
+
+.index_pages{
+    padding: 20px;
+    background: #f3f3f4;
+}
+
+.index_wrapper{
+    background: #fff;
+}
+
+.indexBox_top{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+
+.indexBox_top .title{
+    display: inline-block;
+    padding: 0;
+    text-overflow: ellipsis;
+}
+
+.indexBox_top .rightBox{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.tabTitle span{
+    display: inline-block;
+    width: 50px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.tabTitle span.active{
+    color: #1c84c6;
+}
+
+.timeBox{
+    margin-left: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.timeBox .timeBox-box{
+
+}
+
+.timeBox .input{
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.timeBox img{
+    width: 30px;
+    height: 30px;
+}
+
+.indexBox_main{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 15px;
+    border-top: 1px solid #ccc;
+}
+
+.indexBox_main .title{
+    display: block;
+}
+
+.wrapper{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px 0;
+    width: 100%;
+}
+
+.wrapper .line{
+    height: 50px;
+    border-right: 1px solid #ccc;
+    margin-right: 30px;
+    padding-right: 30px;
+}
+
+.wrapper .clo-12{
+    width: 16.66%;
+}
+
+.wrapper .item{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.wrapper .item:nth-last-child(1){
+    border-right: none;
+}
+
+.wrapper .item img{
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.wrapper .item .info{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.wrapper .item .info .num{
+    font-size: 20px;
+    margin-top: 8px;
+}
+
+.wrapper .clo-3{
+    width: 33.33%;
+}
+.wrapper .clo-2{
+    width: 50%;
+}
+
+.itemBox_mt{
+   padding-top: 20px;
+}
+
+.itemBox{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.itemBox .item{
+    background: #fff;
+    padding: 20px 20px 30px 20px;
+    margin-right: 20px;
+}
+
+.itemBox .item:nth-last-child(1){
+    margin-right: 0;
+}
+
+.itemBox .wrapper{
+    padding: 0  0 20px;
+}
+

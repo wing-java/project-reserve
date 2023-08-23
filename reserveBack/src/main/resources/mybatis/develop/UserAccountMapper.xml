@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.user.mapper.UserAccountMapper">
+
+	<!-- 查询用户收款账户列表 -->
+	<select id="getUserAccountList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.user_id,
+			t.account,
+			t.account_name,
+			t.legal_id_card,
+			t.legal_crad_photo,
+			t.bank_name,
+			t.bank_branch_name,
+			t.type,
+			t.isdefault,
+			t.account_img,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_account t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.account != null and map.account != ''">
+				AND t.account = #{map.account}
+			</if>
+			<if test="map.account_name != null and map.account_name != ''">
+				AND t.account_name like concat('%', #{map.account_name}, '%')
+			</if>
+			<if test="map.bank_name != null and map.bank_name != ''">
+				AND t.bank_name like concat('%', #{map.bank_name}, '%')
+			</if>
+			<if test="map.type != null and map.type != ''">
+				AND t.type = #{map.type}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 导出用户收款账号信息 -->
+	<select id="selectUserAccountList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.user.domain.UserAccount" >
+		SELECT
+			t.id,
+			t.user_id,
+			t.account,
+			t.account_name,
+			t.legal_id_card,
+			t.legal_crad_photo,
+			t.bank_name,
+			t.bank_branch_name,
+			t.type,
+			t.isdefault,
+			t.account_img,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_account t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.account != null and map.account != ''">
+				AND t.account = #{map.account}
+			</if>
+			<if test="map.account_name != null and map.account_name != ''">
+				AND t.account_name like concat('%', #{map.account_name}, '%')
+			</if>
+			<if test="map.bank_name != null and map.bank_name != ''">
+				AND t.bank_name like concat('%', #{map.bank_name}, '%')
+			</if>
+			<if test="map.type != null and map.type != ''">
+				AND t.type = #{map.type}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+</mapper>

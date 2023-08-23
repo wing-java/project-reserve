@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('用户套餐列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								账号：<input type="text" name="sys_user_account"/>
+							</li>
+							<li>
+								UID：<input type="text" name="uid"/>
+							</li>
+							<li>
+								手机号：<input type="text" name="user_tel"/>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+	        	<!-- 操作封装：修改信息，全屏 -->
+		        <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="develop:userFeedBack:edit">
+		            <i class="fa fa-edit"></i> 修改回复
+		        </a>
+		        <!-- 表格：导出数据 -->
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:userFeedBack:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//编辑
+		var editFlag = [[${@permission.hasPermi('develop:userInfo:edit')}]];
+		//详情
+		var detailFlag = [[${@permission.hasPermi('develop:userFeedBack:detail')}]];
+		
+		//前缀路径
+		var prefix = "/develop/userFeedBack";
+		
+		//初始化方法
+		$(function() {
+		   	//查询用户意见反馈列表
+		    queryUserFeedBackList();
+		});
+
+		
+		//查询用户意见反馈列表
+		function queryUserFeedBackList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        updateUrl: prefix + "/edit/{id}",//编辑路径
+		        detailUrl: prefix + "/detail/{id}",//详情路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "意见反馈",//模块名称：用户
+		        showExport: true,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true
+				},
+				{
+					field : 'sys_user_account', 
+					title : '编号/账号/UID',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.user_id + '</a>'
+								+ '<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.sys_user_account + '</a>'
+								+'<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.uid + '</a>'
+		            }
+				},
+				{
+					field : 'feedback_title', 
+					title : '反馈标题'
+				},
+				{
+					field : 'feedback_content', 
+					title : '反馈内容',
+					align: 'center',
+				  	formatter: function(value, row, index) {
+				      	return $.table.tooltip(value);
+				  	}
+				},
+				{
+		            field: 'feedback_img',
+		            title: '反馈图片',
+		            formatter: function(value, row, index) {
+		            	if(value != null && value != ""){
+		            		var imgs = value.split(",");
+			            	var imgResult = "";
+			            	for(var i=0;i<imgs.length;i++){
+			            		imgResult = imgResult + $.table.imageView(qiniu_domain+imgs[i]);
+			            	}
+			            	return imgResult;
+		            	}
+					}
+		        },
+				{
+					field : 'contact_way', 
+					title : '联系方式'
+				},
+				{
+					field : 'feedback_answer', 
+					title : '反馈回复',
+					align: 'center',
+				  	formatter: function(value, row, index) {
+				      	return $.table.tooltip(value);
+				  	}
+				},
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	//事件数组
+		            	var actions = [];
+		            	//编辑按钮：修改信息 全屏
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+		            	//详情按钮
+		            	actions.push('<a class="btn btn-warning btn-xs ' + detailFlag + '" href="#" onclick="detail(\'' + row.id + '\')"><i class="fa fa-search"></i>详细</a>');
+		                return actions.join('');
+		            }
+		        }]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+		
+		
+		/* 查询意见反馈详情 */
+		function detail(id){
+			var url = prefix + '/detail/'+id;
+		    //打开新的弹出层，对应弹出层名称，URL，长宽大小
+		   	$.modal.openTab("反馈详情", url);
+		}
+	</script>
+</body>
+</html>

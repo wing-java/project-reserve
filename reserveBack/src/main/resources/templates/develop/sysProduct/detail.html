@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('商品详情')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+				<form class="form-horizontal m" >
+					
+					<h3>商品基本信息</h3>
+					<div class="form-group">
+						<label class="col-sm-1 control-label">商品名称：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="hidden" id="goods_show" th:value="${sysProduct.goods_show}" readonly="readonly" >
+							<input class="form-control" type="hidden" id="goods_navigation" th:value="${sysProduct.goods_navigation}" readonly="readonly" >
+							<input class="form-control" type="hidden" id="goods_describe" th:value="${sysProduct.goods_describe}" readonly="readonly" >
+						
+							<input class="form-control" type="text" th:value="${sysProduct.goods_name}" readonly="readonly">
+						</div>
+<!-- 						<label class="col-sm-1 control-label">商品分类：</label> -->
+<!-- 						<div class="col-sm-3"> -->
+<!-- 							<input class="form-control" type="text" th:value="${sysProduct.category_name}" readonly="readonly"> -->
+<!-- 						</div> -->
+						<label class="col-sm-1 control-label">交易价：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${sysProduct.goods_price}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">股权数量：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${sysProduct.sharestock_num}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">库存：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${sysProduct.goods_stock_num}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">销量：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${sysProduct.goods_sales_num}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">商品状态：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${@dict.getLabel('goods_info_goods_status',sysProduct.goods_status)}" disabled="disabled">
+						</div>
+						<label class="col-sm-1 control-label">删除状态：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${@dict.getLabel('sys_all_table_del',sysProduct.del_status)}" disabled="disabled">
+						</div>
+						<label class="col-sm-1 control-label">创建时间：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${sysProduct.cre_date}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label" th:if="${sysProduct.up_date!=null and sysProduct.up_date!=''}" >更新时间：</label>
+						<div class="col-sm-3" th:if="${sysProduct.up_date!=null and sysProduct.up_date!=''}" >
+							<input class="form-control" type="text" th:value="${sysProduct.up_date}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label" th:if="${sysProduct.remark!=null and sysProduct.remark!=''}">操作备注：</label>
+						<div class="col-sm-3" th:if="${sysProduct.remark!=null and sysProduct.remark!=''}">
+							<input class="form-control" type="text" th:value="${sysProduct.remark}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label" th:if="${sysProduct.update_by!=null and sysProduct.update_by!=''}">更新人：</label>
+						<div class="col-sm-3" th:if="${sysProduct.update_by!=null and sysProduct.update_by!=''}">
+							<input class="form-control" type="text" th:value="${sysProduct.update_by}" readonly="readonly">
+						</div> 
+					</div>
+					<div class="form-group"> 
+			        	<label class="col-sm-1 control-label">商品展示图：</label>  
+			            <div class="col-sm-11">
+			                <div class="ibox float-e-margins">
+			                    <div class="ibox-content">
+			                        <div class="form-group">
+				                        <div class="file-loading">
+								            <input id="fileinput-demo-goods_show" name="file"  type="file"  >
+								        </div>
+			                        </div>
+			                    </div>
+			                </div>
+			            </div>
+			       	</div>
+			       	<div class="form-group"> 
+			        	<label class="col-sm-1 control-label">商品导航图：</label>  
+			            <div class="col-sm-11">
+			                <div class="ibox float-e-margins">
+			                    <div class="ibox-content">
+			                        <div class="form-group">
+				                        <div class="file-loading">
+								            <input id="fileinput-demo-goods_navigation" name="file"  type="file"  >
+								        </div>
+			                        </div>
+			                    </div>
+			                </div>
+			            </div>
+			       	</div>
+			       	<div class="form-group"> 
+			        	<label class="col-sm-1 control-label">商品描述图：</label>  
+			            <div class="col-sm-11">
+			                <div class="ibox float-e-margins">
+			                    <div class="ibox-content">
+			                        <div class="form-group">
+				                        <div class="file-loading">
+								            <input id="fileinput-demo-goods_describe" name="file"  type="file"  >
+								        </div>
+			                        </div>
+			                    </div>
+			                </div>
+			            </div>
+			       	</div>
+			   	</form>
+			</div>
+			
+		</div>
+		
+	</div>
+	
+	
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: bootstrap-fileinput-js" />
+	<script th:inline="javascript">
+		//初始化方法
+		$(function() {
+			//初始化图片信息
+			inintPhoto();
+		});
+		
+		//初始化图片信息
+		function inintPhoto(){
+			//商品展示图
+			var goods_show_data_preview = [];
+			getHaveSetPhotoArrayView(goods_show_data_preview, $("#goods_show").val());
+			initFileInputDetail(goods_show_data_preview, "goods_show", 1);
+			
+			//商品导航图
+			var goods_navigation_data_preview = [];
+			getHaveSetPhotoArrayView(goods_navigation_data_preview, $("#goods_navigation").val());
+			initFileInputDetail(goods_navigation_data_preview, "goods_navigation", 6);
+			
+			//商品描述图
+			var goods_describe_data_preview = [];
+			getHaveSetPhotoArrayView(goods_describe_data_preview, $("#goods_describe").val());
+			initFileInputDetail(goods_describe_data_preview, "goods_describe", 15);
+		}
+	</script>
+
+</body>
+
+</html>

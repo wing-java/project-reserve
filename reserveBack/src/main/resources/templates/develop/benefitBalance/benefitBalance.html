@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('余额流水列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								订单号：<input type="text" name="order_id"/>
+							</li>
+							<li>
+								账号：<input type="text" name="sys_user_account" id="sys_user_account" />
+							</li>
+							<li>
+								UID：<input type="text" name="uid" id="uid" />
+							</li>
+							<li>
+								手机号：<input type="text" name="user_tel" id="user_tel" />
+							</li>
+							<li id="op_type_name">
+							
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+		        <!-- 表格：导出数据 -->
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:benefitBalance:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//详情
+		var detailFlag = [[${@permission.hasPermi('develop:benefitDeposit:detail')}]];
+		
+		//前缀路径
+		var prefix = "/develop/benefitBalance";
+		
+		//初始化方法
+		$(function() {
+			//初始化业务类型
+			initOpType();
+		   	//查询余额钱包流水列表
+		    queryBenefitBalanceList();
+		});
+
+		
+		//查询余额钱包流水列表
+		function queryBenefitBalanceList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "余额流水",//模块名称：用户
+		        showExport: true,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true
+				},
+				{
+					field : 'order_id', 
+					title : '订单号'
+				},
+				{
+					field : 'user_id', 
+					title : '用户编号',
+					sortable: true,
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + value + '</a>';
+		            }
+				},
+		        {
+					field : 'sys_user_account', 
+					title : '账号',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + value + '</a>';
+		            }
+				},
+				{
+					field : 'uid', 
+					title : 'UID',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + value + '</a>';
+		            }
+				},
+				{
+					field : 'user_tel', 
+					title : '验证账户',
+					formatter: function(value, row, index) {
+						if(row.register_type=='1'){
+							 return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.user_tel + '</a>';
+						}if(row.register_type=='2'){
+							 return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.user_email + '</a>';
+						}else{
+							return '无';
+						}
+		            }
+				},
+				{
+					field : 'op_type', 
+					title : '业务编号'
+				},
+				{
+					field : 'op_name', 
+					title : '业务名称'
+				},
+				{
+					field : 'before_num', 
+					title : '变动前数量'
+				},
+				{
+					field : 'num', 
+					title : '变动数量'
+				},
+				{
+					field : 'after_num', 
+					title : '变动后数量'
+				},
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				}]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+		
+		
+		//初始化操作类型
+		function initOpType(){
+			//查询相应的业务类型列表
+			$.ajax({
+				cache : true,
+				type : "post",
+				url : "/develop/sysBenefitName/getBenefitTypeList",
+				data : {
+					purse_type : '01'
+				},
+				async : false,
+				error : function(request) {
+					parent.layer.alert("网络超时");
+				},
+				success : function(data) {
+					var obj='业务类型：<select name="op_type" ><option value="">所有</option>';
+					for(var i=0;i<data.length;i++){
+						obj=obj+'<option value='+data[i].op_type+'>'+data[i].op_name+'</option>';
+					}
+					obj=obj+"</select>";
+					$("#op_type_name").append(obj);
+				}
+			});
+		}
+		
+		
+		//查看流水详情
+		function benefitDetail(order_id, op_type, op_name) {
+		    var url = '/develop/benefitDeposit/benefitDetail?order_id='+order_id+'&op_type='+op_type+'&op_name='+op_name;
+		    //打开新的弹出层，对应弹出层名称，URL，长宽大小
+		    $.modal.openFull("流水详情", url);
+		}
+		
+	</script>
+</body>
+</html>

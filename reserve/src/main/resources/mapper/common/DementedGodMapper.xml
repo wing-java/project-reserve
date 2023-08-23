@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.common.DementedGodMapper">
+
+	<!-- 保存狂神记录 -->
+	<insert id="insertDementedGodTrade" parameterType="java.util.Map">
+		insert into t_user_trade_demented_god
+		(
+			user_id,
+			mch_id,
+			out_trade_no,
+			channel,
+			amount,
+			oper_type,
+			sys_order_no,
+			notify_url,
+			recharge_url,
+		 	body,
+			user_ip,
+			cre_date,
+			cre_time
+		)
+		values
+		(
+			#{map.user_id},
+			#{map.mchid},
+			#{map.out_trade_no},
+			#{map.channel},
+			#{map.amount},
+			#{map.oper_type},
+			#{map.sys_order_no},
+			#{map.notify_url},
+			#{map.recharge_url},
+			#{map.body},
+			#{map.user_ip},
+			#{map.cre_date},
+			#{map.cre_time}
+		)
+	</insert>
+	
+	<!-- 查询狂神支付订单 -->
+	<select id="getDementedGodTradeByOrderNo" parameterType="java.lang.String" resultType="java.util.Map">
+		select * from t_user_trade_demented_god where out_trade_no = #{out_trade_no}
+	</select>
+	
+	<!-- 更新订单状态 -->
+	<update id="updateOrderStatus" parameterType="java.util.Map">
+		update t_user_trade_demented_god
+		   set status = #{map.status},
+		   	   pay_datetime = #{map.pay_datetime},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where id = #{map.id}
+	</update>
+	
+	<!-- 更新充值订单状态 -->
+	<update id="updateRechargeOrderStatus" parameterType="java.util.Map">
+		update t_user_recharge_online
+		   set status = #{map.new_status},
+		   	   up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where order_no = #{map.order_no}
+		   and status = #{map.old_status}
+	</update>
+
+</mapper>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('用户身份信息认证失败')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<base th:href="${#request.getContextPath()}+'/'">
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	
+	<h3 style="text-align: center;margin-top: 20%" th:text="${error_msg}" ></h3><br>
+	
+</div>
+<th:block th:include="include :: footer" />
+
+
+</body>
+
+</html>

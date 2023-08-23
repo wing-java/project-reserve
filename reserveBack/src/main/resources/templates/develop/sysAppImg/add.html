@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增轮播广告')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-sysAppImg-add">
+		
+		<div class="form-group">
+            <label class="col-sm-1 control-label">海报类型：</label>
+            <div class="col-sm-10">
+            	<input type="hidden" name="img_url" id="img_url" readonly="readonly">
+                <div class="input-group" style="width: 100%">
+             		<select name="img_type" class="form-control m-b" th:with="type=${@dict.getType('sys_app_img_img_type')}">
+            			<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+        			</select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group"> 
+        	<label class="col-sm-1 control-label ">轮播图片：</label>  
+            <div class="col-sm-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+	                        <div class="file-loading">
+	                        	<input id="fileinput-demo-img_url" name="file"  type="file" >
+					        </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+       	</div>
+       	
+<!--        	<div class="form-group"> -->
+<!-- 			<label class="col-sm-1 control-label">公告编号：</label> -->
+<!-- 			<div class="col-sm-10"> -->
+<!-- 				<textarea class="form-control" rows="5" name="img_link" id="img_link" placeholder="请输入图片链接" ></textarea> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+		
+		<div class="form-group">
+			<label class="col-sm-1 control-label">排序：</label>
+			<div class="col-sm-10">
+				<input class="form-control" type="text" name="order_num" id="order_num" >
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-1 control-label">备注说明：</label>
+			<div class="col-sm-10">
+				<textarea class="form-control" name="note" id="note" placeholder="请输入备注说明" ></textarea>
+			</div>
+		</div>
+		
+	</form>
+</div>
+
+<div class="row">
+	<div class="col-sm-offset-5 col-sm-10">
+	    <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+	    <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+	</div>
+</div>
+
+
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-fileinput-js" />
+
+<script th:inline="javascript">
+var img_url_array = new Array();
+
+$("#form-sysAppImg-add").validate({
+	rules:{
+		img_type:{
+			required:true
+		},
+		/* img_link:{
+			required:true
+		}, */
+      	order_num: {
+	        required: true
+      	}
+	},
+	messages: {
+		img_type: {
+            required: "请选择图片类型"
+        },
+        /* img_link: {
+            required: "请输入图片链接"
+        }, */
+        order_num: {
+            required: "请输入排序"
+        }
+ 	},
+	focusCleanup: true
+});
+
+
+function submitHandler() {
+	if ($.validate.form()) {
+		if(img_url_array.length==0){
+			layer.msg("请选择并上传图片",{icon:5,time : 1000});
+			return;
+		}else{
+			$("#img_url").val(getArrayPhotoUrls(img_url_array));
+			$.operate.saveTab("/develop/sysAppImg/add", $('#form-sysAppImg-add').serialize());
+		} 
+   	}
+}
+
+
+$(document).ready(function () {
+	//APP图片
+	initFileInputAdd("img_url",img_url_array,"支持单图片拖拽上传<br>建议图片格式：jpg<br>头部轮播：750*316<br>精选、兑换、免单轮播：750*270<br>分类轮播：558*236",1);
+});
+
+</script>
+</body>
+</html>

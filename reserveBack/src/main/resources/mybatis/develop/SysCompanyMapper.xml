@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ruoyi.project.develop.param.mapper.SysCompanyMapper">
+
+	<!-- 查询公司简介列表 -->
+	<select id="getSysCompanyList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			company_name,
+			company_logo,
+			company_size,
+			company_address,
+			company_profile,
+			company_photos,
+			remark,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_company
+	</select>
+	
+	
+	<!-- 导出快递信息 -->
+	<select id="selectSysCompanyList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.param.domain.SysCompany" >
+		SELECT
+			id,
+			company_name,
+			company_logo,
+			company_size,
+			company_address,
+			company_profile,
+			company_photos,
+			remark,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_company
+	</select>
+	
+	
+	<!-- 根据参数id查询版本详情 -->
+	<select id="getSysCompanyById" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+			id,
+			company_name,
+			company_logo,
+			company_size,
+			company_address,
+			company_profile,
+			company_photos,
+			remark,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_company
+		where id=#{company_id}
+	</select>
+	
+	
+	<!-- 更新公司简介 -->
+	<update id="updateSysCompany" parameterType="java.util.Map" >
+		update t_sys_company
+ 		set
+ 			company_name = #{map.company_name},
+ 			company_logo = #{map.company_logo},
+ 			company_size = #{map.company_size},
+ 			company_address = #{map.company_address},
+ 			company_profile = #{map.company_profile},
+ 			company_photos = #{map.company_photos},
+ 			remark = #{map.remark},
+ 			up_date = #{map.up_date},
+ 			up_time = #{map.up_time},
+ 			update_by = #{map.update_by}
+ 		where id=#{map.company_id}
+	</update>
+	
+    
+</mapper>

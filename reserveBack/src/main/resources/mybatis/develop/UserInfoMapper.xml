@@ -1,0 +1,1158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.user.mapper.UserInfoMapper">
+
+	<!-- 查询用户信息列表 -->
+	<select id="getUserInfoList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.sys_user_account,
+			t.uid,
+			t.uid2,
+			t.register_type,
+			t.user_tel,
+			t.user_email,
+			t.head_photo,
+			t.status,
+			t.referer_id,
+			t.referer_num,
+			t.under_num,
+			t.algebra,
+			t.parent_chain,
+			t.device_type,
+			t.device_no,
+			t.version_no,
+			t.app_version,
+			t.task_status,
+			t.person_performance,
+			t.team_performance,
+			t.is_valid,
+			t.nick_name,
+			t.auth_status,
+			
+			w.balance_num,
+			w.sharestock_num,
+			w.total_benefit,
+			
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.register_type AS referer_register_type,
+			t1.sys_user_account AS referer_sys_user_account,
+			t1.uid AS referer_uid,
+			t1.user_tel AS referer_user_tel,
+			t1.user_email AS referer_user_email
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		LEFT JOIN t_user_info t1 ON t.referer_id = t1.id
+		<where>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t1.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t1.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t.parent_chain) or t.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 统计用户信息 -->
+	<select id="summaryUserInfoList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			IFNULL(sum(w.balance_num),0.00) AS sum_balance_num,
+			IFNULL(sum(w.sharestock_num),0.00) AS sum_sharestock_num,
+			IFNULL(sum(w.total_benefit),0.00) AS sum_total_benefit
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		LEFT JOIN t_user_info t1 ON t.referer_id = t1.id
+		<where>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t1.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t1.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t.parent_chain) or t.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 导出用户信息 -->
+	<select id="selectUserInfoList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.user.domain.UserInfo" >
+		SELECT
+			t.id,
+			t.sys_user_account,
+			t.uid,
+			t.uid2,
+			t.register_type,
+			t.user_tel,
+			t.user_email,
+			t.head_photo,
+			t.status,
+			t.referer_id,
+			t.referer_num,
+			t.under_num,
+			t.algebra,
+			t.parent_chain,
+			t.device_type,
+			t.device_no,
+			t.version_no,
+			t.app_version,
+			t.task_status,
+			t.person_performance,
+			t.team_performance,
+			t.is_valid,
+			t.nick_name,
+			t.auth_status,
+			
+			w.balance_num,
+			w.sharestock_num,
+			w.total_benefit,
+			
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.register_type AS referer_register_type,
+			t1.sys_user_account AS referer_sys_user_account,
+			t1.uid AS referer_uid,
+			t1.user_tel AS referer_user_tel,
+			t1.user_email AS referer_user_email
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		LEFT JOIN t_user_info t1 ON t.referer_id = t1.id
+		<where>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t1.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t1.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t.parent_chain) or t.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 查询父级团队成员列表 -->
+	<select id="getParentUserInfoList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t1.algebra - t.algebra AS rank,
+			t.id,
+			t.sys_user_account,
+			t.uid,
+			t.uid2,
+			t.register_type,
+			t.user_tel,
+			t.user_email,
+			t.nick_name,
+			t.head_photo,
+			t.status,
+			t.referer_id,
+			t.referer_num,
+			t.under_num,
+			t.algebra,
+			t.parent_chain,
+			t.device_type,
+			t.device_no,
+			t.version_no,
+			t.app_version,
+			t.task_status,
+			t.person_performance,
+			t.team_performance,
+			
+			w.balance_num,
+			w.sharestock_num,
+			w.total_benefit,
+			
+			
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t2.register_type AS referer_register_type,
+			t2.sys_user_account AS referer_sys_user_account,
+			t2.uid AS referer_uid,
+			t2.user_tel AS referer_user_tel,
+			t2.user_email AS referer_user_email,
+			t2.nick_name AS referer_nick_name
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		LEFT JOIN t_user_info t1 ON FIND_IN_SET(t.id, t1.parent_chain)
+		LEFT JOIN t_user_info t2 ON t.referer_id = t2.id
+		<where>
+			t1.id = #{map.user_id}
+			<if test="map.rank != null and map.rank != ''"> 
+				AND t1.algebra - t.algebra = #{map.rank} 
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t2.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t2.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t2.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		order by rank
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 导出父级团队成员列表 -->
+	<select id="selectParentUserInfoList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.user.domain.UserInfo" >
+		SELECT
+			t1.algebra - t.algebra AS rank,
+			t.id,
+			t.sys_user_account,
+			t.uid,
+			t.uid2,
+			t.register_type,
+			t.user_tel,
+			t.user_email,
+			t.nick_name,
+			t.head_photo,
+			t.status,
+			t.referer_id,
+			t.referer_num,
+			t.under_num,
+			t.algebra,
+			t.parent_chain,
+			t.device_type,
+			t.device_no,
+			t.version_no,
+			t.app_version,
+			t.task_status,
+			t.person_performance,
+			t.team_performance,
+			
+			w.balance_num,
+			w.sharestock_num,
+			w.total_benefit,
+			
+			
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t2.register_type AS referer_register_type,
+			t2.sys_user_account AS referer_sys_user_account,
+			t2.uid AS referer_uid,
+			t2.user_tel AS referer_user_tel,
+			t2.user_email AS referer_user_email,
+			t2.nick_name AS referer_nick_name
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		LEFT JOIN t_user_info t1 ON FIND_IN_SET(t.id, t1.parent_chain)
+		LEFT JOIN t_user_info t2 ON t.referer_id = t2.id
+		<where>
+			t1.id = #{map.user_id}
+			<if test="map.rank != null and map.rank != ''"> 
+				AND t1.algebra - t.algebra = #{map.rank} 
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t2.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t2.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t2.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		order by rank
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 统计父级成员数据信息 -->
+	<select id="summaryParentUserInfoList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			IFNULL(sum(w.balance_num),0.00) AS sum_balance_num,
+			IFNULL(sum(w.sharestock_num),0.00) AS sum_sharestock_num,
+			IFNULL(sum(w.total_benefit),0.00) AS sum_total_benefit
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		LEFT JOIN t_user_info t1 ON FIND_IN_SET(t.id, t1.parent_chain)
+		LEFT JOIN t_user_info t2 ON t.referer_id = t2.id
+		<where>
+			t1.id = #{map.user_id}
+			<if test="map.rank != null and map.rank != ''"> 
+				AND t1.algebra - t.algebra = #{map.rank} 
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.agent_type != null and map.agent_type != ''">
+				AND t.agent_type = #{map.agent_type}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t2.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t2.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t2.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+	</select>
+	
+	
+	
+	<!-- 查询伞下成员列表 -->
+	<select id="getChildrenUserList" resultType="java.util.Map" parameterType="java.util.Map">
+		SELECT
+			t1.algebra - t.algebra AS rank,
+			t.id,
+			t.sys_user_account,
+			t.uid,
+			t.uid2,
+			t.register_type,
+			t.user_tel,
+			t.user_email,
+			t.nick_name,
+			t.head_photo,
+			t.status,
+			t.referer_id,
+			t.referer_num,
+			t.under_num,
+			t.algebra,
+			t.parent_chain,
+			t.device_type,
+			t.device_no,
+			t.version_no,
+			t.app_version,
+			t.task_status,
+			t.person_performance,
+			t.team_performance,
+			
+			w.balance_num,
+			w.sharestock_num,
+			w.total_benefit,
+			
+			
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t2.register_type AS referer_register_type,
+			t2.sys_user_account AS referer_sys_user_account,
+			t2.uid AS referer_uid,
+			t2.user_tel AS referer_user_tel,
+			t2.user_email AS referer_user_email,
+			t2.nick_name AS referer_nick_name
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_info t1 ON FIND_IN_SET(t1.id, t.parent_chain)
+		LEFT JOIN t_user_info t2 ON t.referer_id = t2.id
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		<where>
+			t1.id = #{map.user_id}
+			<if test="map.rank != null and map.rank != ''"> 
+				AND t1.algebra - t.algebra = #{map.rank} 
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t2.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t2.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t2.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		order by rank
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 导出伞下成员列表 -->
+	<select id="selectChildrenUserInfoList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.user.domain.UserInfo" >
+		SELECT
+			t1.algebra - t.algebra AS rank,
+			t.id,
+			t.sys_user_account,
+			t.uid,
+			t.uid2,
+			t.register_type,
+			t.user_tel,
+			t.user_email,
+			t.nick_name,
+			t.head_photo,
+			t.status,
+			t.referer_id,
+			t.referer_num,
+			t.under_num,
+			t.algebra,
+			t.parent_chain,
+			t.device_type,
+			t.device_no,
+			t.version_no,
+			t.app_version,
+			t.task_status,
+			t.person_performance,
+			t.team_performance,
+			t.is_valid,
+			
+			w.balance_num,
+			w.sharestock_num,
+			w.total_benefit,
+			
+			
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t2.register_type AS referer_register_type,
+			t2.sys_user_account AS referer_sys_user_account,
+			t2.uid AS referer_uid,
+			t2.user_tel AS referer_user_tel,
+			t2.user_email AS referer_user_email,
+			t2.nick_name AS referer_nick_name
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		LEFT JOIN t_user_info t1 ON FIND_IN_SET(t1.id, t.parent_chain)
+		LEFT JOIN t_user_info t2 ON t.referer_id = t2.id
+		<where>
+			t1.id = #{map.user_id}
+			<if test="map.rank != null and map.rank != ''"> 
+				AND t1.algebra - t.algebra = #{map.rank} 
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t2.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t2.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t2.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		order by rank
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 统计子级成员数据信息 -->
+	<select id="summaryChildrenUserInfoList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			IFNULL(sum(w.balance_num),0.00) AS sum_balance_num,
+			IFNULL(sum(w.sharestock_num),0.00) AS sum_sharestock_num,
+			IFNULL(sum(w.total_benefit),0.00) AS sum_total_benefit
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+			LEFT JOIN t_user_info t1 ON FIND_IN_SET(t1.id, t.parent_chain)
+			LEFT JOIN t_user_info t2 ON t.referer_id = t2.id
+		<where>
+			t1.id = #{map.user_id}
+			<if test="map.rank != null and map.rank != ''"> 
+				AND t1.algebra - t.algebra = #{map.rank} 
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				t.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t.uid = #{map.uid}
+			</if>
+			<if test="map.uid2 != null and map.uid2 != ''">
+				AND t.uid2 = #{map.uid2}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t.register_type = #{map.register_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.task_status != null and map.task_status != ''">
+				AND t.task_status = #{map.task_status}
+			</if>
+			<if test="map.referer_sys_user_account != null and map.referer_sys_user_account != ''">
+				AND t2.sys_user_account = #{map.referer_sys_user_account}
+			</if>
+			<if test="map.referer_user_tel != null and map.referer_user_tel != ''">
+				AND t2.user_tel like concat('%', #{map.referer_user_tel}, '%')
+			</if>
+			<if test="map.referer_user_email != null and map.referer_user_email != ''">
+				AND t2.user_email like concat('%', #{map.referer_user_email}, '%')
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+	</select>
+	
+	
+	
+	
+	<!-- 更新用户状态 -->
+	<update id="updateUserStatus"  parameterType="java.util.Map" >
+		update t_user_info set status=#{map.new_status},remark=#{map.remark}
+		where id=#{map.user_id} and status=#{map.old_status}
+	</update>
+	<!-- 记录冻结账号 -->
+	<insert id="addFrozeUser"  parameterType="java.util.Map" >
+		insert into t_user_frozen (user_id,cre_date,cre_time,remark)
+			values (#{map.user_id},#{map.cre_date},#{map.cre_time},#{map.remark})
+	</insert>
+	<!-- 删除冻结账号 -->
+	<delete id="deleteFrozeUser" parameterType="java.util.Map" >
+		delete from t_user_frozen where user_id=#{map.user_id}
+	</delete>
+	
+	
+	<!-- 根据用户id查询用户详情 -->
+	<select id="getUserInfoById" parameterType="java.lang.String" resultType="com.ruoyi.project.develop.user.domain.UserInfo" >
+		SELECT
+			t.id,
+			t.sys_user_account,
+			t.uid,
+			t.uid2,
+			t.register_type,
+			t.user_tel,
+			t.user_email,
+			t.nick_name,
+			t.head_photo,
+			t.status,
+			t.referer_id,
+			t.referer_num,
+			t.under_num,
+			t.algebra,
+			t.parent_chain,
+			t.device_type,
+			t.device_no,
+			t.version_no,
+			t.app_version,
+			t.task_status,
+			t.person_performance,
+			t.team_performance,
+			t.is_valid,
+			
+			w.balance_num,
+			w.sharestock_num,
+			w.total_benefit,
+			
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.register_type AS referer_register_type,
+			t1.sys_user_account AS referer_sys_user_account,
+			t1.uid AS referer_uid,
+			t1.user_tel AS referer_user_tel,
+			t1.user_email AS referer_user_email,
+			t1.nick_name AS referer_nick_name
+		FROM
+			t_user_info t
+		LEFT JOIN t_user_wallet w ON t.id = w.user_id
+		LEFT JOIN t_user_info t1 ON t.referer_id = t1.id
+		where t.id=#{user_id}
+	</select>
+	<!-- 查询用户基础信息放入缓存 -->
+	<select id="getRealUserInfoById" parameterType="java.lang.String" resultType="java.util.Map">
+		select 
+			   *
+		  from t_user_info 
+		 where id = #{user_id}
+	</select>
+	<!-- 根据手机号码查询用户信息 -->
+	<select id="getUserByUserTel" parameterType="java.util.Map" resultType="java.util.Map" >
+		select * from t_user_info 
+		<where>
+			user_tel=#{map.user_tel} and register_type=1
+			<if test="map.check != null and map.check != ''">
+				AND id != #{map.user_id}
+			</if>
+		</where>
+	</select>
+	<!-- 根据邮箱查询用户信息 -->
+	<select id="getUserByUserEmail" parameterType="java.util.Map" resultType="java.util.Map" >
+		select * from t_user_info
+		<where>
+			user_email=#{map.user_email} and register_type=2
+			<if test="map.check != null and map.check != ''">
+				AND id != #{map.user_id}
+			</if>
+		</where>
+	</select>
+	<!-- 根据id查询用户信息 -->
+	<select id="getUserMapById" parameterType="java.lang.String" resultType="java.util.Map" >
+		select * from t_user_info where id=#{user_id}
+	</select>
+	<!-- 根据用户账号查询用户信息 -->
+	<select id="getUserMapBySysUserAccount" parameterType="java.lang.String" resultType="java.util.Map" >
+		select * from t_user_info where sys_user_account=#{sys_user_account}
+	</select>
+	<!-- 查询该手机号注册人数 -->
+	<select id="getRegisterNumByUserTel" parameterType="java.lang.String" resultType="java.lang.Integer" >
+		select count(*) from t_user_info where user_tel=#{user_tel}
+	</select>
+	<!-- 查询该邮箱注册人数 -->
+	<select id="getRegisterNumByUserEmail" parameterType="java.lang.String" resultType="java.lang.Integer" >
+		select count(*) from t_user_info where user_email=#{user_email}
+	</select>
+	
+	
+	<!-- 更新用户信息 -->
+	<update id="updateUserInfo" parameterType="java.util.Map" >
+		update t_user_info set 
+		<if test="map.login_password != null and map.login_password != ''">
+			login_password = #{map.login_password},
+		</if>
+		<if test="map.pay_password != null and map.pay_password != ''">
+			pay_password = #{map.pay_password},
+		</if>
+		<if test="map.register_type != null and map.register_type != '' " >
+      		register_type = #{map.register_type},
+      	</if>
+      	<if test="map.sys_user_account != null and map.sys_user_account != '' " >
+      		sys_user_account = #{map.sys_user_account},
+      	</if>
+      	<if test="map.user_tel != null and map.user_tel != '' " >
+      		user_tel = #{map.user_tel},
+      	</if>
+      	<if test="map.user_email != null and map.user_email != '' " >
+      		user_email = #{map.user_email},
+      	</if>
+		<if test="map.remark != null and map.remark != ''">
+			remark = #{map.remark},
+		</if>
+		<if test="map.uid != null and map.uid != '' " >
+	      	uid = #{map.uid},
+	    </if>
+	    <if test="map.uid2 != null and map.uid2 != '' " >
+	      	uid2 = #{map.uid2},
+	    </if>
+		<if test="map.up_date != null and map.up_date != ''">
+			up_date = #{map.up_date},
+		</if>
+		<if test="map.up_time != null and map.up_time != ''">
+			up_time = #{map.up_time}
+		</if>
+		where id=#{map.user_id}
+	</update>
+
+
+	
+	<!-- 更新用户钱包信息 -->
+	<update id="updateUserWallet" parameterType="java.util.Map" >
+		update t_user_wallet set 
+			<if test="map.balance_num != null and map.balance_num != '' " >balance_num=balance_num+#{map.balance_num},</if>
+			<if test="map.sharestock_num != null and map.sharestock_num != '' " >sharestock_num=score_num+#{map.sharestock_num},</if>
+			<if test="map.total_benefit != null and map.total_benefit != '' " >total_benefit=total_benefit+#{map.total_benefit},</if>
+			op_order_no=#{map.op_order_no},
+			op_type=#{map.op_type},
+			up_date=#{map.cre_date},
+			up_time=#{map.cre_time}
+		where user_id=#{map.user_id} 
+			<if test="map.balance_num != null and map.balance_num != '' " >and balance_num+#{map.balance_num}>=0</if>
+			<if test="map.sharestock_num != null and map.sharestock_num != '' " >and sharestock_num+#{map.sharestock_num}>=0</if>
+			<if test="map.total_benefit != null and map.total_benefit != '' " >and total_benefit+#{map.total_benefit}>=0</if>
+	</update>
+	
+
+	<!-- 实时统计用户注册信息 -->
+	<select id="getSummaryUserRegisterList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			COUNT(*) AS register_num,
+			cre_date
+		FROM
+			t_user_info
+		<where>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		GROUP BY cre_date
+		order by cre_date DESC
+	</select>
+	<!-- 用户每日注册量统计 -->
+	<select id="getUserRegisterList" resultType="java.util.Map" >
+		SELECT
+			cre_date,
+			count(*) AS register_num
+		FROM
+			t_user_info
+		GROUP BY
+			cre_date
+		ORDER BY
+			cre_date
+	</select>
+	<!-- 导出实时统计用户注册信息 -->
+	<select id="selectSummaryUserRegisterList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.statistics.domain.SummaryUserRegisterEvery">
+		SELECT
+			COUNT(*) AS register_num,
+			cre_date
+		FROM
+			t_user_info
+		<where>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		GROUP BY cre_date
+		order by cre_date DESC
+	</select>
+	<!-- 平台钱包信息统计 -->
+	<select id="getPlatformPurseInfo" resultType="java.util.Map" >
+		SELECT
+			IFNULL(sum(balance_num),0.00) AS total_balance_num,
+			IFNULL(sum(sharestock_num),0.00) AS total_sharestock_num,
+			IFNULL(sum(total_benefit),0.00) AS total_total_benefit
+		FROM
+			t_user_wallet
+	</select>
+	
+	<!-- 查询用户列表 -->
+	<select id="getUserInfoListByParam" resultType="java.util.Map" >
+		select * from t_user_info
+	</select>
+	
+	<!-- 查询推广码使用人数 -->
+	<select id="getRegisterNumByUid" parameterType="java.util.Map" resultType="int">
+		select count(1) from t_user_info where id &lt;&gt; #{map.id} and uid = #{map.uid}
+	</select>
+	
+	
+	<!-- 更新直推和伞下人数 -->
+	<update id="updateUserReferUnderNum" parameterType="java.util.Map">
+		update t_user_info
+		   set referer_num = referer_num + #{map.refer_num},
+		       under_num = under_num + #{map.under_num}
+		 where id = #{map.user_id}
+	</update>
+	
+	<!-- 更新推荐信息 -->
+	<update id="updateUserReferInfo" parameterType="java.util.Map">
+		update t_user_info
+		   set referer_id = #{map.referer_id},
+		       algebra = algebra + #{map.algebra},
+		       parent_chain = #{map.parent_chain}
+		 where id = #{map.user_id}
+	</update>
+	
+	<!-- 查询当前用户伞下成员 -->
+	<select id="getUnderUserList" parameterType="java.lang.String" resultType="java.util.Map">
+		select
+			*
+		from t_user_info
+		where find_in_set(#{user_id},parent_chain)
+	</select>
+	
+	<!-- 查询父级链成员 -->
+	<select id="getParentChainUserList" parameterType="java.lang.String" resultType="java.util.Map">
+		select
+			*
+		from t_user_info
+		where find_in_set(id, #{parent_chain})
+	</select>
+	
+	<!-- 更新用户业绩 -->
+	<update id="updateUserPerformance" parameterType="java.util.Map">
+		update t_user_info
+		   set person_performance = person_performance + #{map.person_performance},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where id = #{map.user_id}
+	</update>
+	
+	<!-- 更新父级业绩 -->
+	<update id="updateUserPerformanceParent" parameterType="java.util.Map">
+		update t_user_info
+		   set team_performance = team_performance + #{map.team_performance},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where find_in_set(id, #{map.parent_chain})
+	</update>
+	
+	<!-- 新增用户业绩 -->
+	<insert id="addUserSysPerformance" parameterType="java.util.Map">
+		insert into t_user_sys_addperformance
+		(
+			user_id,
+			person_performance,
+			cre_date,
+			cre_time,
+			remark,
+			create_by
+		)
+		values
+		(
+			#{map.user_id},
+			#{map.person_performance},
+			#{map.cre_date},
+			#{map.cre_time},
+			#{map.remark},
+			#{map.create_by}
+		)
+	</insert>
+	
+</mapper>

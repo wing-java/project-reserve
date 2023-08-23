@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('邮箱账号配置信息')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+		
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								邮箱账号：<input type="text" name="account"/>
+							</li>
+							<!-- <li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li> -->
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+		
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+		        <!-- 操作封装：添加信息 -->
+	        	<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="develop:sysEmailAccount:add">
+	                <i class="fa fa-plus"></i> 新增
+	            </a>
+	            <!-- 操作封装：修改信息 -->
+	            <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="develop:sysEmailAccount:edit">
+		            <i class="fa fa-edit"></i> 修改
+		        </a>
+		        <!-- 表格：导出数据 -->
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:sysEmailAccount:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//编辑
+		var editFlag = [[${@permission.hasPermi('develop:sysEmailAccount:edit')}]];
+		//删除
+		var removeFlag = [[${@permission.hasPermi('develop:sysEmailAccount:remove')}]];
+	
+		//前缀路径
+		var prefix = "/develop/sysEmailAccount";
+		
+		//初始化方法
+		$(function() {
+			//实时查询系统发送邮箱账号信息
+		    querySysEmailAccountList();
+		});
+
+		
+		//实时查询系统发送邮箱账号信息
+		function querySysEmailAccountList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        createUrl: prefix + "/add",//新增路径
+		        updateUrl: prefix + "/edit/{id}",//编辑路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "系统发送邮箱账号信息",//模块名称：用户
+		        showExport: true,
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	//事件数组
+		            	var actions = [];
+		            	//编辑按钮：修改信息 全屏
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.num + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+		            	actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="sysDel(\'' + row.num + '\')"><i class="fa fa-key"></i>删除</a>');
+		            	return actions.join('');
+		            }
+		        },
+		        {
+					field : 'num', 
+					title : '邮箱编号',
+					sortable: true
+				},
+				{
+					field : 'account', 
+					title : '邮箱账号'
+				},
+				{
+					field : 'password', 
+					title : '邮箱密码'
+				},
+				{
+					field : 'login_pass', 
+					title : '邮箱登录密码'
+				},
+				{
+					field : 'remark', 
+					title : '备注'
+				},
+				{
+					field : 'create_by', 
+					title : '创建者'
+				},
+				{
+					field : 'update_by', 
+					title : '更新者'
+				},
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+					field : 'up_date', 
+					title : '更新时间',
+					sortable: true
+				}]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+		
+		
+		//删除邮箱账号
+		function sysDel(num) {
+			//弹出确认层，发送post请求到后台
+			$.modal.confirm("确认要删除该邮箱账号吗？", function() {
+				$.operate.post(prefix + "/remove", { "ids": num});
+		    })
+		}
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.system.SysContractMapper">
+
+	
+	<!-- 根据类型查询系统协议合同信息 -->
+	<select id="getSysContractByType" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			contract_type,
+			contract_title,
+			contract_content
+		FROM
+			t_sys_contract_info
+		where contract_type=#{map.contract_type} 
+	</select>
+	
+</mapper>

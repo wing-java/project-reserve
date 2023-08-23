@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('余额充值详情')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			<div class="wrapper wrapper-content animated fadeInRight ibox-content" >
+				<form class="form-horizontal m" >
+					<h3>用户信息</h3>
+					<div class="form-group">
+						<label class="col-sm-1 control-label">用户编号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.user_id}" disabled="disabled" />
+						</div>
+						<label class="col-sm-1 control-label">用户账号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.sys_user_account}" disabled="disabled" />
+						</div>
+						<label class="col-sm-1 control-label">用户UID：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.uid}" disabled="disabled" />
+						</div>
+					</div>
+					
+					<br><h3>订单信息</h3>
+					<div class="form-group">
+						<label class="col-sm-1 control-label">订单编号：</label>
+						<div class="col-sm-3">
+							<input type="hidden" name="recharge_type" id="recharge_type" th:value="${userRechargeRecordDetail.userRechargeRecord.recharge_type}" >
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.id}" disabled="disabled" />
+						</div>
+						<label class="col-sm-1 control-label">订单号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.order_id}" disabled="disabled" />
+						</div>
+						<label class="col-sm-1 control-label">商户订单：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.out_trade_no}" disabled="disabled" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-1 control-label">充值数量：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.recharge_num}" disabled="disabled" />
+						</div>
+						<label class="col-sm-1 control-label">充值渠道：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${@dict.getLabel('user_recharge_record_recharge_type',userRechargeRecordDetail.userRechargeRecord.recharge_type)}" disabled="disabled">
+						</div>
+						<label class="col-sm-1 control-label">充值状态：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${@dict.getLabel('user_recharge_record_status',userRechargeRecordDetail.userRechargeRecord.status)}" disabled="disabled">
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-1 control-label">创建时间：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.cre_date}" disabled="disabled">
+						</div>
+						<label class="col-sm-1 control-label" th:if="${userRechargeRecordDetail.userRechargeRecord.up_date!=null and userRechargeRecordDetail.userRechargeRecord.up_date!=''}" >更新时间：</label>
+						<div class="col-sm-3" th:if="${userRechargeRecordDetail.userRechargeRecord.up_date!=null and userRechargeRecordDetail.userRechargeRecord.up_date!=''}" >
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecord.up_date}" readonly="readonly">
+						</div>
+					</div>
+			       	
+			       	<br><h3 th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='01'}" >支付宝支付信息</h3>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='01'}" >
+						<label class="col-sm-1 control-label">应用ID：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.app_id}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">交易状态：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.trade_status}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">交易号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.trade_no}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='01'}" >
+						<label class="col-sm-1 control-label">总金额：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.total_amount}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">描述信息：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.body}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">最晚付款：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.timeout_express}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='01'}" >
+						<label class="col-sm-1 control-label">卖支付宝：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.seller_email}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">买支付宝：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.buyer_id}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">开票金额：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.invoice_amount}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='01'}" >
+						<label class="col-sm-1 control-label">支付信息：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.fund_bill_list}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">通知类型：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.notify_type}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">实收金额：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.receipt_amount}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='01'}" >
+						<label class="col-sm-1 control-label">付款金额：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.buyer_pay_amount}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">卖支付宝号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.seller_id}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">交易付款：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.gmt_payment}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='01'}" >
+						<label class="col-sm-1 control-label">通知时间：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.notify_time}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">授权APPID：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.auth_app_id}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">买支付宝号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.buyer_logon_id}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='01'}" >
+						<label class="col-sm-1 control-label">集分宝额：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.point_amount}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">创建时间：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.cre_date}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">更新时间：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.up_date}" readonly="readonly">
+						</div>
+					</div>
+					
+					<br><h3 th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='02'}" >微信支付信息</h3>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='02'}" >
+						<label class="col-sm-1 control-label">公众号ID：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.appid}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">分配商户号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.mch_id}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">交易类型：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.trade_type}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='02'}" >
+						<label class="col-sm-1 control-label">微信订单号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.transaction_id}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">随机字符串：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.nonce_str}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">业务结果：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.result_code}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='02'}" >
+						<label class="col-sm-1 control-label">错误代码：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.err_code}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">错误代码描述：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.err_code_des}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">付款银行：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.bank_type}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='02'}" >
+						<label class="col-sm-1 control-label">用户标识：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.openid}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">货币种类：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.fee_type}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">现金支付金额：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.cash_fee}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='02'}" >
+						<label class="col-sm-1 control-label">订单金额：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.total_fee}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">支付完成时间：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.time_end}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">是否关注公众号：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.is_subscribe}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='02'}" >
+						<label class="col-sm-1 control-label">返回码：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.return_code}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">商品描述：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.body}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">终端ip：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.spbill_create_ip}" readonly="readonly">
+						</div>
+					</div>
+					<div class="form-group" th:if="${userRechargeRecordDetail.userRechargeRecord.recharge_type=='02'}" >
+						<label class="col-sm-1 control-label">预付会话标识：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.prepay_id}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">创建时间：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.cre_date}" readonly="readonly">
+						</div>
+						<label class="col-sm-1 control-label">更新时间：</label>
+						<div class="col-sm-3">
+							<input class="form-control" type="text" th:value="${userRechargeRecordDetail.userRechargeRecordPayInfo.up_date}" readonly="readonly">
+						</div>
+					</div>
+					
+			   	</form>
+			   	
+			</div>
+		</div>
+	</div>
+	
+	
+	<th:block th:include="include :: footer" />
+
+</body>
+
+</html>

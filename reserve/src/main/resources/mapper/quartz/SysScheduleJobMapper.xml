@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.longecological.mapper.quartz.ScheduleJobMapper">
+	
+	<!-- 查询所有调度任务（状态为未执行并且调度任务开启的） -->
+	<select id="selectAllScheduleJob" resultType="com.example.longecological.entity.ScheduleJob" >
+		select * from t_sys_schedule_job where carryStatus=0 and jobStatus=1
+	</select>
+	
+</mapper>

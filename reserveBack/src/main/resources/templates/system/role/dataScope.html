@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('角色数据权限')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<th:block th:include="include :: ztree-css" />
+</head>
+
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		
+		<form class="form-horizontal m" id="form-role-edit" th:object="${role}">
+			<!-- 角色id -->
+			<input id="roleId" name="roleId" type="hidden" th:field="*{roleId}"/>
+			<!-- 角色名称 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">角色名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="roleName" id="roleName" th:field="*{roleName}" readonly="true"/>
+				</div>
+			</div>
+			<!-- 权限字符 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">权限字符：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="roleKey" id="roleKey" th:field="*{roleKey}" readonly="true">
+				</div>
+			</div>
+			<!-- 数据范围 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">数据范围：</label>
+				<div class="col-sm-8">
+					<select id="dataScope" name="dataScope" class="form-control m-b">
+						<option value="1" th:field="*{dataScope}">全部数据权限</option>
+						<option value="2" th:field="*{dataScope}">自定数据权限</option>
+						<option value="3" th:field="*{dataScope}">本部门数据权限</option>
+						<option value="4" th:field="*{dataScope}">本部门及以下数据权限</option>
+					</select>
+					<span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 特殊情况下，设置为“自定数据权限”</span>
+				</div>
+			</div>
+			<!-- 数据权限=====》如果是自定义权限则显示，否则不显示 -->
+			<div class="form-group" id="authDataScope" th:style="'display:' + @{(*{dataScope=='2'} ? 'block' : 'none')} + ''">
+				<label class="col-sm-3 control-label">数据权限</label>
+				<div class="col-sm-8">
+					<div id="deptTrees" class="ztree"></div>
+				</div>
+			</div>
+		</form>
+		
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: ztree-js" />
+	
+	<script type="text/javascript">
+		/* 初始化加载角色部门（数据权限）列表树 */
+	    $(function() {
+			var url = ctx + "system/dept/roleDeptTreeData?roleId=" + $("#roleId").val();
+			var options = {
+				id: "deptTrees",//zTree 的唯一标识，初始化后，等于 用户定义的 zTree 容器的 id 属性值。
+		        url: url,
+		        //设置zTree是否可以被勾选,及勾选的参数配置
+		        check: { 
+		        	enable: true, //设置 zTree 的节点上是否显示 checkbox / radio，默认值: false
+		        	nocheckInherit: true, //当父节点设置 nocheck = true 时，设置子节点是否自动继承 nocheck = true 。[setting.check.enable = true 时生效]
+		        	chkboxType: { "Y": "ps", "N": "ps" } //勾选 checkbox 对于父子节点的关联关系。[setting.check.enable = true 且 setting.check.chkStyle = "checkbox" 时生效]
+				},
+		        expandLevel: 2
+		    };
+			//初始化树结构
+			$.tree.init(options);
+	    });
+
+		
+	  	//保存提交
+		function submitHandler() {
+			//校验通过
+	        if ($.validate.form()) {
+	        	//编辑数据权限
+	        	edit();
+	        }
+	    }
+		
+	  	
+	  	/* 编辑数据权限 */
+		function edit() {
+	  		//角色id
+			var roleId = $("input[name='roleId']").val();
+	  		//角色名称
+			var roleName = $("input[name='roleName']").val();
+	  		//权限字符
+			var roleKey = $("input[name='roleKey']").val();
+	  		//数据范围
+			var dataScope = $("#dataScope").val();
+			//获取当前被勾选集合
+            var deptIds = $.tree.getCheckedNodes();
+			$.ajax({
+				cache : true,
+				type : "POST",
+				url : ctx + "system/role/authDataScope",
+				data : {
+					"roleId": roleId,
+					"roleName": roleName,
+					"roleKey": roleKey,
+					"dataScope": dataScope,
+			        "deptIds": deptIds
+				},
+				async : false,
+				error : function(request) {
+					// 错误提示
+					$.modal.alertError("系统错误");
+				},
+				success : function(data) {
+					// 成功回调执行事件（父窗体静默更新）
+					$.operate.successCallback(data);
+				}
+			});
+		}
+		
+	  	
+	  	//数据范围下拉框更新事件
+		$("#dataScope").change(function(event){
+			//数据范围选中的值
+        	var dataScope = $(event.target).val();
+        	dataScopeVisible(dataScope);
+        });
+		
+	  	
+	  	//选中事件的值变化触发事件
+		function dataScopeVisible(dataScope) {
+	  		//如果数据范围为“自定义数据”，则“数据权限”显示，否则隐藏
+			if (dataScope == 2) {
+	    		$("#authDataScope").show();
+	    	} else {
+	    		$._tree.checkAllNodes(false);
+	    		$("#authDataScope").hide();
+	    	}
+		}
+	</script>
+</body>
+</html>

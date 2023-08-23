@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.develop.notice.mapper.SysBonusMapper">
+    
+    <!-- 查询列表 -->
+    <select id="getSysBonusList" parameterType="java.util.Map" resultType="java.util.Map" >
+        SELECT
+			id,
+			title,
+			content,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_bonus_info
+        <where>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+    </select>
+    
+    
+    <!-- 详情 -->
+    <select id="getBonusById" parameterType="java.lang.String" resultType="java.util.Map" >
+         SELECT
+			id,
+			title,
+			content,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_bonus_info
+        where id = #{bonus_id}
+    </select>
+    
+    
+   	<!--  新增 -->
+    <insert id="addSysBonus" parameterType="java.util.Map">
+        insert into t_sys_bonus_info (
+			<if test="map.title != null and map.title != '' ">title, </if>
+			<if test="map.content != null and map.content != '' ">content, </if>
+ 			<if test="map.create_by != null and map.create_by != ''">create_by,</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">cre_date,</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">cre_time</if>
+ 		)values(
+			<if test="map.title != null and map.title != ''">#{map.title}, </if>
+			<if test="map.content != null and map.content != ''">#{map.content}, </if>
+ 			<if test="map.create_by != null and map.create_by != ''">#{map.create_by},</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">#{map.cre_date},</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">#{map.cre_time}</if>
+		)
+    </insert>
+	 
+	 
+	<!--  修改 -->
+    <update id="updateSysBonus" parameterType="java.util.Map">
+        update t_sys_bonus_info 
+        <set>
+            <if test="map.title != null and map.title != ''">title = #{map.title}, </if>
+            <if test="map.content != null and map.content != ''">content = #{map.content}, </if>
+            <if test="map.update_by != null and map.update_by != ''">update_by = #{map.update_by},</if>
+            <if test="map.up_date != null and map.up_date != ''">up_date = #{map.up_date},</if>
+            <if test="map.up_time != null and map.up_time != ''">up_time = #{map.up_time}</if>
+        </set>
+        where id = #{map.bonus_id}
+    </update>
+	
+	
+	<!-- 删除 -->
+    <delete id="deleteSysBonus" parameterType="String">
+        delete from t_sys_bonus_info where id=#{bonus_id}
+    </delete>
+    
+</mapper>

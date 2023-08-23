@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.common.SysFunctionLockParamMapper">
+
+	
+	<!-- 根据参数代码查询参数值 -->
+	<select id="getFunctionLockParamByCode" parameterType="java.lang.String" resultType="java.lang.String" >
+		select value from t_sys_function_lock_param where code=#{code}
+	</select>
+	
+	
+	<!-- 查询系统功能开关参数值列表 -->
+	<select id="getSysFuctionLockParamList" parameterType="java.lang.String" resultType="java.util.Map">
+		select * from t_sys_function_lock_param
+	</select>
+	
+</mapper>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('平台流水类型汇总列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								汇总类型：
+								<select name="summary_type" id="summary_type" >
+									<option value="1">总汇总</option>
+									<option value="2" selected="selected">按天汇总</option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+		        <!-- 表格：导出数据 -->
+<!-- 	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:summaryPlatformBenefit:export"> -->
+<!-- 		            <i class="fa fa-download"></i> 导出 -->
+<!-- 		        </a> -->
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-bordered">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+	
+		//前缀路径
+		var prefix = "/develop/summaryPlatformBenefit";
+		
+		//初始化方法
+		$(function() {
+		   	//查询平台流水类性汇总列表
+		    querySummaryPlatformBenefitList();
+		});
+
+		
+		//查询平台流水类性汇总列表
+		function querySummaryPlatformBenefitList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "平台流水类型汇总",//模块名称：用户
+		        showExport: true,
+		        queryParams: queryParams,
+		        //列信息
+		        columns: [
+	        	[
+	        		{
+		        		title : '日期',
+		        		align : 'center',
+		        		colspan : 1
+	        		}, 
+	        		{
+		        		title : '余额',
+		        		align : 'center',
+		        		colspan : 11
+	        		}
+	        	],	
+		        [	
+					{
+						field : 'cre_date', 
+						title : '统计日期',
+						sortable: true
+					},
+					{
+						field : 'balance_type_01', 
+						title : '充值'
+					},
+					{
+						field : 'balance_type_02', 
+						title : '理财'
+					},
+					{
+						field : 'balance_type_03', 
+						title : '拨款'
+					},
+					{
+						field : 'balance_type_04', 
+						title : '扣款'
+					},
+					{
+						field : 'balance_type_07', 
+						title : '提现'
+					},
+					{
+						field : 'balance_type_08', 
+						title : '签到'
+					},
+					{
+						field : 'balance_type_09', 
+						title : '分享'
+					},
+					{
+						field : 'balance_type_10', 
+						title : '分段'
+					},
+					{
+						field : 'balance_type_11', 
+						title : '转出'
+					},
+					{
+						field : 'balance_type_12', 
+						title : '转入'
+					},
+					{
+						field : 'balance_type_13', 
+						title : '年度'
+					},
+					]
+		    	]	
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+		
+		
+		//参数处理
+		function queryParams(params) {
+			var search = $.table.queryParams(params);
+			search.summary_type = $('#summary_type option:selected') .val();//选中的值
+			return search;
+		}
+	</script>
+</body>
+</html>

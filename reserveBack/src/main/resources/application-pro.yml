@@ -1,0 +1,64 @@
+# \u6570\u636e\u6e90\u914d\u7f6e
+spring:
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.jdbc.Driver
+        druid:
+            # \u4e3b\u5e93\u6570\u636e\u6e90
+            master:
+                url: jdbc:mysql://cb.cershffxmm8d.ap-southeast-1.rds.amazonaws.com:3306/reserve?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
+                username: root
+                password: JGiu28g2324ru8gf
+            # \u4ece\u5e93\u6570\u636e\u6e90
+            slave:
+                # \u4ece\u6570\u636e\u6e90\u5f00\u5173/\u9ed8\u8ba4\u5173\u95ed
+                enabled: false
+                url: 
+                username: 
+                password: 
+            # \u521d\u59cb\u8fde\u63a5\u6570
+            initialSize: 5
+            # \u6700\u5c0f\u8fde\u63a5\u6c60\u6570\u91cf
+            minIdle: 10
+            # \u6700\u5927\u8fde\u63a5\u6c60\u6570\u91cf
+            maxActive: 20
+            # \u914d\u7f6e\u83b7\u53d6\u8fde\u63a5\u7b49\u5f85\u8d85\u65f6\u7684\u65f6\u95f4
+            maxWait: 60000
+            # \u914d\u7f6e\u95f4\u9694\u591a\u4e45\u624d\u8fdb\u884c\u4e00\u6b21\u68c0\u6d4b\uff0c\u68c0\u6d4b\u9700\u8981\u5173\u95ed\u7684\u7a7a\u95f2\u8fde\u63a5\uff0c\u5355\u4f4d\u662f\u6beb\u79d2
+            timeBetweenEvictionRunsMillis: 60000
+            # \u914d\u7f6e\u4e00\u4e2a\u8fde\u63a5\u5728\u6c60\u4e2d\u6700\u5c0f\u751f\u5b58\u7684\u65f6\u95f4\uff0c\u5355\u4f4d\u662f\u6beb\u79d2
+            minEvictableIdleTimeMillis: 300000
+            # \u914d\u7f6e\u4e00\u4e2a\u8fde\u63a5\u5728\u6c60\u4e2d\u6700\u5927\u751f\u5b58\u7684\u65f6\u95f4\uff0c\u5355\u4f4d\u662f\u6beb\u79d2
+            maxEvictableIdleTimeMillis: 900000
+            # \u914d\u7f6e\u68c0\u6d4b\u8fde\u63a5\u662f\u5426\u6709\u6548
+            validationQuery: SELECT 1 FROM DUAL
+            testWhileIdle: true
+            testOnBorrow: false
+            testOnReturn: false
+            webStatFilter: 
+                enabled: true
+            statViewServlet:
+                enabled: true
+                # \u8bbe\u7f6e\u767d\u540d\u5355\uff0c\u4e0d\u586b\u5219\u5141\u8bb8\u6240\u6709\u8bbf\u95ee
+                allow:
+                url-pattern: /monitor/druid/*
+            filter:
+                stat:
+                    enabled: true
+                    # \u6162SQL\u8bb0\u5f55
+                    log-slow-sql: true
+                    slow-sql-millis: 1000
+                    merge-sql: true
+                wall:
+                    config:
+                        multi-statement-allow: true
+    redis:
+        host: localhost
+        port: 6379
+        password: wyegrybsf
+        database: 0
+rocketmq:
+    name-server: 127.0.0.1:9876
+    producer:
+        group: proGroupBack-reserve
+        send-message-timeout: 3000

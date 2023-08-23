@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('用户订单列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								订单号：<input type="text" name="order_id" id="order_id" />
+							</li>
+							<li>
+								账号：<input type="text" name="sys_user_account" />
+							</li>
+							<li>
+								手机号：<input type="text" name="user_tel"/>
+							</li>
+							<li>
+								订单状态：
+								<select name="status" id="status" th:with="type=${@dict.getType('user_order_status')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li class="select-time">
+								<label>支付时间： </label>
+								<input type="text" class="time-input" id="start_date" placeholder="开始时间" name="start_date"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="end_date" placeholder="结束时间" name="end_date"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search();"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+		        <!-- 表格：导出数据 -->
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:userProductOrder:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//详情
+		var detailFlag = [[${@permission.hasPermi('develop:userProductOrder:detail')}]];
+	
+		//数据字典
+		var datas_type = [[${@dict.getType('user_order_type')}]];
+		var datas_status = [[${@dict.getType('user_order_status')}]];
+		var datas_del_status = [[${@dict.getType('sys_all_table_del')}]];
+	
+		//前缀路径
+		var prefix = "/develop/userProductOrder";
+		
+		//初始化方法
+		$(function() {
+		   	//查询用户矿机信息列表
+		    queryUserProductOrderList();
+		});
+
+		
+		//查询用户矿机信息列表
+		function queryUserProductOrderList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        exportUrl: prefix + "/export",//导出路径
+		        sysRecycleUrl: prefix + "/sysSend/{id}",//系统发货
+		        sysRewardUrl: prefix + "/sysPick/{id}",//系统发货
+		        modalName: "用户订单",//模块名称：用户
+		        showExport: true,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true
+				},
+				{
+					field : 'order_no', 
+					title : '订单号'
+				},
+				{
+					field : 'status', 
+					title : '状态',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_status, row.status);
+		            }
+				},
+				{
+					field : 'sys_user_account', 
+					title : '账号/UID',
+					formatter: function(value, row, index) {
+						return  '<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.sys_user_account + '</a>'
+								+'<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.uid + '</a>'
+		            }
+				},
+				{
+					field : 'cash_num', 
+					title : '金额'
+				},
+				{
+					field : 'sharestock_num', 
+					title : '股权'
+				},
+				{
+					field : 'sharestock_no', 
+					title : '股权证件编号'
+				},
+				{
+					field : 'init_date1', 
+					title : '年度收益信息',
+					formatter: function(value, row, index) {
+						var date_desc = '时间:'+row.init_date1;
+						date_desc += '<br>总收益:'+row.total_benefit1;
+		            	return date_desc;
+		            }
+				},
+				{
+					field : 'init_date2', 
+					title : '阶段收益信息',
+					formatter: function(value, row, index) {
+						var date_desc = '时间:'+row.init_date2;
+						date_desc += '<br>总收益:'+row.total_benefit2;
+						date_desc += '<br>待领取:'+row.unclaimed_benefit;
+		            	return date_desc;
+		            }
+				},
+				{
+					field : 'cre_date', 
+					title : '时间',
+					formatter: function(value, row, index) {
+						var date_desc = '创建:'+row.cre_date;
+						if(row.pay_date!=null && row.pay_date!=""){
+							date_desc += '<br>支付:'+row.pay_date;
+						}
+		            	return date_desc;
+		            }
+				}]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+		
+	</script>
+</body>
+
+</html>

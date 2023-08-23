@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('支付渠道')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								渠道类型：
+								<select name="type" th:with="type=${@dict.getType('sys_channel_type')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								充值类型：
+								<select name="type" th:with="type=${@dict.getType('sys_channel_recharge_type')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+	           	<!-- 操作封装：添加信息，以tab页展现 -->
+	        	<a class="btn btn-success" onclick="$.operate.addTab()" shiro:hasPermission="develop:sysChannel:add">
+	                <i class="fa fa-plus"></i> 新增
+	            </a>
+	            <!-- 操作封装：修改信息，以tab页展现 -->
+	            <a class="btn btn-primary single disabled" onclick="$.operate.editTab()" shiro:hasPermission="develop:sysChannel:edit">
+		            <i class="fa fa-edit"></i> 修改
+		        </a>
+		         <!-- 操作封装：批量删除信息 -->
+	            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="develop:sysChannel:remove">
+	                <i class="fa fa-remove"></i> 删除
+	            </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//编辑
+		var editFlag = [[${@permission.hasPermi('develop:sysChannel:edit')}]];	
+		//删除
+		var removeFlag = [[${@permission.hasPermi('develop:sysChannel:remove')}]];
+		
+		//数据字典
+		var datas_sys_channel_type = [[${@dict.getType('sys_channel_type')}]];
+		var datas_sys_channel_recharge_type = [[${@dict.getType('sys_channel_recharge_type')}]];
+	
+		//前缀路径
+		var prefix = "/develop/sysChannel";
+		
+		//初始化方法
+		$(function() {
+		   	//查询
+		    querySysChannelList();
+		});
+
+		
+		//查询APP图片列表
+		function querySysChannelList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        createUrl: prefix + "/add",//新增路径
+		        updateUrl: prefix + "/edit/{id}",//编辑路径
+		        removeUrl: prefix + "/remove",//删除路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "支付渠道",//模块名称：用户
+		        showExport: true,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true
+				},
+				{
+					field : 'channel_type', 
+					title : '渠道类型',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_sys_channel_type, value);
+		            }
+				},
+				{
+					field : 'recharge_type', 
+					title : '充值类型',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_sys_channel_recharge_type, value);
+		            }
+				},
+				{
+					field : 'title', 
+					title : '标题'
+				},
+				{
+					field : 'product', 
+					title : '渠道编码'
+				},
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+					field : 'create_by', 
+					title : '创建人'
+				},
+				{
+					field : 'up_date', 
+					title : '更新时间',
+					sortable: true
+				},
+				{
+					field : 'update_by', 
+					title : '更新人'
+				},
+				{
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	//事件数组
+		                var actions = [];
+		            	//编辑按钮：修改信息，以tab页展现
+		                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+		              	//删除按钮：删除信息
+		            	actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a> ');
+		            	return actions.join('');
+		            }
+		        }]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+	</script>
+</body>
+</html>

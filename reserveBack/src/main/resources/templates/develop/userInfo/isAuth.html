@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('用户身份信息认证')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<base th:href="${#request.getContextPath()}+'/'">
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	
+	<h2 style="text-align: center;">请先进行身份信息认证</h2><br>
+	<form class="form-horizontal m" id="form-user-isAuth" action="/develop/userInfo/isAuth">
+		<div class="form-group">
+           	<label class="col-sm-3 control-label">图形验证码：</label>
+              	<div class="col-sm-5">
+             		<input type="text" class="form-control" name="img_code" id="img_code" placeholder="请输入图形验证码" required="required">
+             	</div>
+               <div class="col-xs-3">
+				<a href="javascript:void(0);" title="点击更换验证码">
+					<img th:src="@{captcha/captchaImage(type=${captchaType})}" class="imgcode" />
+				</a>
+			</div>
+        </div>
+       	<div class="form-group">
+        	<label class="col-sm-3 control-label">短信验证码：</label>
+          	<div class="col-sm-5">
+<!--             	<input type="text" class="form-control" name="sms_code" id="sms_code" placeholder="请输入短信验证码" required="required"> -->
+            	<input type="password" class="form-control" name="sms_code" id="sms_code" placeholder="请输入短信验证码" required="required">
+            	<input type="hidden" name="id" id="id" th:value="${id}" />
+				<input type="hidden" name="bus_type" id="bus_type" th:value="${bus_type}" />
+          	</div>
+          	<div class="col-xs-3">
+<!-- 				<button type="button" class="btn btn-sm btn-success" id="sendsms_code" ><i class="fa fa-check"></i>获取验证码</button> -->
+			</div>
+       	</div>
+       	
+       	<div class="form-group" align="center" style="margin-top: 5%">
+       		<button type="submit" class="btn btn-sm btn-primary" style="width: 60%;height: 35px" >提交</button>
+       	</div>
+	</form>
+</div>
+<th:block th:include="include :: footer" />
+
+<script>
+
+$(function(){
+	$(".imgcode").click();
+})
+
+
+//点击更换图形验证码
+$('.imgcode').click(function() {
+	var url = "/captcha/captchaImage?type=math&s=" + Math.random();
+	//摄入值
+	$(".imgcode").attr("src", url);
+});
+
+
+/* 获取短信验证码 */
+$("#sendsms_code").click(function(){
+	if($("#img_code").val()==""){
+		$.modal.msgWarning("请输入图形验证码");//提示错误消息
+		return;
+	}
+	time(this);
+	$.ajax({
+		url: "/develop/smsCode/sendSmsCode",
+		type: 'post',
+		dataType:"json",
+		data:{
+			'bus_type' : $("#bus_type").val(),
+			'img_code' : $("#img_code").val()
+		},
+		success:function(data){
+			if(data.code=="0"){
+				$.modal.msgSuccess(data.msg);
+			}else{
+				layer.msg(data.msg,{icon:5,time : 1000},function(){
+					window.clearInterval(t1);
+					$("#sendsms_code")[0].removeAttribute("disabled");
+					$("#sendsms_code")[0].value = "获取验证码";
+				});
+			}
+      	},
+      	error:function(jqXHR, textStatus, errorThrown){
+      		window.clearInterval(t1);
+			$("#sendsms_code")[0].removeAttribute("disabled");
+			$("#sendsms_code")[0].value = "获取验证码";
+		}
+	}); 
+})
+
+
+//倒计时
+var t1 = '';
+var wait=100;
+function time(o) {
+	if (wait == 0) {
+		o.removeAttribute("disabled");
+		o.value = "获取验证码";
+		wait = 100;
+	} else {
+		o.setAttribute("disabled", true);
+		o.value = "重新发送(" + wait + ")";
+		wait--;
+		t1 = setTimeout(function() {
+			time(o,wait)
+		}, 1000)
+	}
+}
+
+</script>
+</body>
+
+</html>

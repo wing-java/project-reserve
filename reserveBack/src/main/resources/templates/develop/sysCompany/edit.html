@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增系统物流')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-sysCompany-edit">
+		<div class="form-group">
+			<input type="hidden" id="company_id" name="company_id" th:value="${id}" readonly="readonly" >
+			<input type="hidden" name="company_logo" id="old_company_logo" readonly="readonly"  >
+			<input type="hidden" name="company_photos" id="old_company_photos" readonly="readonly"  >
+			<input type="hidden" name="new_company_logo" id="new_company_logo"  >
+			<input type="hidden" name="new_company_photos" id="new_company_photos" >
+			<label class="col-sm-2 control-label">公司名称：</label>
+            <div class="col-sm-9">
+            	<input class="form-control" type="text" name="company_name" id="company_name" value="" placeholder="请输入公司名称"  />
+            </div>
+		</div>
+<!-- 		<div class="form-group">  -->
+<!-- 			<label class="col-sm-2 control-label ">公司logo：</label>   -->
+<!--             <div class="col-sm-9"> -->
+<!--                 <div class="ibox float-e-margins"> -->
+<!--                     <div class="ibox-content"> -->
+<!--                         <div class="form-group"> -->
+<!-- 	                        <div class="file-loading"> -->
+<!-- 	                        	<input id="fileinput-demo-new_company_logo" name="file"  type="file"  > -->
+<!-- 					        </div> -->
+<!--                         </div> -->
+<!--                         <hr> -->
+<!--                     </div> -->
+<!--                 </div> -->
+<!--             </div> -->
+<!--        	</div> -->
+<!-- 		<div class="form-group"> -->
+<!-- 			<label class="col-sm-2 control-label ">公司规模：</label> -->
+<!-- 			<div class="col-sm-9"> -->
+<!-- 				<input class="form-control" type="text" name="company_size" id="company_size" value="" placeholder="请输入公司规模"  /> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+<!-- 		<div class="form-group"> -->
+<!-- 			<label class="col-sm-2 control-label ">公司地址：</label> -->
+<!-- 			<div class="col-sm-9"> -->
+<!-- 				<input class="form-control" type="text" name="company_address" id="company_address" value="" placeholder="请输入公司地址"  /> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+<!-- 		<div class="form-group"> -->
+<!-- 			<label class="col-sm-2 control-label ">公司简介：</label> -->
+<!-- 			<div class="col-sm-9"> -->
+<!-- 				<textarea class="form-control" rows="5" name="company_profile" id="company_profile" placeholder="请输入公司简介" ></textarea> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+		<div class="form-group"> 
+        	<label class="col-sm-2 control-label ">公司相册：</label>  
+            <div class="col-sm-9">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+	                        <div class="file-loading">
+	                        	<input id="fileinput-demo-new_company_photos" name="file"  type="file" multiple="multiple">
+					        </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+       	</div>
+	</form>
+</div>
+
+<div class="row" style="margin-bottom: 100px">
+	<div class="col-sm-offset-5 col-sm-10">
+	    <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+	    <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+	</div>
+</div>
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-fileinput-js" />
+
+<script th:inline="javascript">
+var id = [[${id}]]; 
+
+var company_logo_data = [];
+var company_photos_data = [];
+
+var company_logo_array = new Array();
+var company_photos_array = new Array();
+
+//查询参数信息
+$(function(){
+	$.ajax({
+		url: "/develop/sysCompany/getSysCompanyById",
+		type: 'post',
+		dataType:"json",
+		data:{
+			'id' : id,
+		},
+		success:function(data){
+			$("#company_name").val(data.company_name);
+// 			$("#company_size").val(data.company_size);
+// 			$("#company_address").val(data.company_address);
+// 			$("#company_profile").val(data.company_profile);
+// 			$("#old_company_logo").val(data.company_logo);
+			$("#old_company_photos").val(data.company_photos);
+			
+			//初始化图片
+			initPhoto();
+      	}
+	}); 
+}) 
+$("#form-sysCompany-edit").validate({
+	rules:{
+		company_name:{
+			required:true
+		},
+// 		company_size:{
+// 			required:true
+// 		},
+// 		company_address:{
+// 			required:true
+// 		},
+// 		company_profile:{
+// 			required:true
+// 		}
+	},
+	messages: {
+		company_name:{
+			required: "请输入公司名称"
+		},
+// 		company_size: {
+//             required: "请输入公司规模"
+//         },
+//         company_address: {
+//             required: "请输入公司地址"
+//         },
+//         company_profile: {
+//             required: "请输入公司简介"
+//         }
+ 	},
+	focusCleanup: true
+});
+
+
+function submitHandler() {
+	if ($.validate.form()) {
+		$("#old_company_logo").val(getAllPhotosUrl(company_logo_data, company_logo_array));
+		$("#old_company_photos").val(getAllPhotosUrl(company_photos_data, company_photos_array));
+// 		if($("#old_company_logo").val()==""){
+// 			layer.msg("请选择并上传公司logo",{icon:5,time : 1000});
+// 			return;
+// 		}else 
+		if($("#old_company_photos").val()==""){
+			layer.msg("请选择并上传公司相册",{icon:5,time : 1000});
+			return;
+		}else{
+			$.operate.saveTab("/develop/sysCompany/edit", $('#form-sysCompany-edit').serialize());
+		}
+	} 
+}
+
+//初始化图片信息
+function initPhoto(){
+	var company_logo_data_preview = [];
+	var company_logo_data_preview_config = [];
+	getHaveSetPhotoArray(company_logo_data, company_logo_data_preview, company_logo_data_preview_config, $("#old_company_logo").val());
+	initFileInputEdit(company_logo_data, company_logo_data_preview, company_logo_data_preview_config, "new_company_logo",company_logo_array,"支持单图片拖拽上传<br>建议图片格式：jpg<br>尺寸大小：334*324",1);
+	
+	var company_photos_data_preview = [];
+	var company_photos_data_preview_config = [];
+	getHaveSetPhotoArrayVideo(company_photos_data, company_photos_data_preview, company_photos_data_preview_config, $("#old_company_photos").val());
+	initFileInputEditVideo(company_photos_data, company_photos_data_preview, company_photos_data_preview_config, "new_company_photos",company_photos_array,"支持多图片拖拽上传<br>建议图片格式：jpg<br>尺寸大小：750*620",6);
+}
+
+</script>
+	
+</body>
+
+</html>

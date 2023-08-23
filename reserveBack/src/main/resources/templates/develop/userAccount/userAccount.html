@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('用户账号列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								收款账号：<input type="text" name="account"/>
+							</li>
+							<li>
+								账户类型：
+								<select name="type" th:with="type=${@dict.getType('user_account_type')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								账户名：<input type="text" name="account_name"/>
+							</li>
+							<li>
+								账号：<input type="text" name="sys_user_account"/>
+							</li>
+							<li>
+								UID：<input type="text" name="uid"/>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+		        <!-- 表格：导出数据 -->
+<!-- 	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:userAccount:export"> -->
+<!-- 		            <i class="fa fa-download"></i> 导出 -->
+<!-- 		        </a> -->
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		var datas_type = [[${@dict.getType('user_account_type')}]];
+	
+		//前缀路径
+		var prefix = "/develop/userAccount";
+		
+		//初始化方法
+		$(function() {
+		   	//查询用户收款账号列表
+		    queryUserAccountList();
+		});
+
+		
+		//查询用户收款账号列表
+		function queryUserAccountList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "收款账号",//模块名称：用户
+		        showExport: true,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true
+				},
+				{
+					field : 'sys_user_account', 
+					title : '编号/账号/UID',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.user_id + '</a>'
+								+ '<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.sys_user_account + '</a>'
+								+'<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.uid + '</a>'
+		            }
+				},
+				{
+					field : 'type', 
+					title : '账户类型',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_type, value);
+		            }
+				},
+				{
+					field : 'account', 
+					title : '账号'
+				},
+				{
+					field : 'account_name', 
+					title : '账户名'
+				},
+				{
+					field : 'legal_id_card', 
+					title : '身份证号码',
+					visible: false
+				},
+				{
+		            field: 'legal_crad_photo',
+		            title: '证件照',
+		            formatter: function(value, row, index) {
+		            	if(value != null && value != ""){
+		            		var imgs = value.split(",");
+			            	var imgResult = "";
+			            	for(var i=0;i<imgs.length;i++){
+			            		imgResult = imgResult + $.table.imageView(qiniu_domain+imgs[i],400,400);
+			            	}
+			            	return imgResult;
+		            	}
+					},
+					visible: false
+		        },
+				{
+					field : 'bank_name', 
+					title : '开户行'
+				},
+				/* {
+					field : 'bank_branch_name', 
+					title : '开户支行'
+				}, */
+				{
+		            field: 'account_img',
+		            title: '收款码',
+		            formatter: function(value, row, index) {
+		            	if(value != null && value != ""){
+		            		var imgs = value.split(",");
+			            	var imgResult = "";
+			            	for(var i=0;i<imgs.length;i++){
+			            		imgResult = imgResult + $.table.imageView(qiniu_domain+imgs[i],400,400);
+			            	}
+			            	return imgResult;
+		            	}
+					},
+					visible: false
+		        },
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+					field : 'up_date', 
+					title : '更新时间',
+					sortable: true
+				}]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+	</script>
+</body>
+</html>

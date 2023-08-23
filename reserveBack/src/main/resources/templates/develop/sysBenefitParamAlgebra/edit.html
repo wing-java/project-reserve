@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改分享收益参数')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<base th:href="${#request.getContextPath()}+'/'">
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-sysBenefitParamAlgebra-edit">
+		<input type="hidden" id="id" name="id" th:value="${id}" readonly="readonly" >
+		<div class="form-group">
+			<label class="col-sm-3 control-label ">层级：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" readonly="readonly" name="rank" id="rank" value=""  />
+				</div>
+			</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">收益比例：</label>
+			<div class="col-sm-8">
+				<input class="form-control" type="text" name="rate" id="rate" >
+			</div>
+		</div>
+	</form>
+</div>
+
+
+<th:block th:include="include :: footer" />
+
+<script th:inline="javascript">
+var id = [[${id}]]; 
+//查询参数信息
+$(function(){
+	$.ajax({
+		url: "/develop/sysBenefitParamAlgebra/getSysBenefitParamAlgebraById",
+		type: 'post',
+		dataType:"json",
+		data:{
+			'id' : id,
+		},
+		success:function(data){
+			$("#rank").val(data.rank);
+			$("#rate").val(data.rate);
+      	}
+	}); 
+}) 
+
+
+$("#form-sysBenefitParamAlgebra-edit").validate({
+	rules:{
+		rate:{
+			required:true
+		},
+	},
+	messages: {
+		rate: {
+            required: "请输入收益比例"
+        },
+ 	},
+	focusCleanup: true
+});
+
+function submitHandler() {
+   if ($.validate.form()) {
+   		$.operate.save("/develop/sysBenefitParamAlgebra/edit", $('#form-sysBenefitParamAlgebra-edit').serialize());
+   }
+}
+</script>
+	
+</body>
+
+</html>

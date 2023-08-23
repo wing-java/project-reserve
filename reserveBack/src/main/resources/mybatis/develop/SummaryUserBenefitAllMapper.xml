@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.statistics.mapper.SummaryUserBenefitAllMapper">
+
+	<select id="getSummaryUserBenefitAllList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.*, 
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_summary_user_benefit_all t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<select id="selectSummaryUserBenefitAllList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.statistics.domain.SummaryUserBenefitAll" >
+		SELECT
+			t.*, 
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_summary_user_benefit_all t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+</mapper>

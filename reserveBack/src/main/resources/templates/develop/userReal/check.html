@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('实名详情')" />
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	
+	<form class="form-horizontal m-t" id="form-userReal-check">
+	
+		<input id="id" name="id"  type="hidden" th:value="${userReal.id}" />
+		
+		<h3>代理商信息</h3>
+		<div class="form-group" >
+			<label class="col-sm-2 control-label">编号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userReal.id}">
+			</div>
+			<label class="col-sm-2 control-label">认证状态：</label>
+			<div class="col-sm-4 form-control-static" th:text="${@dict.getLabel('user_real_status',userReal.status)}" >
+			</div>
+			<label class="col-sm-2 control-label">创建日期：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userReal.cre_date}">
+			</div>
+			<label class="col-sm-2 control-label">更新日期：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userReal.up_date}">
+			</div>
+			<label class="col-sm-2 control-label">更新管理员：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userReal.update_by}">
+			</div>
+			<label class="col-sm-2 control-label">审核备注：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userReal.note}">
+			</div>
+		</div>
+		<h3 >个人认证信息</h3>
+		<div class="form-group" >
+			<label class="col-sm-2 control-label">姓名：</label>
+			<div class="col-sm-4 form-control-static">
+				<input name="name" id="name" th:value="${userReal.name}" class="form-control" type="text"  >
+			</div>
+			<label class="col-sm-2 control-label">身份证号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userReal.id_card}">
+			</div>
+		</div>
+<!-- 		<div class="form-group">  -->
+<!--         	<label class="col-sm-2 control-label">证件照：</label>   -->
+<!--             <div class="col-sm-10"> -->
+<!--                 <div class="ibox float-e-margins"> -->
+<!--                     <div class="ibox-content"> -->
+<!--                         <div class="form-group"> -->
+<!-- 	                        <div class="file-loading"> -->
+<!-- 	                        	<input type="hidden" name="card_photo" id="card_photo" th:value="${userReal.card_photo}" > -->
+<!-- 					            <input id="fileinput-demo-card_photo" name="file"  type="file"  > -->
+<!-- 					        </div> -->
+<!--                         </div> -->
+<!--                     </div> -->
+<!--                 </div> -->
+<!--             </div> -->
+<!--        	</div> -->
+		<div class="form-group">
+			<label class="col-sm-2 control-label">审核状态：</label>
+			<div class="col-sm-4">
+				<label class="radio-box"> <input type="radio" name="status" value="09" th:checked="true"/> 通过 </label> 
+				<label class="radio-box"> <input type="radio" name="status" value="08" /> 不通过 </label> 
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">审核备注：</label>
+			<div class="col-sm-10">
+				<textarea id="note" name="note" class="form-control" placeholder="" ></textarea>
+			</div>
+		</div>
+	</form>
+	
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-fileinput-js" />
+
+<script th:inline="javascript">
+$(function(){
+	//初始化图片信息
+// 	inintPhoto();
+})
+
+
+//初始化图片信息
+function inintPhoto(){
+	//证件照
+	var card_photo_data_preview = [];
+	getHaveSetPhotoArrayView(card_photo_data_preview, $("#card_photo").val());
+	initFileInputDetail(card_photo_data_preview, "card_photo", 3);
+}
+
+//前缀路径
+var prefix = "/develop/userReal";
+
+$("#form-userReal-check").validate({
+	onkeyup: false,
+	rules:{
+	},
+	messages: {
+    },
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+    	$.operate.save(prefix + "/check", $('#form-userReal-check').serialize());
+    }
+}
+</script>
+
+
+</body>
+</html>

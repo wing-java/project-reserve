@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.task.mapper.UserCashTaskMapper">
+
+	<!-- 查询列表 -->
+	<select id="getUserCashTaskSatus02" resultType="java.util.Map">
+		select * from t_user_cash where cash_status = '02' and task_status = '02'
+	</select>
+	
+</mapper>

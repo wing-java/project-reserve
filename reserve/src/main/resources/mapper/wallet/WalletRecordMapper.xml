@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.wallet.WalletRecordMapper">
+	
+	<!-- 查询余额流水列表 -->
+	<select id="getWalletRecordList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			t.id,
+			t.user_id,
+			t.type AS op_type,
+			CAST(t.before_num AS CHAR) AS before_num,
+			CAST(t.num AS CHAR) AS num,
+			CAST(t.after_num AS CHAR) AS after_num,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y.%m.%d %H:%i'
+			) AS cre_time,
+			t.order_id,
+			t1.op_type_code,
+			t1.op_name
+		FROM
+			${map.table} t
+		LEFT JOIN t_sys_benefit_name t1 ON t.type = t1.op_type
+		<where>
+			t.user_id=#{map.sys_user_id}
+      		<if test="map.op_type != null and map.op_type != '' " >
+        		 AND t.type in ${map.op_type}
+      		</if>
+      		<if test="map.last_id != null and map.last_id != '' " >
+        		 AND t.id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by t.id desc
+        LIMIT 0,10
+	</select>
+	
+</mapper>

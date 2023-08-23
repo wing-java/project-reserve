@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ruoyi.project.develop.param.mapper.SysCjBankcodeMapper">
+
+
+	<!-- 查询 -->
+	<select id="getSysCjBankcodeList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			type,
+			bankcode,
+			title,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_chuanjun_bankcode
+		<where>
+			<if test="map.type != null and map.type != ''">
+				type = #{map.type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	
+	<!-- 导出 -->
+	<select id="selectSysCjBankcodeList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.param.domain.SysCjBankcode" >
+		SELECT
+			id,
+			type,
+			bankcode,
+			title,
+			create_by,
+			update_by,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_chuanjun_bankcode
+		<where>
+			<if test="map.type != null and map.type != ''">
+				type = #{map.type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 查询详情 -->
+	<select id="getSysCjBankcodeById" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT * FROM t_sys_chuanjun_bankcode where id=#{cjBankcode_id}
+	</select>
+	
+	
+	<!-- 更新 -->
+	<update id="updateSysCjBankcode" parameterType="java.util.Map" >
+		update t_sys_chuanjun_bankcode
+ 		<set>
+ 			<if test="map.type != null and map.type != ''">type = #{map.type},</if>
+ 			<if test="map.bankcode != null and map.bankcode != ''">bankcode = #{map.bankcode},</if>
+ 			<if test="map.title != null and map.title != ''">title = #{map.title},</if>
+ 			<if test="map.update_by != null and map.update_by != ''">update_by = #{map.update_by},</if>
+ 			<if test="map.up_date != null and map.up_date != ''">up_date = #{map.up_date},</if>
+ 			<if test="map.up_time != null and map.up_time != ''">up_time = #{map.up_time}</if>
+ 		</set>
+ 		where id = #{map.cjBankcode_id}
+	</update>
+	
+	
+	<!-- 新增 -->
+ 	<insert id="addSysCjBankcode" parameterType="java.util.Map" >
+ 		insert into t_sys_chuanjun_bankcode(
+ 			<if test="map.type != null and map.type != ''">type,</if>
+ 			<if test="map.bankcode != null and map.bankcode != ''">bankcode,</if>
+ 			<if test="map.title != null and map.title != ''">title,</if>
+ 			<if test="map.create_by != null and map.create_by != ''">create_by,</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">cre_date,</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">cre_time</if>
+ 		)values(
+ 			<if test="map.type != null and map.type != ''">#{map.type},</if>
+ 			<if test="map.bankcode != null and map.bankcode != ''">#{map.bankcode},</if>
+ 			<if test="map.title != null and map.title != ''">#{map.title},</if>
+ 			<if test="map.create_by != null and map.create_by != ''">#{map.create_by},</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">#{map.cre_date},</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">#{map.cre_time}</if>
+ 		)
+	</insert>
+	
+	
+	<!-- 根据国际交易所id删除 -->
+	<delete id="deleteSysCjBankcode" parameterType="java.lang.String" >
+		delete from t_sys_chuanjun_bankcode where id=#{cjBankcode_id}
+	</delete>
+	
+</mapper>

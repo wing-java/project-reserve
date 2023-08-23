@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.async.AsyncBenefitMapper">
+	
+	<!-- 查询阶段收益比例 -->
+	<select id="getUserOrderDayBenefitRate" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			t.* 
+		FROM
+			t_sys_benefit_param_day t
+		where
+			t.days &lt;= #{map.days}
+			and not EXISTS (
+				select 1 from t_user_reward_to_day t1 where t1.user_id = #{map.user_id} and t1.buy_order_id = #{map.buy_order_id} and t.days = t1.days
+			)
+		ORDER BY
+			days DESC
+		limit 1
+	</select>
+	
+	<!-- 更新待领取收益 -->
+	<update id="updateOrderUnclaimedBenefit" parameterType="java.util.Map">
+		update t_user_product_order_info
+		   set unclaimed_benefit = #{map.new_unclaimed_benefit},
+		       unclaimed_days = #{map.unclaimed_days},
+		       unclaimed_rate = #{map.unclaimed_rate},
+		       <if test="map.total_benefit2 != null and map.total_benefit2 != '' " >total_benefit2 = total_benefit2 + #{map.total_benefit2},</if>
+		       <if test="map.init_date2 != null and map.init_date2 != '' " >init_date2 = #{map.init_date2},</if>
+		       <if test="map.init_time2 != null and map.init_time2 != '' " >init_time2 = #{map.init_time2},</if>
+		       up_date = #{map.date},
+		       up_time = #{map.time}
+		 where id = #{map.id}
+		   and unclaimed_benefit = #{map.old_unclaimed_benefit}
+	</update>
+	
+	<!-- 记录阶段收益 -->
+	<insert id="addUserRewardToDay" parameterType="java.util.Map">
+		insert into t_user_reward_to_day
+		(
+			user_id,
+			order_no,
+			benefit,
+			buy_order_no,
+			buy_order_id,
+			days,
+			rate,
+			cre_date,
+			cre_time
+		)
+		values
+		(
+			#{map.user_id},
+			#{map.order_no},
+			#{map.benefit},
+			#{map.buy_order_no},
+			#{map.buy_order_id},
+			#{map.days},
+			#{map.rate},
+			#{map.cre_date},
+			#{map.cre_time}
+		)
+	</insert>
+	
+	<!-- 查询年收益比例 -->
+	<select id="getUserOrderYearBenefitRate" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			t.* 
+		FROM
+			t_sys_benefit_param_year t
+		where
+			t.days &lt;= #{map.days}
+			and not EXISTS (
+				select 1 from t_user_reward_to_year t1 where t1.user_id = #{map.user_id} and t1.buy_order_id = #{map.buy_order_id} and t.days = t1.days
+			)
+		ORDER BY
+			days DESC
+		limit 1
+	</select>
+	
+	<!-- 记录年收益 -->
+	<insert id="addUserRewardToYear" parameterType="java.util.Map">
+		insert into t_user_reward_to_year
+		(
+			user_id,
+			order_no,
+			benefit,
+			buy_order_no,
+			buy_order_id,
+			year,
+			days,
+			rate,
+			cre_date,
+			cre_time
+		)
+		values
+		(
+			#{map.user_id},
+			#{map.order_no},
+			#{map.benefit},
+			#{map.buy_order_no},
+			#{map.buy_order_id},
+			#{map.year},
+			#{map.days},
+			#{map.rate},
+			#{map.cre_date},
+			#{map.cre_time}
+		)
+	</insert>
+	
+	<!-- 查询层级收益列表 -->
+	<select id="getUserOrderAlgebraList" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+			t1.id,
+			t.rank,
+			t.rate 
+		FROM
+			t_sys_benefit_param_algebra t
+			LEFT JOIN ( SELECT id, ( #{map.algebra}-algebra ) AS rank FROM t_user_info WHERE find_in_set( id, #{map.parent_chain} ) ORDER BY algebra DESC ) t1 ON t.rank = t1.rank 
+		WHERE
+			t1.id IS NOT NULL
+	</select>
+	
+	<!-- 记录分享收益 -->
+	<insert id="addUserRewardToAlgebra" parameterType="java.util.Map">
+		insert into t_user_reward_to_algebra
+		(
+			user_id,
+			order_no,
+			benefit,
+			buy_order_no,
+			buy_order_id,
+			rank,
+			rate,
+			cre_date,
+			cre_time
+		)
+		values
+		(
+			#{map.user_id},
+			#{map.order_no},
+			#{map.benefit},
+			#{map.buy_order_no},
+			#{map.buy_order_id},
+			#{map.rank},
+			#{map.rate},
+			#{map.cre_date},
+			#{map.cre_time}
+		)
+	</insert>
+	
+	<!-- 更新订单状态 -->
+	<update id="updateOrderStatus" parameterType="java.util.Map">
+		update t_user_product_order_info
+		   set settle_status = #{map.new_status},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where id = #{map.id}
+		   and settle_status = #{map.old_status}
+	</update>
+	
+	<!-- 订单详情 -->
+	<select id="getUserOrderById" parameterType="java.lang.String" resultType="java.util.Map">
+		select * from t_user_product_order_info where id = #{id}
+	</select>
+	
+	<!-- 更新结束状态 -->
+	<update id="updateOrderIsEnd" parameterType="java.util.Map">
+		update t_user_product_order_info
+		   set is_end = '1',
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where id = #{map.id}
+	</update>
+	
+	<!-- 更新年度收益 -->
+	<update id="updateOrderYearBenefit" parameterType="java.util.Map">
+		update t_user_product_order_info
+		   set is_end = #{map.is_end},
+		   	   total_benefit1 = total_benefit1 + #{map.total_benefit1},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where id = #{map.id}
+	</update>
+		
+</mapper>

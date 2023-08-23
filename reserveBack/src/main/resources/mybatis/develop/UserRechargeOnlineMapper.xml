@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.ruoyi.project.develop.trade.mapper.UserRechargeOnlineMapper">
+
+	<!-- 查询用户线上充值列表 -->
+	<select id="getUserRechargeOnlineList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.order_no,
+			t.out_trade_no,
+			t.recharge_type,
+			t.account_type,
+			t.recharge_num,
+			t.user_id,
+			t.status,
+			t.trade_status,
+			t.channel_type,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_recharge_online t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.order_no != null and map.order_no != ''">
+				AND t.order_no = #{map.order_no}
+			</if>
+			<if test="map.out_trade_no != null and map.out_trade_no != ''">
+				AND t.out_trade_no = #{map.out_trade_no}
+			</if>
+			<if test="map.recharge_type != null and map.recharge_type != ''">
+				AND t.recharge_type = #{map.recharge_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.trade_status != null and map.trade_status != ''">
+				AND t.trade_status = #{map.trade_status}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 导出用户线上充值信息 -->
+	<select id="selectUserRechargeOnlineList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.trade.domain.UserRechargeOnline" >
+		SELECT
+			t.id,
+			t.order_no,
+			t.out_trade_no,
+			t.recharge_type,
+			t.account_type,
+			t.recharge_num,
+			t.user_id,
+			t.status,
+			t.trade_status,
+			t.channel_type,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_recharge_online t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.order_no != null and map.order_no != ''">
+				AND t.order_id = #{map.order_id}
+			</if>
+			<if test="map.out_trade_no != null and map.out_trade_no != ''">
+				AND t.out_trade_no = #{map.out_trade_no}
+			</if>
+			<if test="map.recharge_type != null and map.recharge_type != ''">
+				AND t.recharge_type = #{map.recharge_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.trade_status != null and map.trade_status != ''">
+				AND t.trade_status = #{map.trade_status}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 汇总充值记录数据 -->
+	<select id="summaryUserRechargeOnlineList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			IFNULL(sum(t.recharge_num),0.00) AS sum_recharge_num
+		FROM
+			t_user_recharge_online t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.order_no != null and map.order_no != ''">
+				AND t.order_no = #{map.order_no}
+			</if>
+			<if test="map.out_trade_no != null and map.out_trade_no != ''">
+				AND t.out_trade_no = #{map.out_trade_no}
+			</if>
+			<if test="map.recharge_type != null and map.recharge_type != ''">
+				AND t.recharge_type = #{map.recharge_type}
+			</if>
+			<if test="map.account_type != null and map.account_type != ''">
+				AND t.account_type = #{map.account_type}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.trade_status != null and map.trade_status != ''">
+				AND t.trade_status = #{map.trade_status}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 根据编号查询线上充值详情 -->
+	<select id="getUserRechargeOnlineDetailById" parameterType="java.lang.String" resultType="com.ruoyi.project.develop.trade.domain.UserRechargeOnline" >
+		SELECT
+			t.id,
+			t.order_no,
+			t.out_trade_no,
+			t.recharge_type,
+			t.account_type,
+			t.recharge_num,
+			t.user_id,
+			t.status,
+			t.trade_status,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_recharge_online t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		where t.id=#{recharge_id}
+	</select>
+	<!-- 根据商户订单号查询线上充值的支付宝支付详情 -->
+	<select id="getUserRechargeOnlineAlipayByOutTradeNo" parameterType="java.lang.String" resultType="com.ruoyi.project.develop.pay.domain.UserTradeAlipay" >
+		SELECT
+			id,app_id,out_trade_no,trade_status,trade_no,total_amount,subject,body,status,timeout_express,
+			seller_email,buyer_id,invoice_amount,fund_bill_list,notify_type,receipt_amount,buyer_pay_amount,
+			seller_id,gmt_payment,notify_time,auth_app_id,buyer_logon_id,point_amount,
+			DATE_FORMAT(STR_TO_DATE(CONCAT(cre_date, cre_time),'%Y%m%d%H%i%s'),'%Y-%m-%d %H:%i:%s') AS cre_date,
+			DATE_FORMAT(STR_TO_DATE(CONCAT(up_date, up_time),'%Y%m%d%H%i%s'),'%Y-%m-%d %H:%i:%s') AS up_date
+		FROM
+			t_user_trade_alipay 
+		where out_trade_no=#{out_trade_no}
+	</select>
+	<!-- 根据商户订单号查询线上充值的支付宝支付详情 -->
+	<select id="getUserRechargeOnlineWechatpayByOutTradeNo" parameterType="java.lang.String" resultType="com.ruoyi.project.develop.pay.domain.UserTradeWechatpay" >
+		SELECT
+			id,appid,mch_id,trade_type,transaction_id,nonce_str,out_trade_no,status,result_code,err_code,
+			err_code_des,bank_type,openid,fee_type,cash_fee,total_fee,time_end,
+			is_subscribe,return_code,body,spbill_create_ip,prepay_id,mweb_url,
+			DATE_FORMAT(STR_TO_DATE(CONCAT(cre_date, cre_time),'%Y%m%d%H%i%s'),'%Y-%m-%d %H:%i:%s') AS cre_date,
+			DATE_FORMAT(STR_TO_DATE(CONCAT(up_date, up_time),'%Y%m%d%H%i%s'),'%Y-%m-%d %H:%i:%s') AS up_date
+		FROM
+			t_user_trade_wechatpay 
+		where out_trade_no=#{out_trade_no}
+	</select>
+	
+	
+</mapper>

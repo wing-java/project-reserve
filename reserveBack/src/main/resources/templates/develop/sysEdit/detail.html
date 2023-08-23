@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('参数修改记录详细')" />
+	<th:block th:include="include :: jsonview-css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	
+	<form class="form-horizontal m-t" id="signupForm">
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">表名：</label>
+			<div class="form-control-static" th:text="${sysEdit.table_name}">
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">旧值：</label>
+			<div class="form-control-static"><pre id="old_value"></pre></div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">新值：</label>
+			<div class="form-control-static"><pre id="new_value"></pre></div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">修改备注：</label>
+			<div class="form-control-static" th:text="${sysEdit.remark}" >
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">修改时间：</label>
+			<div class="form-control-static" th:text="${sysEdit.cre_date}" >
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">修改人：</label>
+			<div class="form-control-static" th:text="${sysEdit.create_by}" >
+			</div>
+		</div>
+		
+	</form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: jsonview-js" />
+    <script th:inline="javascript">
+	    $(function() {
+	    	var old_value = [[${sysEdit.old_value}]];
+	    	if ($.common.isNotEmpty(old_value) && old_value.length < 2000) {
+	    		$("#old_value").JSONView(old_value);
+	    	} else {
+	    		$("#old_value").text(old_value);
+	    	}
+	    	
+	    	var new_value = [[${sysEdit.new_value}]];
+	    	if ($.common.isNotEmpty(new_value) && new_value.length < 2000) {
+	    		$("#new_value").JSONView(new_value);
+	    	} else {
+	    		$("#new_value").text(new_value);
+	    	}
+	    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.param.mapper.SysBenefitParamYearMapper">
+
+	<!-- 查询 -->
+	<select id="getSysBenefitParamYearList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			year,
+			days,
+			rate,
+			create_by,
+			update_by,
+			DATE_FORMAT(STR_TO_DATE(CONCAT(cre_date, cre_time),'%Y%m%d%H%i%s'),'%Y-%m-%d %H:%i:%s') AS cre_date,
+			DATE_FORMAT(STR_TO_DATE(CONCAT(up_date, up_time),'%Y%m%d%H%i%s'),'%Y-%m-%d %H:%i:%s') AS up_date
+		FROM t_sys_benefit_param_year
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 导出 -->
+	<select id="selectSysBenefitParamYearList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.param.domain.SysBenefitParamYear" >
+		SELECT
+			id,
+			year,
+			days,
+			rate,
+			create_by,
+			update_by,
+			DATE_FORMAT(STR_TO_DATE(CONCAT(cre_date, cre_time),'%Y%m%d%H%i%s'),'%Y-%m-%d %H:%i:%s') AS cre_date,
+			DATE_FORMAT(STR_TO_DATE(CONCAT(up_date, up_time),'%Y%m%d%H%i%s'),'%Y-%m-%d %H:%i:%s') AS up_date
+		FROM t_sys_benefit_param_year
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 根据参数id查询参数详情 -->
+	<select id="getSysBenefitParamYearById" parameterType="java.lang.String" resultType="java.util.Map">
+		select * from t_sys_benefit_param_year where id=#{id}
+	</select>
+	
+	<!-- 更新参数信息 -->
+	<update id="updateSysBenefitParamYear" parameterType="java.util.Map" >
+		update t_sys_benefit_param_year
+ 		<set>
+ 			<if test="map.rate != null and map.rate != ''">rate = #{map.rate},</if>
+ 			<if test="map.update_by != null and map.update_by != ''">update_by = #{map.update_by},</if>
+ 			<if test="map.up_date != null and map.up_date != ''">up_date = #{map.up_date},</if>
+ 			<if test="map.up_time != null and map.up_time != ''">up_time = #{map.up_time},</if>
+ 		</set>
+ 		where id = #{map.id}
+	</update>
+	
+</mapper>

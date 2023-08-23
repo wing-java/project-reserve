@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.product.mapper.SysCategoryMapper">
+
+	<!-- 查询商品信息列表 -->
+	<select id="getSysCategoryList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.category_name,
+			t.rank,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_product_category_info t
+		<where>
+			<if test="map.category_name != null and map.category_name != ''">
+				AND t.category_name = #{map.category_name}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 导出商品分类信息 -->
+	<select id="selectSysCategoryList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.product.domain.SysCategory" >
+		SELECT
+			t.id,
+			t.category_name,
+			t.rank,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_product_category_info t
+		<where>
+			<if test="map.category_name != null and map.category_name != ''">
+				AND t.category_name = #{map.category_name}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 根据编号查询商品详情 -->
+	<select id="getSysCategoryById" parameterType="java.lang.String" resultType="java.util.Map" >
+		SELECT
+			*
+		FROM
+			t_sys_product_category_info 
+		where id=#{category_id}
+	</select>
+	<!-- 新增商品信息 -->
+ 	<insert id="addSysCategory" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="map.goods_id">
+ 		insert into t_sys_product_category_info(
+ 			<if test="map.category_name != null and map.category_name != ''">category_name,</if>
+ 			<if test="map.rank != null and map.rank != ''">rank,</if>
+ 			<if test="map.create_by != null and map.create_by != ''">create_by,</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">cre_date,</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">cre_time</if>
+ 		)values(
+ 			<if test="map.category_name != null and map.category_name != ''">#{map.category_name},</if>
+ 			<if test="map.rank != null and map.rank != ''">#{map.rank},</if>
+ 			<if test="map.create_by != null and map.create_by != ''">#{map.create_by},</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">#{map.cre_date},</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">#{map.cre_time}</if>
+ 		)
+	</insert>
+	<!-- 更新商品信息 -->
+	<update id="updateSysCategory" parameterType="java.util.Map" >
+		update t_sys_product_category_info
+			set 
+			<if test="map.category_name != null and map.category_name != '' ">
+				category_name = #{map.category_name},
+			</if>
+			update_by = #{map.update_by},
+			up_date = #{map.up_date},up_time = #{map.up_time}
+ 		where id=#{map.category_id} 
+	</update>
+	<!-- 查询最大排序-->
+	<select id="getMaxRankSysCategory" resultType="java.lang.String">
+		select max(rank) from t_sys_product_category_info
+	</select>
+	<!-- 查询当前排序产品 -->
+	<select id="getCategoryInfoByRank" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from t_sys_product_category_info where rank = #{map.rank}
+	</select>
+	<!-- 更新产品排序 -->
+	<update id="updateSysCategoryRank" parameterType="java.util.Map">
+		update t_sys_product_category_info set rank = #{map.rank} where id = #{map.id}
+	</update>
+	<!-- 删除 -->
+	<delete id="deleteSysCategory" parameterType="java.lang.String">
+		delete from t_sys_product_category_info where id = #{category_id}
+	</delete>
+	
+</mapper>

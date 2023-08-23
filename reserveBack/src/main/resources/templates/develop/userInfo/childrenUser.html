@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('用户信息列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<input type="hidden" id="user_id" name="user_id" th:value="${user_id}">
+						<ul>
+							<li>
+								子级代数：<input type="text" name="rank" id="rank" />
+							</li>
+							<li>
+								账号：<input type="text" name="sys_user_account" id="sys_user_account" />
+							</li>
+							<li>
+								UID：<input type="text" name="uid" id="uid" />
+							</li>
+							<li>
+								邀请码：<input type="text" name="uid2" id="uid2" />
+							</li>
+							<li>
+								手机号：<input type="text" name="user_tel" id="user_tel" />
+							</li>
+							<li>
+								状态：
+								<select name="status" id="status" th:with="type=${@dict.getType('user_info_status')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								推荐人账号：<input type="text" name="referer_sys_user_account" id="referer_sys_user_account"/>
+							</li>
+							<li>
+								推荐人手机号：<input type="text" name="referer_user_tel" id="referer_user_tel" />
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="searchTable()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+<!-- 	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:userInfo:export"> -->
+<!-- 		            <i class="fa fa-download"></i> 导出 -->
+<!-- 		        </a> -->
+		        <a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="develop:userInfo:edit">
+		            <i class="fa fa-edit"></i> 修改
+		        </a>
+		        <a class="btn btn-warning" onclick="$.operate.sysFreezeUserAll('1');" shiro:hasPermission="develop:userInfo:sysFreeze">
+		            <i class="fa fa-lock"></i> 批量拉黑
+		        </a>
+	            <a class="btn btn-primary" onclick="$.operate.sysFreezeUserAll('0');" shiro:hasPermission="develop:userInfo:sysFreeze">
+		            <i class="fa fa-unlock"></i> 批量解除
+		        </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//详情
+		var detailFlag = [[${@permission.hasPermi('develop:userInfo:detail')}]];
+		//冻结解冻
+		var sysFreezeFlag = [[${@permission.hasPermi('develop:userInfo:sysFreeze')}]];
+		//编辑
+    	var editFlag = [[${@permission.hasPermi('develop:userInfo:edit')}]];
+	
+    	//数据字典
+		var datas_status = [[${@dict.getType('user_info_status')}]];
+		var datas_sys_agent_type = [[${@dict.getType('sys_agent_type')}]];
+	
+		//前缀路径
+		var prefix = "/develop/userInfo";
+		
+		//初始化方法
+		$(function() {
+			//初始化时间范围
+			//intiTime();
+		   	//查询用户列表
+		    queryChildrenUserInfoList();
+		  	//汇总数据
+		    setTimeout("summaryChildrenUserInfoList()","1000"); 
+		});
+
+		
+		//查询用户列表
+		function queryChildrenUserInfoList() {
+		    var options = {
+		        url: prefix + "/childrenList",//URL列表路径
+		        detailUrl: prefix + "/detail/{id}",//详情路径
+		        updateUrl: prefix + "/edit/{id}",//编辑路径
+		        exportUrl: prefix + "/childrenExport",//导出路径
+		        sysAuthOperUrl: prefix + "/sysFreeze/{id}",//导出路径
+		        modalName: "伞下团队成员信息",//模块名称：用户
+		        showFooter: true,
+		        showExport: true,
+		        queryParams: queryParams,
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'rank', 
+					title : '代数',
+					sortable: true
+				},
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true,
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.id + '\')">' + value + '</a>';
+		            }
+				},
+		        {
+					field : 'user_tel', 
+					title : '手机号',
+					formatter: function(value, row, index) {
+						return  '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.id + '\')">' + value + '</a>';
+		            }
+				},
+				{
+					field : 'uid', 
+					title : 'UID',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.id + '\')">' + value + '</a>';
+		            }
+				}, 
+				{
+					field : 'uid2', 
+					title : '邀请码',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.id + '\')">' + value + '</a>';
+		            }
+				}, 
+				{
+					field : 'referer_user_tel', 
+					title : '推荐人手机号',
+					formatter: function(value, row, index) {
+						if(row.referer_id != null && row.referer_id != ''){
+							return  '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.referer_id + '\')">' + value + '</a>';
+						}
+		            }
+				},
+				{
+					field : 'balance_num', 
+					title : '余额',
+					sortable: true,
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.userBenefitTab(\'' + row.id + '\',\'01\')">' + value + '</a> ';
+		            },
+		            footerFormatter:function (value) {
+				        return "<span id='sum_balance_num'>总余额：0.00<span>";
+				    }
+				},
+				{
+					field : 'sharestock_num', 
+					title : '股权',
+					sortable: true
+				},
+				{
+					field : 'total_benefit', 
+					title : '收益',
+					sortable: true
+				},
+				{
+					field : 'person_performance', 
+					title : '认购金额',
+					sortable: true
+				},
+// 				{
+// 					field : 'team_performance', 
+// 					title : '团队业绩',
+// 					sortable: true
+// 				},
+				{
+					field : 'status', 
+					title : '状态',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_status, value);
+		            }
+				},
+				{
+					field : 'referer_num', 
+					title : '直推',
+					sortable: true
+				},
+				{
+					field : 'under_num', 
+					title : '团队',
+					sortable: true
+				},
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	//事件数组
+		                var actions = [];
+		              	//详情按钮
+		            	actions.push('<a class="btn btn-warning btn-xs ' + detailFlag + '" href="javascript:void(0)" onclick="$.operate.detail(\'' + row.id + '\')"><i class="fa fa-search"></i>详细</a> ');
+		            	//编辑按钮：修改信息 全屏
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+		            	if(row.status==0){
+		            		 //冻结
+			                actions.push('<a class="btn btn-danger btn-xs ' + sysFreezeFlag + '" href="javascript:void(0)" onclick="$.operate.sysFreezeUser(\'' + row.id + '\', \'1\')"><i class="fa fa-lock"></i>拉黑</a> ');
+			           	}else{
+			           		//解冻
+			               	actions.push('<a class="btn btn-primary btn-xs ' + sysFreezeFlag + '" href="javascript:void(0)" onclick="$.operate.sysFreezeUser(\'' + row.id + '\', \'0\')"><i class="fa fa-unlock"></i>解除</a> ');
+			           	}
+		              	return actions.join('');
+		            }
+		        }]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+		
+		
+		//参数处理
+		function queryParams(params) {
+			var search = $.table.queryParams(params);
+			search.user_id = $('#user_id').val();//选中的值
+			return search;
+		}
+		
+		
+		//自定义搜索事件
+		function searchTable(){
+			$.table.search();
+			//汇总数据
+		    setTimeout("summaryChildrenUserInfoList()","1000"); 
+		}
+		
+		
+		//汇总数据统计
+		function summaryChildrenUserInfoList(){
+			$.ajax({
+				url:"/develop/userInfo/summaryChildrenUserInfoList",
+				type:"post",
+				dataType:"json",
+				data:{
+					'user_id' : $("#user_id").val(),
+					'rank' : $("#rank").val(),
+					'sys_user_account' : $("#sys_user_account").val(),
+					'uid' : $("#uid").val(),
+					'user_tel' : $("#user_tel").val(),
+					'status' : $("#status").val(),
+					'referer_sys_user_account' : $("#referer_sys_user_account").val(),
+					'referer_user_tel' : $("#referer_user_tel").val(),
+					'beginTime' : $("#startTime").val(),
+					'endTime' : $("#endTime").val()
+				},
+				success:function(data){
+					$("#sum_balance_num").html("总余额："+data.sum_balance_num);
+				},
+				error:function(){
+					alert("error");
+				}
+			});
+		}
+		
+	</script>
+</body>
+</html>

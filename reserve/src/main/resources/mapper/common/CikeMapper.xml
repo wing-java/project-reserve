@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.common.CikeMapper">
+
+	<!-- 保存川军记录 -->
+	<insert id="insertCikeTrade" parameterType="java.util.Map">
+		insert into t_user_trade_cike
+		(
+			user_id,
+			mer_id,
+			order_no,
+			pay_type,
+			notifyurl,
+			money,
+			user_ip,
+			recharge_url,
+			oper_type,
+			sys_order_no,
+			cre_date,
+			cre_time
+		)
+		values
+		(
+			#{map.user_id},
+			#{map.merId},
+			#{map.merOrderId},
+			#{map.payType},
+			#{map.notifyUrl},
+			#{map.tranAmt},
+			#{map.merUserIp},
+			#{map.recharge_url},
+			#{map.oper_type},
+			#{map.sys_order_no},
+			#{map.cre_date},
+			#{map.cre_time}
+		)
+	</insert>
+	
+	<!-- 查询刺客支付订单 -->
+	<select id="getCikeTradeByOrderNo" parameterType="java.lang.String" resultType="java.util.Map">
+		select * from t_user_trade_cike where order_no = #{order_no}
+	</select>
+	
+	<!-- 更新订单状态 -->
+	<update id="updateOrderStatus" parameterType="java.util.Map">
+		update t_user_trade_cike
+		   set status = #{map.status},
+		   	   pay_datetime = #{map.pay_datetime},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where id = #{map.id}
+	</update>
+	
+	<!-- 更新充值订单状态 -->
+	<update id="updateRechargeOrderStatus" parameterType="java.util.Map">
+		update t_user_recharge_online
+		   set status = #{map.new_status},
+		   	   up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where order_no = #{map.order_no}
+		   and status = #{map.old_status}
+	</update>
+
+</mapper>

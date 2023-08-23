@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.product.SysProductOrderMapper">
+	
+	<!-- 更新产品库存数量 -->
+	<update id="updateProductStockAndSales" parameterType="java.util.Map">
+		update t_sys_product_info
+		   set goods_stock_num = goods_stock_num - #{map.goods_num},
+		       goods_sales_num = goods_sales_num + #{map.goods_num},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where id = #{map.product_id}
+		   and goods_stock_num - #{map.goods_num} >= 0
+	</update>
+	
+	<!-- 保存订单信息 -->
+	<insert id="addUserProductOrderInfo" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="map.order_id">
+		insert into t_user_product_order_info
+		(
+			order_no,
+			user_id,
+			goods_num,
+			cash_num,
+			cre_date,
+			cre_time,
+			pay_date,
+			pay_time,
+			product_id,
+			goods_price,
+			goods_name,
+			goods_show,
+			sharestock_num,
+			sharestock_no,
+			init_date1,
+			init_time1,
+			init_date2,
+			init_time2,
+			real_name,
+			status
+		)
+		values
+		(
+			#{map.order_no},
+			#{map.user_id},
+			#{map.goods_num},
+			#{map.cash_num},
+			#{map.cre_date},
+			#{map.cre_time},
+			#{map.cre_date},
+			#{map.cre_time},
+			#{map.product_id},
+			#{map.goods_price},
+			#{map.goods_name},
+			#{map.goods_show},
+			#{map.sharestock_num},
+			#{map.sharestock_no},
+			#{map.cre_date},
+			#{map.cre_time},
+			#{map.cre_date},
+			#{map.cre_time},
+			#{map.real_name},
+			#{map.status}
+		)
+	</insert>
+	
+	<!-- 查询用户产品订单信息 -->
+	<select id="getUserProductOrderInfoById" parameterType="java.util.Map" resultType="java.util.Map">
+		select
+			id as order_id,
+			order_no,
+			user_id,
+			goods_num,
+			cash_num,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(pay_date, pay_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS pay_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(init_date1, init_time1),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date1,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(init_date2, init_time2),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date2,
+			TIMESTAMPDIFF(DAY,CONCAT(init_date1, init_time1),DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')) as days1,
+			TIMESTAMPDIFF(DAY,CONCAT(init_date2, init_time2),DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')) as days2,
+			total_benefit1,
+			total_benefit2,
+			unclaimed_benefit,
+			unclaimed_days,
+			unclaimed_rate,
+			sharestock_num,
+			sharestock_no,
+			real_name,
+			is_end,
+			product_id,
+			goods_price,
+			goods_name,
+			goods_show
+	   from t_user_product_order_info
+	  where id = #{map.order_id}
+	</select>
+	
+	<!-- 查询产品订单列表 -->
+	<select id="getSysProductOrderList" parameterType="java.util.Map" resultType="java.util.Map">
+		select
+			id as order_id,
+			order_no,
+			user_id,
+			goods_num,
+			cash_num,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(pay_date, pay_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS pay_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(init_date1, init_time1),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date1,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(init_date2, init_time2),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date2,
+			TIMESTAMPDIFF(DAY,CONCAT(init_date1, init_time1),DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')) as days1,
+			TIMESTAMPDIFF(DAY,CONCAT(init_date2, init_time2),DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')) as days2,
+			total_benefit1,
+			total_benefit2,
+			unclaimed_benefit,
+			unclaimed_days,
+			unclaimed_rate,
+			sharestock_num,
+			sharestock_no,
+			real_name,
+			is_end,
+			product_id,
+			goods_price,
+			goods_name,
+			goods_show
+	   from t_user_product_order_info
+		where user_id = #{map.sys_user_id} and status = '09'
+			  <if test="map.last_id != null and map.last_id != '' " >
+        		 and id &lt; #{map.last_id}
+      		  </if>
+		order by id desc
+		limit 0,20
+	</select>
+	
+	<!-- 查询证书编号 -->
+	<select id="getSysSharestock" resultType="int">
+		select sharestock_rank from t_sys_sharestock
+	</select>
+	
+	<!-- 更新证书编号 -->
+	<update id="updateSysSharestock">
+		update t_sys_sharestock set sharestock_rank = sharestock_rank + 1
+	</update>
+	
+</mapper>

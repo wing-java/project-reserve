@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('收货地址列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								订单号：<input type="text" name="order_no" id="order_no" />
+							</li>
+							<li>
+								账号：<input type="text" name="sys_user_account" id="sys_user_account" />
+							</li>
+							<li>
+								UID：<input type="text" name="uid" id="uid" />
+							</li>
+							<!-- <li>
+								手机号：<input type="text" name="user_tel" id="user_tel" />
+							</li> -->
+							<li>
+								充值渠道：
+								<select name="recharge_type" id="recharge_type" th:with="type=${@dict.getType('user_recharge_record_recharge_type')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								充值账户：
+								<select name="account_type" id="account_type" th:with="type=${@dict.getType('user_recharge_record_account_type')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								充值状态：
+								<select name="status" id="status" th:with="type=${@dict.getType('user_recharge_record_status')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="searchTable()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+		        <!-- 表格：导出数据 -->
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:userRechargeOnline:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		var detailFlag = [[${@permission.hasPermi('develop:userRechargeOnline:detail')}]];
+	
+		//数据字典
+		var datas_recharge_type = [[${@dict.getType('user_recharge_record_recharge_type')}]];
+		var datas_account_type = [[${@dict.getType('user_recharge_record_account_type')}]];
+		var datas_status = [[${@dict.getType('user_recharge_record_status')}]];
+		var datas_sys_channel_type = [[${@dict.getType('sys_channel_type')}]];
+		
+		//前缀路径
+		var prefix = "/develop/userRechargeOnline";
+		
+		//初始化方法
+		$(function() {
+		   	//查询用户充值记录列表
+		    queryUserRechargeOnlineList();
+		  	//汇总数据
+		    setTimeout("summaryUserRechargeOnlineList()","1000"); 
+		});
+
+		
+		//查询用户余额充值记录列表
+		function queryUserRechargeOnlineList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "余额线上充值",//模块名称：用户
+		        showFooter: true,
+		        showExport: true,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true,
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailRecharge(\'' + row.id + '\')">' + value + '</a>';
+		            }
+				},
+				{
+					field : 'sys_user_account', 
+					title : '编号/账号/UID',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.user_id + '</a>'
+								+ '<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.sys_user_account + '</a>'
+								+'<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.uid + '</a>'
+		            }
+				},
+				{
+					field : 'order_no', 
+					title : '订单号'
+				},
+// 				{
+// 					field : 'out_trade_no', 
+// 					title : '商户订单号'
+// 				},
+				{
+					field : 'recharge_num', 
+					title : '充值数量',
+					footerFormatter:function (value) {
+				        return "<span id='sum_recharge_num'>充值总额：0.00<span>";
+				    }
+				},
+				{
+					field : 'recharge_type', 
+					title : '充值类型',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_recharge_type, value);
+		            }
+				},
+				{
+					field : 'account_type', 
+					title : '充值账户',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_account_type, value);
+		            }
+				},
+				{
+					field : 'status', 
+					title : '充值状态',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_status, value);
+		            }
+				},
+				{
+					field : 'channel_type', 
+					title : '支付类型',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_sys_channel_type, value);
+		            }
+				},
+// 				{
+// 					field : 'trade_status', 
+// 					title : '交易状态'
+// 				},
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+					field : 'up_date', 
+					title : '更新时间',
+					sortable: true
+				}]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+		
+		
+		//自定义搜索事件
+		function searchTable(){
+			$.table.search();
+			//汇总数据
+		    setTimeout("summaryUserRechargeOnlineList()","1000"); 
+		}
+
+		
+		//汇总数据统计
+		function summaryUserRechargeOnlineList(){
+			$.ajax({
+				url:"/develop/userRechargeOnline/summaryUserRechargeOnlineList",
+				type:"post",
+				dataType:"json",
+				data:{
+					'order_id' : $("#order_id").val(),
+					'sys_user_account' : $("#sys_user_account").val(),
+					'uid' : $("#uid").val(),
+					'recharge_type' : $("#recharge_type").val(),
+					'account_type' : $("#account_type").val(),
+					'status' : $("#status").val(),
+					'beginTime' : $("#startTime").val(),
+					'endTime' : $("#endTime").val()
+				},
+				success:function(data){
+					$("#sum_recharge_num").html("充值总额："+data.sum_recharge_num);
+				},
+				error:function(){
+					alert("error");
+				}
+			});
+		}
+		
+	</script>
+</body>
+</html>

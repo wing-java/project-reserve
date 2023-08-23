@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('用户流水详情列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<input type="hidden" id="user_id" name="user_id" th:value="${user_id}">
+						<input type="hidden" id="purse_type_value" name="purse_type_value" th:value="${purse_type}">
+						<ul>
+							<li>
+								订单号：<input type="text" name="order_id"/>
+							</li>
+							<li>
+								手机号：<input type="text" name="user_tel"/>
+							</li>
+							<li>
+								钱包类型：
+								<select name="purse_type" id="purse_type" th:with="type=${@dict.getType('benefit_record_purse_type')}">
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li id="op_type_name">
+							
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+	        	<!-- 表格：导出数据 -->
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:userInfo:userBenefitList">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//详情
+		var detailFlag = [[${@permission.hasPermi('develop:benefitDeposit:detail')}]];
+	
+		//数据字典
+		var datas_purse_type = [[${@dict.getType('benefit_record_purse_type')}]];
+		
+	
+		//前缀路径
+		var prefix = "/develop/userInfo";
+		
+		//初始化方法
+		$(function() {
+			initPurseType();
+			//初始化业务类型
+			initOpType();
+		   	//查询定存钱包流水列表
+		    queryBenefitDepositList();
+		});
+
+		
+		//查询定存钱包流水列表
+		function queryBenefitDepositList() {
+		    var options = {
+		        url: prefix + "/userBenefitList",//URL列表路径
+		        exportUrl: prefix + "/userBenefitExport",//导出路径
+		        modalName: "用户流水详情列表",//模块名称：用户
+		        showExport: true,
+		        queryParams: queryParams,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true
+				},
+				{
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	//事件数组
+		                var actions = [];
+		              	//详情按钮
+		            	actions.push('<a class="btn btn-warning btn-xs ' + detailFlag + '" href="javascript:void(0)" onclick="benefitDetail(\'' + row.order_id + '\',\'' + row.op_type + '\',\'' + row.op_name + '\')"><i class="fa fa-search"></i>详细</a>');
+		              	return actions.join('');
+		            }
+		        },
+				{
+					field : 'purse_type', 
+					title : '钱包类型',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_purse_type, value);
+		            }
+				},
+				{
+					field : 'order_id', 
+					title : '订单号'
+				},
+				{
+					field : 'user_id', 
+					title : '用户编号',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + value + '</a>';
+		            }
+				},
+				{
+					field : 'sys_user_account', 
+					title : '用户账号',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + value + '</a>';
+		            }
+				},
+				{
+					field : 'uid', 
+					title : 'UID',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + value + '</a>';
+		            }
+				},
+				{
+					field : 'op_type', 
+					title : '业务编号'
+				},
+				{
+					field : 'op_name', 
+					title : '业务名称'
+				},
+				{
+					field : 'before_num', 
+					title : '变动前数量'
+				},
+				{
+					field : 'num', 
+					title : '变动数量'
+				},
+				{
+					field : 'after_num', 
+					title : '变动后数量'
+				},
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				}]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+		
+		
+		//初始化钱包类型
+		function initPurseType(){
+			var purse_type_value = $("#purse_type_value").val();
+			$("#purse_type").find("option[value='"+purse_type_value+"']").attr("selected",true);
+		}
+		
+		//初始化业务类型
+		function initOpType(){
+			//查询相应的业务类型列表
+			$.ajax({
+				cache : true,
+				type : "post",
+				url : "/develop/sysBenefitName/getBenefitTypeList",
+				data : {
+					'purse_type' : $("#purse_type option:selected").val()
+				},
+				async : false,
+				error : function(request) {
+					parent.layer.alert("网络超时");
+				},
+				success : function(data) {
+					var obj='业务类型：<select name="op_type" ><option value="">所有</option>';
+					for(var i=0;i<data.length;i++){
+						obj=obj+'<option value='+data[i].op_type+'>'+data[i].op_name+'</option>';
+					}
+					obj=obj+"</select>";
+					$("#op_type_name").html(obj);
+				}
+			});
+		}
+		
+		
+		//钱包类型改变的时候
+		$("#purse_type").on("change",function(){
+			initOpType();
+		})
+		
+		
+		//参数处理
+		function queryParams(params) {
+			var search = $.table.queryParams(params);
+			search.user_id = $('#user_id').val();//选中的值
+			search.purse_type = $('#purse_type option:selected') .val();//选中的值
+			return search;
+		}
+		
+		
+		//查看流水详情
+		function benefitDetail(order_id, op_type, op_name) {
+		    var url = '/develop/benefitDeposit/benefitDetail?order_id='+order_id+'&op_type='+op_type+'&op_name='+op_name;
+		    //打开新的弹出层，对应弹出层名称，URL，长宽大小
+		    $.modal.openFull("流水详情", url);
+		}
+	</script>
+</body>
+</html>

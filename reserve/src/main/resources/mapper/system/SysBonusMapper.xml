@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.system.SysBonusMapper">
+	
+	<!-- 查询系统公告列表 -->
+	<select id="getSysBonusList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			title,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y.%m.%d %H:%i'
+			) AS cre_date
+		FROM
+			t_sys_bonus_info
+		<where>
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 and id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by id desc
+        LIMIT 0,10
+	</select>
+	
+	
+	<!-- 查询系统公告详情 -->
+	<select id="getSysBonusDetail" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			title,
+			content,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y.%m.%d %H:%i:%s'
+			) AS cre_date
+		FROM
+			t_sys_bonus_info
+		WHERE
+			id=#{map.bonus_id}
+	</select>
+	
+</mapper>

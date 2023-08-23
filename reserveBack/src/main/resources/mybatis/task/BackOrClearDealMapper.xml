@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.task.mapper.BackOrClearDealMapper">
+
+	<!-- 备份验证码 -->
+	<insert id="backUpVerifyRecord" parameterType="java.lang.String">
+		insert into t_verify_record_copy(user_id, user_name, system_type, bus_type, acc_type, account, 
+						code, status, create_time, send_time, invalid_time, verify_time, msg_template)
+			   select user_id, user_name, system_type, bus_type, acc_type, account, 
+			   		  code, status, create_time, send_time, invalid_time, verify_time, msg_template from t_verify_record 
+			    where create_time &lt;= #{date}
+	</insert>
+	<!-- 删除短信验证码主表记录 -->
+	<delete id="delVerifyRecord" parameterType="java.lang.String">
+		delete from t_verify_record where create_time &lt;= #{date}
+	</delete>
+	
+</mapper>

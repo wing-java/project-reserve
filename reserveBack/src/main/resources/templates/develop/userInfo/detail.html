@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('用户详细')" />
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	
+	<form class="form-horizontal m-t" id="signupForm" th:object="${userInfo}">
+		
+		<hr><h3>用户基本资料信息</h3>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">用户编号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.id}">
+			</div>
+			<label class="col-sm-2 control-label">用户账号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.sys_user_account}">
+			</div>
+			<label class="col-sm-2 control-label">UID：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.uid}">
+			</div>
+			<label class="col-sm-2 control-label">邀请码：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.uid2}">
+			</div>
+			<label class="col-sm-2 control-label">手机号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.user_tel}">
+			</div>
+			<label class="col-sm-2 control-label">用户状态：</label>
+			<div class="col-sm-4 form-control-static" th:text="${@dict.getLabel('user_info_status',userInfo.status)}" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label" th:if="${userInfo.register_type!=null and userInfo.register_type!=''}" >验证账户：</label>
+			<div class="col-sm-4 form-control-static" th:if="${userInfo.register_type!=null and userInfo.register_type!=''}" th:text="${userInfo.register_type == '1' ? userInfo.user_tel : userInfo.user_email}" >
+			</div>
+			<label class="col-sm-2 control-label" th:if="${userInfo.register_type!=null and userInfo.register_type!=''}" >验证类型：</label>
+			<div class="col-sm-4 form-control-static" th:if="${userInfo.register_type!=null and userInfo.register_type!=''}" th:class="${userInfo.register_type == 1 ? 'label label-primary' : 'label label-danger'}" th:text="${userInfo.register_type == '1' ? '手机' : '邮箱'}">
+			</div>
+		</div>
+<!-- 		<div class="form-group">  -->
+<!--         	<label class="col-sm-2 control-label">用户头像：</label>   -->
+<!--             <div class="col-sm-10"> -->
+<!--                 <div class="ibox float-e-margins"> -->
+<!--                     <div class="ibox-content"> -->
+<!--                         <div class="form-group"> -->
+<!-- 	                        <div class="file-loading"> -->
+<!-- 	                        	<input type="hidden" name="head_photo" id="head_photo" th:value="${userInfo.head_photo}" > -->
+<!-- 					            <input id="fileinput-demo-head_photo" name="file"  type="file"  > -->
+<!-- 					        </div> -->
+<!--                         </div> -->
+<!--                     </div> -->
+<!--                 </div> -->
+<!--             </div> -->
+<!--        	</div> -->
+       	
+		
+		<br><hr><h3>用户钱包基本信息</h3>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">余额：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.balance_num}" >
+			</div>
+			<label class="col-sm-2 control-label">股权：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.sharestock_num}" >
+			</div>
+			<label class="col-sm-2 control-label">总收益：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.total_benefit}" >
+			</div>
+			<label class="col-sm-2 control-label">直推人数：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.referer_num}">
+			</div>
+			<label class="col-sm-2 control-label">团队人数：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.under_num}">
+			</div>
+			<label class="col-sm-2 control-label">认购金额：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.person_performance}">
+			</div>
+<!-- 			<label class="col-sm-2 control-label">团队业绩：</label> -->
+<!-- 			<div class="col-sm-4 form-control-static" th:text="${userInfo.team_performance}" > -->
+<!-- 			</div> -->
+		</div>
+		
+		
+		<br th:if="${userInfo.referer_id!=null}"><hr th:if="${userInfo.referer_id!=null}"><h3 th:if="${userInfo.referer_id!=null}">推荐人基本资料信息</h3>
+		<div class="form-group" th:if="${userInfo.referer_id!=null}">
+			<label class="col-sm-2 control-label">推荐人编号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.referer_id}" >
+			</div>
+			<label class="col-sm-2 control-label">推荐人账号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.referer_sys_user_account}">
+			</div>
+			<label class="col-sm-2 control-label">推荐人UID：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.referer_uid}">
+			</div>
+			<label class="col-sm-2 control-label" th:if="${userInfo.referer_register_type!=null and userInfo.referer_register_type!=''}" >推荐人验证类型：</label>
+			<div class="col-sm-4 form-control-static" th:if="${userInfo.referer_register_type!=null and userInfo.referer_register_type!=''}" th:class="${userInfo.referer_register_type == 1 ? 'label label-primary' : 'label label-danger'}" th:text="${userInfo.referer_register_type == '1' ? '手机' : '邮箱'}">
+			</div>
+		</div>	
+		<div class="form-group" th:if="${userInfo.referer_id!=null}">
+			<label class="col-sm-2 control-label" th:if="${userInfo.referer_register_type!=null and userInfo.referer_register_type!=''}" >推荐人验证账户：</label>
+			<div class="col-sm-4 form-control-static" th:if="${userInfo.referer_register_type!=null and userInfo.referer_register_type!=''}" th:text="${userInfo.referer_register_type == '1' ? userInfo.referer_user_tel : userInfo.referer_user_email}" >
+			</div>
+		</div>
+		
+		<br><hr><h3>用户相关操作信息</h3>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">注册时间：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.cre_date}">
+			</div>
+			<label class="col-sm-2 control-label">更新时间：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.up_date}" >
+			</div>
+			<label class="col-sm-2 control-label">设备类型：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.device_type}" >
+			</div>
+			<label class="col-sm-2 control-label">设备号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.device_no}" >
+			</div>
+			<label class="col-sm-2 control-label">版本号：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.version_no}" >
+			</div>
+			<label class="col-sm-2 control-label">APP版本：</label>
+			<div class="col-sm-4 form-control-static" th:text="${userInfo.app_version}" >
+			</div>
+		</div>
+		
+	</form>
+	
+</div>
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-fileinput-js" />
+
+
+<script th:inline="javascript">
+$(function(){
+	//初始化图片信息
+	inintPhoto();
+})
+
+
+//初始化图片信息
+function inintPhoto(){
+	//用户头像
+	var head_photo_data_preview = [];
+	getHaveSetPhotoArrayView(head_photo_data_preview, $("#head_photo").val());
+	initFileInputDetail(head_photo_data_preview, "head_photo", 1);
+	
+	//商品实名认证图片
+	var card_photo_data_preview = [];
+	getHaveSetPhotoArrayView(card_photo_data_preview, $("#card_photo").val());
+	initFileInputDetail(card_photo_data_preview, "card_photo", 15);
+}
+
+
+</script>
+
+
+</body>
+</html>

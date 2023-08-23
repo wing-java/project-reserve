@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.statistics.mapper.SummaryPlatformBenefitMapper">
+
+
+	<!-- 平台流水类型每日汇总：平台总汇总 -->
+	<select id="getSummaryPlatformBenefitEveryDayTotalList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			null AS cre_date,
+			
+			SUM(balance_type_01) AS balance_type_01,
+			SUM(balance_type_02) AS balance_type_02,
+			SUM(balance_type_03) AS balance_type_03,
+			SUM(balance_type_04) AS balance_type_04,
+			SUM(balance_type_07) AS balance_type_07,
+			SUM(balance_type_08) AS balance_type_08,
+			SUM(balance_type_09) AS balance_type_09,
+			SUM(balance_type_10) AS balance_type_10,
+			SUM(balance_type_11) AS balance_type_11,
+			SUM(balance_type_12) AS balance_type_12,
+			SUM(balance_type_13) AS balance_type_13
+			
+		FROM
+			t_summary_user_benefit_everyday
+		<where>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		order by cre_date DESC
+	</select>
+	
+	
+	<!-- 平台流水类型每日汇总：平台明细汇总 -->
+	<select id="getSummaryPlatformBenefitEveryDayDetailList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			cre_date,
+			
+			SUM(balance_type_01) AS balance_type_01,
+			SUM(balance_type_02) AS balance_type_02,
+			SUM(balance_type_03) AS balance_type_03,
+			SUM(balance_type_04) AS balance_type_04,
+			SUM(balance_type_07) AS balance_type_07,
+			SUM(balance_type_08) AS balance_type_08,
+			SUM(balance_type_09) AS balance_type_09,
+			SUM(balance_type_10) AS balance_type_10,
+			SUM(balance_type_11) AS balance_type_11,
+			SUM(balance_type_12) AS balance_type_12,
+			SUM(balance_type_13) AS balance_type_13
+			
+		FROM
+			t_summary_user_benefit_everyday
+		<where>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		GROUP BY cre_date
+		order by cre_date DESC
+	</select>
+	
+	
+	<!-- 用户流水类型每日汇总：系统总汇总报表导出 -->
+	 <select id="selectSummaryPlatformBenefitEveryDayTotalList" resultType="com.ruoyi.project.develop.statistics.domain.SummaryPlatformBenefitEvery" parameterType="java.util.Map">
+		SELECT
+			null AS cre_date,
+			
+			SUM(balance_type_01) AS balance_type_01,
+			SUM(balance_type_02) AS balance_type_02,
+			SUM(balance_type_03) AS balance_type_03,
+			SUM(balance_type_04) AS balance_type_04,
+			SUM(balance_type_07) AS balance_type_07,
+			SUM(balance_type_08) AS balance_type_08,
+			SUM(balance_type_09) AS balance_type_09,
+			SUM(balance_type_10) AS balance_type_10,
+			SUM(balance_type_11) AS balance_type_11,
+			SUM(balance_type_12) AS balance_type_12,
+			SUM(balance_type_13) AS balance_type_13
+			
+		FROM
+			t_summary_user_benefit_everyday
+		<where>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		order by cre_date DESC
+	</select>
+	
+	
+	<!-- 导出平台流水类型每日汇总：平台明细汇总 -->
+	 <select id="selectSummaryPlatformBenefitEveryDayDetailList" resultType="com.ruoyi.project.develop.statistics.domain.SummaryPlatformBenefitEvery" parameterType="java.util.Map">
+		SELECT
+			null AS cre_date,
+			
+			SUM(balance_type_01) AS balance_type_01,
+			SUM(balance_type_02) AS balance_type_02,
+			SUM(balance_type_03) AS balance_type_03,
+			SUM(balance_type_04) AS balance_type_04,
+			SUM(balance_type_07) AS balance_type_07,
+			SUM(balance_type_08) AS balance_type_08,
+			SUM(balance_type_09) AS balance_type_09,
+			SUM(balance_type_10) AS balance_type_10,
+			SUM(balance_type_11) AS balance_type_11,
+			SUM(balance_type_12) AS balance_type_12,
+			SUM(balance_type_13) AS balance_type_13
+			
+		FROM
+			t_summary_user_benefit_everyday
+		<where>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		GROUP BY cre_date
+		order by cre_date DESC
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('分享收益')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								收益单号：<input type="text" name="order_no"/>
+							</li>
+							<li>
+								账号：<input type="text" name="sys_user_account" />
+							</li>
+							<li>
+								UID：<input type="text" name="uid"/>
+							</li>
+							<li>
+								订单单号：<input type="text" name="buy_order_no" />
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+		        <!-- 表格：导出数据 -->
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//前缀路径
+		var prefix = "/develop/userRewardToAlgebra";
+		
+		//初始化方法
+		$(function() {
+		   	//查询流水类型列表
+		    queryUserRewardToAlgebraList();
+		});
+
+		
+		//查询流水类型列表
+		function queryUserRewardToAlgebraList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "分享收益",//模块名称：用户
+		        showExport: true,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true
+				},
+				{
+					field : 'sys_user_account', 
+					title : '编号/账号/UID',
+					formatter: function(value, row, index) {
+						return '<a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.user_id + '</a>'
+								+ '<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.sys_user_account + '</a>'
+								+'<br><a href="javascript:void(0)" onclick="$.operate.detailUser(\'' + row.user_id + '\')">' + row.uid + '</a>'
+		            }
+				},
+				{
+					field : 'order_no', 
+					title : '收益单号'
+				},
+				{
+					field : 'buy_order_no', 
+					title : '订单单号'
+				},
+				{
+					field : 'benefit', 
+					title : '收益数量'
+				},
+				{
+					field : 'rank', 
+					title : '层级'
+				},
+				{
+					field : 'rate', 
+					title : '收益比例'
+				},
+				{
+					field : 'cre_date', 
+					title : '创建时间'
+				}]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+	</script>
+</body>
+</html>

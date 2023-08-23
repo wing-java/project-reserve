@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.wallet.UserCashMapper">
+
+	
+	<!-- 查询用户提现记录列表-->
+	<select id="getUserCashList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			order_id,
+			user_id,
+			cash_type,
+			account_type,
+			cash_money,
+			arrival_money,
+			feet_money,
+			charge_rate,
+			charge_min,
+			account,
+			account_name,
+			bank_name,
+			cash_status,
+			remark,
+			task_status,
+			trade_no,
+			complete_time,
+			message,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y.%m.%d %H:%i'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y.%m.%d %H:%i'
+			) AS up_date
+		FROM
+			t_user_cash
+		<where>
+			user_id = #{map.sys_user_id}
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by id desc
+      	LIMIT 0,10
+	</select>
+	<!-- 查询用户提现记录详情-->
+	<select id="getUserCashDetail" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			order_id,
+			user_id,
+			cash_type,
+			account_type,
+			cash_money,
+			arrival_money,
+			feet_money,
+			charge_rate,
+			charge_min,
+			account,
+			account_name,
+			bank_name,
+			cash_status,
+			remark,
+			task_status,
+			trade_no,
+			complete_time,
+			message,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y.%m.%d %H:%i'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y.%m.%d %H:%i'
+			) AS up_date
+		FROM
+			t_user_cash
+		where id=#{map.cash_id}
+			and user_id=#{map.sys_user_id}
+	</select>
+	
+	
+	<!-- 保存用户提现申请记录-->
+	<insert id="addUserCash" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="map.cash_id" >
+		insert into t_user_cash (
+			order_id, user_id, cash_type, account_type, cash_money, feet_money, arrival_money, 
+			charge_rate, charge_min,
+			account, account_name, bank_name, bank_branch_name, account_img, legal_id_card, legal_crad_photo,
+			cash_status, cre_date, cre_time)
+		values (
+			#{map.op_order_no}, #{map.user_id}, #{map.cash_type}, #{map.account_type}, #{map.cash_money}, #{map.feet_money}, #{map.arrival_money}, 
+			#{map.charge_rate}, #{map.charge_min}, 
+			#{map.account}, #{map.account_name}, #{map.bank_name}, #{map.bank_branch_name}, #{map.account_img}, #{map.legal_id_card}, #{map.legal_crad_photo}, 
+			#{map.cash_status}, #{map.up_date}, #{map.up_time})
+	</insert>
+	
+	
+	<!-- 保存用户提现记录详情-->
+	<insert id="addUserCashDetail" parameterType="java.util.Map">
+		insert into t_user_cash_detail (
+			cash_id, cash_detail_status, note, cre_date, cre_time)
+		values (
+			#{map.cash_id}, #{map.cash_detail_status}, #{map.note}, #{map.up_date}, #{map.up_time})
+	</insert>
+	
+	<!-- 查询当天提现笔数 -->
+	<select id="getUserCashByDate" parameterType="java.lang.String" resultType="int">
+		select count(1) from t_user_cash where user_id = #{user_id} and cre_date = #{date}
+	</select>
+	
+</mapper>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增菜单')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		
+		<form class="form-horizontal m" id="form-menu-add">
+			
+			<!-- 树id=菜单id -->
+			<input id="treeId" name="parentId" type="hidden" th:value="${menu.menuId}" />
+			
+			<!-- 上级菜单=====》显示菜单名称和对应的选择按钮事件 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">上级菜单：</label>
+				<div class="col-sm-8">
+				    <div class="input-group">
+					    <input class="form-control" type="text" onclick="selectMenuTree()" id="treeName" readonly="true" th:value="${menu.menuName}">
+				        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+				    </div>
+				</div>
+			</div>
+			
+			<!-- 菜单类型 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单类型：</label>
+				<div class="col-sm-8">
+					<label class="radio-box"> <input type="radio" name="menuType" value="M" /> 目录 </label> 
+					<label class="radio-box"> <input type="radio" name="menuType" value="C" /> 菜单 </label> 
+					<label class="radio-box"> <input type="radio" name="menuType" value="F" /> 按钮 </label>
+				</div>
+			</div>
+			
+			<!-- 菜单名称 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="menuName" id="menuName" required>
+				</div>
+			</div>
+			
+			<!-- 请求地址 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">请求地址：</label>
+				<div class="col-sm-8">
+					<input id="url" name="url" class="form-control" type="text">
+				</div>
+			</div>
+			
+			<!-- 打开方式 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">打开方式：</label>
+				<div class="col-sm-8">
+					<select id="target" name="target" class="form-control m-b">
+	                    <option value="menuItem">页签</option>
+	                    <option value="menuBlank">新窗口</option>
+	                </select>
+				</div>
+			</div>
+			
+			<!-- 权限标识 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">权限标识：</label>
+				<div class="col-sm-8">
+					<input id="perms" name="perms" class="form-control" type="text">
+					<span class="help-block m-b-none" style="color: red"><i class="fa fa-info-circle"></i> 控制器中定义的权限标识，如：@RequiresPermissions("")</span>
+				</div>
+			</div>
+			
+			<!-- 显示排序 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">显示排序：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="orderNum" required>
+				</div>
+			</div>
+			
+			<!-- 图标====》默认隐藏图标区域 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">图标：</label>
+				<div class="col-sm-8">
+					<input id="icon" name="icon" class="form-control" type="text" placeholder="选择图标">
+                    <div class="ms-parent" style="width: 100%;">
+                        <div class="icon-drop animated flipInX" style="display: none;max-height:200px;overflow-y:auto">
+                            <div data-th-include="system/menu/icon"></div>
+                        </div>
+                    </div>
+				</div>
+			</div>
+			
+			<!-- 菜单状态 -->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">菜单状态：</label>
+				<div class="col-sm-8">
+				    <div class="radio-box" th:each="dict : ${@dict.getType('sys_show_hide')}">
+						<input type="radio" th:id="${dict.dictCode}" name="visible" th:value="${dict.dictValue}" th:checked="${dict.isDefault == 'Y' ? true : false}">
+						<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+					</div>
+				</div>
+			</div>
+		</form>
+		
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	 <script>
+	 	//URL前缀
+        var prefix = ctx + "system/menu";
+        
+	 	/* 添加菜单信息校验 */
+        $("#form-menu-add").validate({
+        	onkeyup: false,
+        	rules:{
+        		//菜单类型校验
+        		menuType:{
+        			required:true,
+        		},
+        		//菜单名称校验：唯一
+        		menuName:{
+        			remote: {
+                        url: prefix + "/checkMenuNameUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                        	"parentId": function() {
+		                		return $("input[name='parentId']").val();
+		                    },
+                        	"menuName" : function() {
+                                return $.common.trim($("#menuName").val());
+                            }
+                        },
+                        dataFilter: function(data, type) {
+                        	return $.validate.unique(data);
+                        }
+                    }
+        		},
+        		//排序校验
+        		orderNum:{
+        			digits:true
+        		},
+        	},
+        	messages: {
+                "menuName": {
+                    remote: "菜单已经存在"
+                }
+            },
+            focusCleanup: true
+        });
+        
+	 	
+	 	//保存事件
+        function submitHandler() {
+	 		//校验通过
+	        if ($.validate.form()) {
+	        	//保存信息 刷新表格
+	            $.operate.save(prefix + "/add", $('#form-menu-add').serialize());
+	        }
+	    }
+
+	 	
+	 	//初始化事件
+        $(function() {
+        	//（1）如果光标移入图标文本框，则显示图标区域，绑定了后台请求
+        	$("input[name='icon']").focus(function() {
+                $(".icon-drop").show();
+            });
+        	//（2）如果点击form表单其他区域，则隐藏
+        	$("#form-menu-add").click(function(event) {
+        		//window.event.srcElement与window.event.target 都是指向触发事件的元素，它是什么就有什么样的属性。
+        		//IE浏览器支持window.event.srcElement ， 而firefox支持window.event.target；
+        		//获取触发事件的元素
+        	    var obj = event.srcElement || event.target;
+        		//当前元素不是图标，则隐藏
+        	    if (!$(obj).is("input[name='icon']")) {
+        	    	$(".icon-drop").hide();
+        	    }
+        	});
+        	//（3）选中图标列表中的图标之后回显该图标样式到图标文本域
+        	$(".icon-drop").find(".ico-list i").on("click", function() {
+        		$('#icon').val($(this).attr('class'));
+            });
+        	
+        	//radio按钮选中事件触发
+        	$('input').on('ifChecked', function(event){  
+        		//菜单类型
+        		var menuType = $(event.target).val();
+        		//如果是目录====》请求地址、权限标识、打开方式隐藏。图标显示
+        		if (menuType == "M") {
+                    $("#url").parents(".form-group").hide();
+                    $("#perms").parents(".form-group").hide();
+                    $("#icon").parents(".form-group").show();
+                    $("#target").parents(".form-group").hide();
+                } else if (menuType == "C") {
+                //如果是菜单====》请求地址、权限标识、打开方式显示。图标隐藏
+                	$("#url").parents(".form-group").show();
+                    $("#perms").parents(".form-group").show();
+                    $("#icon").parents(".form-group").hide();
+                    $("#target").parents(".form-group").show();
+                } else if (menuType == "F") {
+                //如果是按钮====》请求地址、打开方式、图标隐藏。权限标识显示
+                	$("#url").parents(".form-group").hide();
+                    $("#perms").parents(".form-group").show();
+                    $("#icon").parents(".form-group").hide();
+                    $("#target").parents(".form-group").hide();
+                }
+        	});  
+        });
+
+	 	
+        /*菜单管理-新增-选择菜单树*/
+        function selectMenuTree() {
+        	//树节点
+        	var treeId = $("#treeId").val();
+        	//如果是大于0，显示节点id，否则显示1
+        	var menuId = treeId > 0 ? treeId : 1;
+        	var url = prefix + "/selectMenuTree/" + menuId;
+			var options = {
+				title: '菜单选择',
+				width: "380",
+				url: url,
+				callBack: doSubmit
+			};
+			//弹出层指定参数选项
+			$.modal.openOptions(options);
+		}
+		
+        
+        //保存提交
+		function doSubmit(index, layero){
+			var body = layer.getChildFrame('body', index);
+			//树节点id
+   			$("#treeId").val(body.find('#treeId').val());
+			//树节点名称
+   			$("#treeName").val(body.find('#treeName').val());
+   			layer.close(index);
+		}
+    </script>
+</body>
+</html>

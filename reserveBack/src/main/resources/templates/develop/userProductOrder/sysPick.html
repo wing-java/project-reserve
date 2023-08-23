@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('系统发货')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-userOrder-sysPick">
+		
+		<input type="hidden" name="id" id="id" th:value="${id}" readonly="readonly">
+		
+		<div class="form-group">
+			<label class="col-sm-2 control-label">操作备注：</label>
+			<div class="col-sm-9">
+				<textarea  class="form-control" rows="3" name="remark" id="remark" placeholder="请输入备注" ></textarea>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: area-js" />
+
+<script th:inline="javascript">
+var id = [[${id}]]; 
+
+$("#form-userOrder-sysPick").validate({
+	rules:{
+	},
+	messages: {
+ 	},
+	focusCleanup: true
+});
+
+
+function submitHandler() {
+	if ($.validate.form()) {
+		$.operate.save("/develop/userProductOrder/sysPick", $('#form-userOrder-sysPick').serialize());
+   	}
+}
+
+
+/**
+ * 选择物流编号
+ */
+function selectShipperCode(){
+	var shipper_code = $('#shipper_code option:selected') .val();//选中的值
+// 	if(shipper_code=='JD'){
+// 		$("#customer_name_div").css("display","block");
+// 	}else{
+// 		$("#customer_name_div").css("display","none");
+// 	}
+}
+
+</script>
+	
+</body>
+
+</html>

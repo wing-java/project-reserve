@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.test.mapper.TestMapper">
+
+
+	<!-- 更新用户订单状态 -->
+	<update id="updateUserOrderInfoStatus" parameterType="java.util.Map" >
+		update t_user_order_info 
+			set status=#{map.new_status},credits_status=#{map.new_credits_status},
+				up_date=#{map.up_date},up_time=#{map.up_time}
+			where id=#{map.user_order_id}
+	</update>
+	
+	<select id="getOrderList" resultType="java.util.Map">
+		select * from t_user_product_order_info where is_end = '0'
+	</select>
+
+	
+</mapper>

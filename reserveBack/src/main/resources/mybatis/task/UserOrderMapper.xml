@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.task.mapper.UserOrderMapper">
+
+	<!-- 查询列表 -->
+	<select id="getUserOrderDayBenefitList" resultType="java.util.Map">
+		SELECT
+			t.* 
+		FROM
+			t_user_product_order_info t 
+		WHERE
+			t.is_end = '0' 
+			AND EXISTS (
+			SELECT
+				1 
+			FROM
+				t_sys_benefit_param_day t1 
+			WHERE
+				t1.days = TIMESTAMPDIFF(
+					DAY,
+				t.init_date2,
+			DATE_FORMAT( NOW(), '%Y%m%d')))
+	</select>
+	
+	<!-- 查询列表 -->
+	<select id="getUserOrderYearBenefitList" resultType="java.util.Map">
+		SELECT
+			t.* 
+		FROM
+			t_user_product_order_info t 
+		WHERE
+			t.is_end = '0' 
+			AND EXISTS (
+			SELECT
+				1 
+			FROM
+				t_sys_benefit_param_year t1 
+			WHERE
+				t1.days = TIMESTAMPDIFF(
+					DAY,
+				t.init_date1,
+			DATE_FORMAT( NOW(), '%Y%m%d')))
+	</select>
+	
+	<select id="getUserOrderSettleList" resultType="java.util.Map">
+		select * from t_user_product_order_info where status = '09' and settle_status = '00'
+	</select>
+	
+</mapper>

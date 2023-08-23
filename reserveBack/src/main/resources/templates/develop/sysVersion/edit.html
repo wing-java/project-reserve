@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改系统版本')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<base th:href="${#request.getContextPath()}+'/'">
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-sysVersion-edit">
+		<div class="form-group">
+			<label class="col-sm-3 control-label ">版本号：</label>
+			<div class="col-sm-8">
+				<input class="form-control" type="hidden" name="version_id" id="version_id" th:value="${id}"  />
+				<input class="form-control" type="text" name="version_no" id="version_no" value=""  />
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">版本下载路径：</label>
+			<div class="col-sm-8">
+				<input class="form-control" type="text" name="version_url" id="version_url" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">是否强制更新：</label>
+			<div class="col-sm-8">
+			    <div class="radio-box" th:each="dict : ${@dict.getType('sys_version_info_status')}">
+					<input type="radio" th:id="${dict.dictCode}" name="status" th:value="${dict.dictValue}" th:checked="${dict.isDefault == 'Y' ? true : false}">
+					<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">设备类型：</label>
+			<div class="col-sm-8">
+			    <div class="radio-box" th:each="dict : ${@dict.getType('user_info_device_type')}">
+					<input type="radio" th:id="${dict.dictCode}" name="device_type" th:value="${dict.dictValue}" th:checked="${dict.isDefault == 'Y' ? true : false}">
+					<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">输入更新备注：</label>
+			<div class="col-sm-8">
+				<textarea class="form-control" name="note" id="note" placeholder="请输入参数备注" ></textarea>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label">输入操作备注：</label>
+			<div class="col-sm-8">
+				<textarea class="form-control" name="remark" id="remark" placeholder="请输入操作备注" ></textarea>
+			</div>
+		</div>
+	</form>
+</div>
+
+
+<th:block th:include="include :: footer" />
+
+<script th:inline="javascript">
+var id = [[${id}]]; 
+//查询参数信息
+$(function(){
+	$.ajax({
+		url: "/develop/sysVersion/getSysVersionById",
+		type: 'post',
+		dataType:"json",
+		data:{
+			'id' : id,
+		},
+		success:function(data){
+			$("#version_no").val(data.version_no);
+			$("#version_url").val(data.version_url);
+			$("#note").val(data.note);
+			$("#remark").val(data.remark);
+      	}
+	}); 
+}) 
+
+
+$("#form-sysVersion-edit").validate({
+	rules:{
+		version_no:{
+			required:true
+		},
+		version_url:{
+			required:true
+		},
+		status:{
+			required:true
+		},
+		device_type:{
+			required:true
+		},
+		note: {
+	        required: true
+      	},
+		/* remark: {
+	        required: true
+      	} */
+	},
+	messages: {
+		version_no: {
+            required: "请输入版本号"
+        },
+        version_url: {
+            required: "请输入参数值"
+        },
+        status: {
+            required: "请选择是否强制更新"
+        },
+        device_type: {
+            required: "请选择设备类型"
+        },
+        note: {
+            required: "请输入参数备注"
+        },
+        /* remark: {
+            required: "请输入操作备注"
+        } */
+ 	},
+	focusCleanup: true
+});
+
+function submitHandler() {
+   if ($.validate.form()) {
+   		$.operate.save("/develop/sysVersion/edit", $('#form-sysVersion-edit').serialize());
+   }
+}
+</script>
+	
+</body>
+
+</html>

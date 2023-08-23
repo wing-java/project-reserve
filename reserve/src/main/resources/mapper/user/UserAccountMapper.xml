@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.user.UserAccountMapper">
+
+	
+	<!-- 查询用户账号列表 -->
+	<select id="getUserAccountList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id AS account_id,
+			user_id,
+			account,
+			account_name,
+			legal_id_card,
+			legal_crad_photo,
+			bank_name,
+			bank_branch_name,
+			type,
+			account_img,
+			isdefault,
+			CONCAT(cre_date, cre_time) AS create_time,
+			CONCAT(up_date, up_time) AS update_time
+		FROM
+			t_user_account
+		<where>
+			user_id = #{map.sys_user_id}
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by isdefault desc,id desc
+        LIMIT 0,10
+	</select>
+	
+	
+	<!-- 将用户所有账号均设置成非默认账号 -->
+	<update id="updateAccountNoDefault" parameterType="java.util.HashMap" >
+		update t_user_account set isdefault=0
+		where user_id = #{map.sys_user_id}
+	</update>
+	
+	
+	<!-- 添加用户账号（默认和非默认通用）-->
+	<insert id="addUserAccount" parameterType="java.util.Map" >
+		insert into t_user_account (
+		    user_id, account, account_name, legal_id_card, legal_crad_photo, 
+		    bank_name, bank_branch_name, type, account_img, isdefault, 
+		    cre_date, cre_time)
+		values (
+			#{map.sys_user_id}, #{map.account}, #{map.account_name}, #{map.legal_id_card}, #{map.legal_crad_photo}, 
+			#{map.bank_name}, #{map.bank_branch_name}, #{map.type}, #{map.account_img}, #{map.isdefault}, 
+			#{map.cre_date}, #{map.cre_time})
+	</insert>
+	
+	
+	<!-- 编辑用户账号（默认和非默认方法都通用） -->
+	<update id="updateUserAccount" parameterType="java.util.HashMap" >
+		update t_user_account
+    	<set >
+	      	<if test="map.account != null and map.account != '' " >
+	      		account = #{map.account},
+	      	</if>
+	      	<if test="map.account_name != null and map.account_name != '' " >
+	      		account_name = #{map.account_name},
+	      	</if>
+	      	<if test="map.legal_id_card != null and map.legal_id_card != '' " >
+	      		legal_id_card = #{map.legal_id_card},
+	      	</if>
+	      	<if test="map.legal_crad_photo != null and map.legal_crad_photo != '' " >
+	      		legal_crad_photo = #{map.legal_crad_photo},
+	      	</if>
+	      	<if test="map.bank_name != null and map.bank_name != '' " >
+	      		bank_name = #{map.bank_name},
+	      	</if>
+	      	<if test="map.bank_branch_name != null and map.bank_branch_name != '' " >
+	      		bank_branch_name = #{map.bank_branch_name},
+	      	</if>
+	      	<if test="map.account_img != null and map.account_img != '' " >
+	      		account_img = #{map.account_img},
+	      	</if>
+	      	<if test="map.isdefault != null and map.isdefault != '' " >
+	      		isdefault = #{map.isdefault},
+	      	</if>
+	      	<if test="map.cre_date != null and map.cre_date != '' " >
+	      		up_date = #{map.cre_date},
+	      	</if>
+	      	<if test="map.cre_time != null and map.cre_time != '' " >
+	      		up_time = #{map.cre_time},
+	      	</if>
+    	</set>
+		where id=#{map.account_id} and user_id=#{map.sys_user_id}
+	</update>
+	
+	
+	<!-- 根据地址ID删除用户账号 -->
+	<delete id="deleteUserAccountById" parameterType="java.util.HashMap">
+		delete from t_user_account where id=#{map.account_id} and user_id=#{map.sys_user_id}
+	</delete>
+	
+	
+	<!-- 根据地址id查询用户账户-->
+	<select id="getUserAccountById" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id AS account_id,
+			user_id,
+			account,
+			account_name,
+			legal_id_card,
+			legal_crad_photo,
+			bank_name,
+			bank_branch_name,
+			type,
+			account_img,
+			isdefault
+		FROM
+			t_user_account
+		where
+			id=#{map.account_id}
+			and user_id = #{map.sys_user_id} 
+	</select>
+	
+	
+	<!-- 根据地址ID删除用户账号 -->
+	<delete id="deleteUserAccountByUserId" parameterType="java.lang.String">
+		delete from t_user_account where user_id=#{sys_user_id}
+	</delete>
+	
+	
+	<!-- 查询用户的收款账户数量 -->
+	<select id="getUserAccountNum" parameterType="java.util.Map" resultType="int" >
+		select count(*) from t_user_account 
+		where user_id = #{map.sys_user_id} and type=#{map.type} 
+	</select>
+	
+	
+	<!-- 查询用户账户信息 -->
+	<select id="getUserAccountInfo" parameterType="java.util.Map" resultType="java.util.Map" >
+		select * from t_user_account 
+		where user_id = #{map.sys_user_id}
+	</select>
+	
+	
+	<!-- 查询用户该类型的账户信息 -->
+	<select id="getUserAccountByType" parameterType="java.util.Map" resultType="java.util.Map" >
+		select * from t_user_account 
+		where user_id = #{map.sys_user_id} and type=#{map.type}
+	</select>
+	
+	
+</mapper>

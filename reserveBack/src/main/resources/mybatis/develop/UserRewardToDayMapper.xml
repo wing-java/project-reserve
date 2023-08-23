@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.reward.mapper.UserRewardToDayMapper">
+
+	<!-- 查询直推奖励列表 -->
+	<select id="getUserRewardToDayList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.user_id,
+			t.order_no,
+			t.benefit,
+			t.buy_order_no,
+			t.buy_order_id,
+			t.days,
+			t.rate,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_reward_to_day t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.order_no != null and map.order_no != ''">
+				AND t.order_no = #{map.order_no}
+			</if>
+			<if test="map.buy_order_no != null and map.buy_order_no != ''">
+				AND t.buy_order_no = #{map.buy_order_no}
+			</if>
+			<if test="map.buy_order_id != null and map.buy_order_id != ''">
+				AND t.buy_order_id = #{map.buy_order_id}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+	
+	<!-- 导出直推奖励信息 -->
+	<select id="selectUserRewardToDayList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.reward.domain.UserRewardToDay" >
+		SELECT
+			t.id,
+			t.user_id,
+			t.order_no,
+			t.benefit,
+			t.buy_order_no,
+			t.buy_order_id,
+			t.days,
+			t.rate,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_reward_to_day t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.user_id != null and map.user_id != ''">
+				t.user_id = #{map.user_id}
+			</if>
+			<if test="map.order_no != null and map.order_no != ''">
+				AND t.order_no = #{map.order_no}
+			</if>
+			<if test="map.buy_order_no != null and map.buy_order_no != ''">
+				AND t.buy_order_no = #{map.buy_order_no}
+			</if>
+			<if test="map.buy_order_id != null and map.buy_order_id != ''">
+				AND t.buy_order_id = #{map.buy_order_id}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	
+</mapper>

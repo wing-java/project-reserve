@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.longecological.mapper.user.UserRechargeOfflineMapper">
+	
+	<!-- 保存用户线下充值记录 -->
+	<insert id="insertUserRechargeOffline" parameterType="java.util.Map">
+		insert into t_user_recharge_offline
+			(order_id, user_id, recharge_type, account_type, recharge_num, 
+			recharge_voucher, status, cre_date, cre_time)
+		values
+			(#{map.order_id}, #{map.user_id}, #{map.recharge_type}, #{map.account_type}, #{map.recharge_num},
+			#{map.recharge_voucher}, #{map.status}, #{map.cre_date}, #{map.cre_time})
+	</insert>
+	
+	
+	<!-- 查询用户线下充值记录列表 -->
+	<select id="getUserRechargeOfflineList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			order_id,
+			user_id,
+			recharge_type,
+			account_type,
+			recharge_num,
+			recharge_voucher,
+			status,
+			note,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i'
+			) AS cre_date
+		FROM
+			t_user_recharge_offline
+		<where>
+			user_id=#{map.sys_user_id}
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by id desc
+		LIMIT 0,10
+	</select>
+	
+	
+	<!-- 查询充值记录详情 -->
+	<select id="getUserRechargeOfflineDetail" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			order_id,
+			user_id,
+			recharge_type,
+			account_type,
+			recharge_num,
+			recharge_voucher,
+			status,
+			note,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i'
+			) AS cre_date
+		FROM
+			t_user_recharge_offline
+		where id=#{map.recharge_id}
+	</select>
+	
+</mapper> 

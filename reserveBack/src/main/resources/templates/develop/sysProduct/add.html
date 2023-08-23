@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增商品信息')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-sysProduct-add">
+		
+		<div class="form-group">
+			<input type="hidden" name="goods_navigation" id="goods_navigation" readonly="readonly">
+			<input type="hidden" name="goods_show" id="goods_show" readonly="readonly">
+			<input type="hidden" name="goods_describe" id="goods_describe" readonly="readonly">
+		</div>
+		<div class="form-group">
+<!-- 			<label class="col-sm-1 control-label">商品类型：</label> -->
+<!-- 			<div class="col-sm-11" id="sysCategoryListContent"> -->
+<!-- 			</div> -->
+			<label class="col-sm-1 control-label">商品名称：</label>
+			<div class="col-sm-11">
+				<input class="form-control" type="text" name="goods_name" id="goods_name" placeholder="请输入商品名称" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-1 control-label">交易价：</label>
+			<div class="col-sm-5">
+				<input class="form-control" type="text" name="goods_price" id="goods_price" placeholder="请输入交易价" >
+			</div>
+			<label class="col-sm-1 control-label">股权数量：</label>
+			<div class="col-sm-5">
+				<input class="form-control" type="text" name="sharestock_num" id="sharestock_num" placeholder="请输入股权数量" >
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-1 control-label">销量：</label>
+			<div class="col-sm-5">
+				<input class="form-control" type="text" name="goods_sales_num" id="goods_sales_num" value="0" placeholder="请输入商品销量" >
+			</div>
+			<label class="col-sm-1 control-label">库存数量：</label>
+			<div class="col-sm-5">
+				<input class="form-control" type="text" name="goods_stock_num" id="goods_stock_num" placeholder="请输入库存数量" >
+			</div>
+		</div>
+		<div class="form-group"> 
+			<label class="col-sm-1 control-label ">展示图：</label>  
+            <div class="col-sm-11">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+	                        <div class="file-loading">
+	                        	<input id="fileinput-demo-goods_show" name="file"  type="file" >
+					        </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+       	</div>
+       	<div class="form-group"> 
+        	<label class="col-sm-1 control-label ">导航图：</label>  
+            <div class="col-sm-11">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+	                        <div class="file-loading">
+	                        	<input id="fileinput-demo-goods_navigation" name="file"  type="file" multiple="multiple" >
+					        </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+       	</div>
+       	<div class="form-group"> 
+        	<label class="col-sm-1 control-label ">描述图：</label>  
+            <div class="col-sm-11">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+	                        <div class="file-loading">
+	                        	<input id="fileinput-demo-goods_describe" name="file"  type="file"  multiple="multiple" >
+					        </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+       	</div>
+       
+		<div class="form-group">
+			<label class="col-sm-1 control-label">操作备注：</label>
+			<div class="col-sm-11">
+				<textarea class="form-control" name="remark" id="remark" placeholder="请输入备注"></textarea>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="row" style="margin-bottom: 100px">
+	<div class="col-sm-offset-5 col-sm-10">
+	    <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+	    <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+	</div>
+</div>
+
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-fileinput-js" />
+
+<script th:inline="javascript">
+var goods_show_array = new Array();
+var goods_navigation_array = new Array();
+var goods_describe_array = new Array();
+
+$("#form-sysProduct-add").validate({
+	rules:{
+      	goods_name:{
+			required:true
+		},
+		goods_price: {
+			required:true,
+      	},
+      	sharestock_num: {
+			required:true,
+      	},
+      	goods_stock_num: {
+			required:true,
+      	},
+      	goods_sales_num: {
+			required:true,
+      	}
+	},
+	messages: {
+      	goods_name: {
+      		required: "请输入商品名称"
+      	},
+      	goods_price: {
+      		required: "请输入商品金额"
+      	},
+      	sharestock_num: {
+			required: "请输入股权数量"
+      	},
+      	goods_stock_num: {
+      		required: "请输入库存"
+      	},
+      	goods_sales_num: {
+      		required: "请输入销量"
+      	}
+ 	},
+	focusCleanup: true
+});
+
+
+function submitHandler() {
+	if ($.validate.form()) {
+		console.log(goods_navigation_array);
+		if(goods_show_array.length==0){
+			layer.msg("请选择并上传商品展示图",{icon:5,time : 1000});
+			return;
+		}else if(goods_navigation_array.length==0){
+			layer.msg("请选择并上传商品导航图",{icon:5,time : 1000});
+			return;
+		}else if(goods_describe_array.length==0){
+			layer.msg("请选择并上传商品描述图",{icon:5,time : 1000});
+			return;
+		}else{
+			$("#goods_show").val(getArrayPhotoUrls(goods_show_array));
+			$("#goods_navigation").val(getArrayPhotoUrls(goods_navigation_array));
+			$("#goods_describe").val(getArrayPhotoUrls(goods_describe_array));
+			$.operate.saveTab("/develop/sysProduct/add", $('#form-sysProduct-add').serialize());
+		} 
+   	}
+}
+
+
+$(document).ready(function () {
+	//商品展示图
+	initFileInputAdd("goods_show",goods_show_array,"支持单图片拖拽上传<br>建议图片格式：jpg<br>尺寸大小：334*324",1);
+	//商品导航图
+	initFileInputAdd("goods_navigation",goods_navigation_array,"支持多图片拖拽上传<br>建议图片格式：jpg<br>尺寸大小：750*620",6);
+	//商品导航图
+	initFileInputAdd("goods_describe",goods_describe_array,"支持多图片拖拽上传<br>建议图片格式：jpg<br>尺寸大小：718*高度不限",15);
+});
+
+//初始化商品类型
+function initOpType(){
+	//查询相应的业务类型列表
+	$.ajax({
+		cache : true,
+		type : "post",
+		url : "/develop/sysCategory/getSysCategoryList",
+		data:{
+		},
+		async : false,
+		error : function(request) {
+			parent.layer.alert("网络超时");
+		},
+		success : function(data) {
+			var obj='<select name="category_id" class="form-control m-b">';
+			for(var i=0;i<data.length;i++){
+				obj=obj+'<option value='+data[i].id+'>'+data[i].category_name+'</option>';
+			}
+			obj=obj+"</select>";
+			$("#sysCategoryListContent").html(obj);
+		}
+	});
+}
+
+$(function(){
+// 	initOpType();
+})
+
+
+</script>
+</body>
+</html>

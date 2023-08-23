@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('编辑轮播广告')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-sysAppImg-edit">
+		
+		<input type="hidden" id="appImg_id" name="appImg_id" th:value="${appImg.id}" readonly="readonly" >
+				
+		<input type="hidden" name="img_type" id="img_type" th:value="${appImg.img_type}" readonly="readonly" >
+		
+		<input type="hidden" name="img_url" id="old_img_url" th:value="${appImg.img_url}" readonly="readonly" >
+		<input type="hidden" name="new_img_url" id="new_img_url"  >
+		
+		<div class="form-group"> 
+        	<label class="col-sm-1 control-label ">APP图片：</label>  
+            <div class="col-sm-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-content">
+                        <div class="form-group">
+	                        <div class="file-loading">
+					            <input id="fileinput-demo-new_img_url" name="file"  type="file" >
+					        </div>
+                        </div>
+                        <hr>
+                    </div>
+                </div>
+            </div>
+       	</div>
+       	
+<!--        	<div class="form-group"> -->
+<!-- 			<label class="col-sm-1 control-label">公告编号：</label> -->
+<!-- 			<div class="col-sm-10"> -->
+<!-- 				<textarea class="form-control" rows="5" name="img_link" id="img_link" th:text="${appImg.img_link}" placeholder="请输入图片链接" ></textarea> -->
+<!-- 			</div> -->
+<!-- 		</div> -->
+		
+		<div class="form-group">
+			<label class="col-sm-1 control-label ">排序：</label>
+			<div class="col-sm-10">
+				<input class="form-control" type="text" name="order_num" id="order_num" th:value="${appImg.order_num}" >
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="col-sm-1 control-label">备注说明：</label>
+			<div class="col-sm-10">
+				<textarea class="form-control" rows="" cols="" name="note" id="note" th:text="${appImg.note}" placeholder="请输入备注说明" ></textarea>
+			</div>
+		</div>
+	</form>
+	
+</div>
+
+<div class="row">
+	<div class="col-sm-offset-5 col-sm-10">
+	    <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+	    <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+	</div>
+</div>
+
+
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-fileinput-js" />
+
+<script th:inline="javascript">
+var img_url_data = [];
+
+var img_url_array = new Array();
+
+//初始化图片信息
+$(function() {
+	//初始化图片信息
+	initPhoto();
+});
+
+$("#form-sysAppImg-edit").validate({
+	rules:{
+		/* img_link: {
+	        required: true
+      	}, */
+      	order_num: {
+	        required: true
+      	}
+	},
+	messages: {
+		/* img_link: {
+            required: "请输入图片链接"
+        }, */
+        order_num: {
+            required: "请输入排序"
+        }
+ 	},
+	focusCleanup: true
+});
+
+
+function submitHandler() {
+	if ($.validate.form()) {
+		$("#old_img_url").val(getAllPhotosUrl(img_url_data, img_url_array));
+		if($("#old_img_url").val()==""){
+			layer.msg("请选择并上传图片",{icon:5,time : 1000});
+			return;
+		}else{
+			$.operate.saveTab("/develop/sysAppImg/edit", $('#form-sysAppImg-edit').serialize());
+		}
+   	}
+}
+
+//初始化图片信息
+function initPhoto(){
+// 	var img_url_data_preview = [];
+// 	var img_url_data_preview_config = [];
+// 	getHaveSetPhotoArray(img_url_data, img_url_data_preview, img_url_data_preview_config, $("#old_img_url").val());
+// 	initFileInputEdit(img_url_data, img_url_data_preview, img_url_data_preview_config, "new_img_url",img_url_array,"支持单图片拖拽上传<br>建议图片格式：jpg<br>头部轮播：750*316<br>精选、兑换、免单轮播：750*270<br>分类轮播：558*236",1);
+	
+	
+	var img_url_data_preview = [];
+	var img_url_data_preview_config = [];
+	getHaveSetPhotoArrayVideo(img_url_data, img_url_data_preview, img_url_data_preview_config, $("#old_img_url").val());
+	initFileInputEditVideo(img_url_data, img_url_data_preview, img_url_data_preview_config, "new_img_url",img_url_array,"支持多图片拖拽上传<br>建议图片格式：jpg<br>尺寸大小：750*620",1);
+}
+
+
+</script>
+</body>
+</html>

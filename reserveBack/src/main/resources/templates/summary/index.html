@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="apple-mobile-web-app-capable" content="yes">  
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">  
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<title></title>
+    <link rel="stylesheet" href="../templates/summary/css/index.css">
+    <style>
+		[v-cloak] {display: none;}
+	</style>
+</head>
+<body>
+    <div id="app" v-clock>
+        <div class="index_pages">
+            <div class="index_wrapper">
+                <div class="indexBox_top">
+                    <div class="title">时间段数据</div>
+                    <div class="rightBox">
+                        <div class="tabTitle">
+                            <span @click="checkTab(0)" :class="[tabActive == 0 ? 'active' : '']">今日</span>
+                            <span @click="checkTab(1)" :class="[tabActive == 1 ? 'active' : '']">本周</span>
+                            <span @click="checkTab(2)" :class="[tabActive == 2 ? 'active' : '']">本月</span>
+                            <span @click="checkTab(3)" :class="[tabActive == 3 ? 'active' : '']">全年</span>
+                        </div>
+                        <div class="timeBox">
+                            <div class="timeBox-box" id="test">
+                                <input type="text" class="input" id="startTime" placeholder="yyyy-MM-dd" v-model="startTime">
+                                -
+                                <input type="text" class="input" id="endTime" placeholder="yyyy-MM-dd" v-model="endTime">
+                            </div>
+                            <img src="../templates/summary/img/sreach.png" @click="searchBtn()" alt="">
+                        </div>
+                    </div>
+                </div>
+                <div class="indexBox_main">
+                    <div class="title">用户信息</div>
+                    <div class="wrapper">
+                        <div class="item clo-12">
+                            <img src="../templates/summary/img/1.png" alt="">
+                            <div class="info">
+                                <div class="lable">首充人数</div>
+                                <div class="num" id="num1">0</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-12">
+                            <img src="../templates/summary/img/1.png" alt="">
+                            <div class="info">
+                                <div class="lable">签到人数</div>
+                                <div class="num" id="num2">0</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-12">
+                            <img src="../templates/summary/img/1.png" alt="">
+                            <div class="info">
+                                <div class="lable">登录人数</div>
+                                <div class="num" id="num3">0</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-12">
+                            <img src="../templates/summary/img/2.png" alt="">
+                            <div class="info">
+                                <div class="lable">新增用户</div>
+                                <div class="num" id="num4">0</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-12">
+                            <img src="../templates/summary/img/2.png" alt="">
+                            <div class="info">
+                                <div class="lable">认购总额</div>
+                                <div class="num" id="num5">0.00</div>
+                            </div>
+                        </div>
+<!--                         <div class="line"></div> -->
+<!--                         <div class="item clo-12"> -->
+<!--                             <img src="../templates/summary/img/success.png" alt=""> -->
+<!--                             <div class="info"> -->
+<!--                                 <div class="lable">赠送彩金</div> -->
+<!--                                 <div class="num">35600</div> -->
+<!--                             </div> -->
+<!--                         </div> -->
+                    </div>
+                </div>
+                <div class="indexBox_main">
+                    <div class="title">充值信息</div>
+                    <div class="wrapper">
+                        <div class="item clo-3">
+                            <img src="../templates/summary/img/3.png" alt="">
+                            <div class="info">
+                                <div class="lable">充值次数</div>
+                                <div class="num" id="num6">0</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-3">
+                            <img src="../templates/summary/img/2.png" alt="">
+                            <div class="info">
+                                <div class="lable">充值人数</div>
+                                <div class="num" id="num7">0</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-3">
+                            <img src="../templates/summary/img/4.png" alt="">
+                            <div class="info">
+                                <div class="lable">充值金额</div>
+                                <div class="num" id="num8">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="indexBox_main">
+                    <div class="title">提现信息</div>
+                    <div class="wrapper">
+                        <div class="item clo-3">
+                            <img src="../templates/summary/img/1.png" alt="">
+                            <div class="info">
+                                <div class="lable">提现次数</div>
+                                <div class="num" id="num9">0</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-3">
+                            <img src="../templates/summary/img/3.png" alt="">
+                            <div class="info">
+                                <div class="lable">提现人数</div>
+                                <div class="num" id="num10">0</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-3">
+                            <img src="../templates/summary/img/1.png" alt="">
+                            <div class="info">
+                                <div class="lable">提现总额</div>
+                                <div class="num" id="num11">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="indexBox_main">
+                    <div class="title">系统修改</div>
+                    <div class="wrapper">
+                        <div class="item clo-2">
+                            <img src="../templates/summary/img/2.png" alt="">
+                            <div class="info">
+                                <div class="lable">拨款</div>
+                                <div class="num" id="num12">0.00</div>
+                            </div>
+                        </div>
+                        <div class="line"></div>
+                        <div class="item clo-2">
+                            <img src="../templates/summary/img/3.png" alt="">
+                            <div class="info">
+                                <div class="lable">扣款</div>
+                                <div class="num" id="num13">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="itemBox itemBox_mt">
+                <div class="wrapper">
+                    <div class="item clo-3">
+                        <img src="../templates/summary/img/2.png" alt="">
+                        <div class="info">
+                            <div class="lable">全部充值总额</div>
+                            <div class="num" id="num14">0.00</div>
+                        </div>
+                    </div>
+                    <div class="item clo-3">
+                        <img src="../templates/summary/img/3.png" alt="">
+                        <div class="info">
+                            <div class="lable">全部充值笔数</div>
+                            <div class="num" id="num15">0</div>
+                        </div>
+                    </div>
+                    <div class="item clo-3">
+                        <img src="../templates/summary/img/4.png" alt="">
+                        <div class="info">
+                            <div class="lable">全部充值人数</div>
+                            <div class="num" id="num16">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="itemBox">
+                <div class="wrapper">
+                    <div class="item clo-3">
+                        <img src="../templates/summary/img/3.png" alt="">
+                        <div class="info">
+                            <div class="lable">全部提现总额</div>
+                            <div class="num" id="num17">0.00</div>
+                        </div>
+                    </div>
+                    <div class="item clo-3">
+                        <img src="../templates/summary/img/3.png" alt="">
+                        <div class="info">
+                            <div class="lable">全部提现笔数</div>
+                            <div class="num" id="num18">0</div>
+                        </div>
+                    </div>
+                    <div class="item clo-3">
+                        <img src="../templates/summary/img/2.png" alt="">
+                        <div class="info">
+                            <div class="lable">全部提现人数</div>
+                            <div class="num" id="num19">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="itemBox">
+                <div class="wrapper">
+                    <div class="item clo-2">
+                        <img src="../templates/summary/img/1.png" alt="">
+                        <div class="info">
+                            <div class="lable">全部用户</div>
+                            <div class="num" id="num20">0</div>
+                        </div>
+                    </div>
+                    <div class="item clo-2">
+                        <img src="../templates/summary/img/1.png" alt="">
+                        <div class="info">
+                            <div class="lable">用户总余额</div>
+                            <div class="num" id="num21">0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="itemBox">
+                <div class="wrapper">
+                    <div class="item clo-2">
+                        <img src="../templates/summary/img/3.png" alt="">
+                        <div class="info">
+                            <div class="lable">系统拨款</div>
+                            <div class="num" id="num22">0.00</div>
+                        </div>
+                    </div>
+                    <div class="item clo-2">
+                        <img src="../templates/summary/img/2.png" alt="">
+                        <div class="info">
+                            <div class="lable">系统扣款</div>
+                            <div class="num" id="num23">0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="../templates/summary/js/jquery-3.4.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../templates/summary/js/vue.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../templates/summary/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../templates/summary/laydate/laydate.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        var vm = new Vue({
+            el:'#app',
+            data:{
+                tabActive: 0,
+            },
+            
+            methods: {
+                checkTab(index){
+                	if(this.tabActive != index){
+                        this.tabActive = index;
+                        if(this.tabActive == 0){
+                            this.startTime = this.getOneDayTime();
+                            this.endTime = this.getOneDayTime();
+                        }else if(this.tabActive == 1){
+                            this.startTime = this.getWeekTime("s",0);
+                            this.endTime = this.getWeekTime("e",0);
+                        }else if(this.tabActive == 2){
+                            this.startTime = this.getMonth("s",0);
+                            this.endTime = this.getMonth("e",0);
+                        }else{
+                            this.startTime = this.getYear("s",0);
+                            this.endTime = this.getYear("e",0);
+                        }
+                        console.log("时间：",this.startTime);
+                        console.log("时间：",this.endTime);
+                    }
+                    this.summary($('#startTime').val(), $('#endTime').val());
+                },
+                searchBtn(){
+                	this.tabActive = '-1';
+                	this.summary($('#startTime').val(), $('#endTime').val());
+                },
+             	// 获取当前日期
+                getOneDayTime() {
+                    const date = new Date();
+                    const filters = n => {
+                        return n < 10 ? (n = '0' + n) : n;
+                    };
+                    const month = filters(date.getMonth() + 1);
+                    const day = filters(date.getDate());
+                    const hours = filters(date.getHours());
+                    const minutes = filters(date.getMinutes());
+                    const seconds = filters(date.getSeconds());
+                    const w = filters(date.getDay());
+                    const week="周"+"日一二三四五六".charAt(w);
+                    const lastTime = `${date.getFullYear()}-${month}-${day}`;
+                    return lastTime;
+                },  
+                // 获取本周日期
+                getWeekTime(type,dates) {
+                    var now = new Date();
+                    var nowTime = now.getTime();
+                    var day = now.getDay();
+                    var longTime = 24 * 60 * 60 * 1000;
+                    var n = longTime * 7 * (dates || 0);
+                    if (type == "s") {
+                        var dd = nowTime - (day - 1) * longTime + n;
+                    };
+                    if (type == "e") {
+                        var dd = nowTime + (7 - day) * longTime + n;
+                    };
+                    dd = new Date(dd);
+                    var y = dd.getFullYear();
+                    var m = dd.getMonth() + 1;
+                    var d = dd.getDate();
+                    m = m < 10 ? "0" + m: m;
+                    d = d < 10 ? "0" + d: d;
+                    var day = y + "-" + m + "-" + d;
+                    return day;
+                },  
+                // 获取本月日期
+                getMonth(type, months) {
+                    var d = new Date();
+                    var year = d.getFullYear();
+                    var month = d.getMonth() + 1;
+                    if (Math.abs(months) > 12) {
+                        months = months % 12;
+                    };
+                    if (months != 0) {
+                        if (month + months > 12) {
+                            year++;
+                            month = (month + months) % 12;
+                        } else if (month + months < 1) {
+                            year--;
+                            month = 12 + month + months;
+                        } else {
+                            month = month + months;
+                        };
+                    };
+                    month = month < 10 ? "0" + month: month;
+                    var date = d.getDate();
+                    var firstday = year + "-" + month + "-" + "01";
+                    var lastday = "";
+                    if (month == "01" || month == "03" || month == "05" || month == "07" || month == "08" || month == "10" || month == "12") {
+                        lastday = year + "-" + month + "-" + 31;
+                    } else if (month == "02") {
+                        if ((year % 4 == 0 && year % 100 != 0) || (year % 100 == 0 && year % 400 == 0)) {
+                            lastday = year + "-" + month + "-" + 29;
+                } else {
+                            lastday = year + "-" + month + "-" + 28;
+                        };
+                    } else {
+                        lastday = year + "-" + month + "-" + 30;
+                    };
+                    var day = "";
+                    if (type == "s") {
+                        day = firstday;
+                    } else {
+                        day = lastday;
+                    };
+                    return day;
+                },
+                // 获取本年时间
+                getYear(type, dates) {
+                    var dd = new Date();
+                    var n = dates || 0;
+                    var year = dd.getFullYear() + Number(n);
+                    if (type == "s") {
+                        var day = year + "-01-01";
+                    };
+                    if (type == "e") {
+                        var day = year + "-12-31";
+                    };
+                    if (!type) {
+                        var day = year + "-01-01/" + year + "-12-31";
+                    };
+                    return day;
+                },
+                summary(startDate, endDate){
+                	this.summaryUserInfo(this.startTime, this.endTime);
+                    this.summaryRecharge(this.startTime, this.endTime);
+                    this.summaryCash(this.startTime, this.endTime);
+                },
+                summaryTotal(){
+                	this.summaryTotalRecharge(this.startTime, this.endTime);
+                    this.summaryTotalCash(this.startTime, this.endTime);
+                    this.summaryTotalUser(this.startTime, this.endTime);
+                },
+                summaryUserInfo(startDate, endDate){
+                	$.ajax({
+                		url: "/develop/chartUser/summaryUserInfo",
+                		type: 'post',
+                		dataType:"json",
+                		data:{
+                			'beginTime' : startDate,
+                			'endTime' : endDate
+                		},
+                		success:function(data){
+                			$('#num1').html(data.num1);
+                			$('#num2').html(data.num2);
+                			$('#num3').html(data.num3);
+                			$('#num4').html(data.num4);
+                			$('#num5').html(data.num5 == null ? '0.00' : data.num5);
+                			$('#num12').html(data.num12 == null ? '0.00' : data.num12);
+                			$('#num13').html(data.num13 == null ? '0.00' : data.num13);
+                    	}
+                	}); 
+                },
+                summaryRecharge(startDate, endDate){
+                	$.ajax({
+                		url: "/develop/chartUser/summaryRecharge",
+                		type: 'post',
+                		dataType:"json",
+                		data:{
+                			'beginTime' : startDate,
+                			'endTime' : endDate
+                		},
+                		success:function(data){
+                			$('#num6').html(data.num6);
+                			$('#num7').html(data.num7);
+                			$('#num8').html(data.num8 == null ? '0.00' : data.num8);
+                    	}
+                	}); 
+                },
+                summaryCash(startDate, endDate){
+                	$.ajax({
+                		url: "/develop/chartUser/summaryCash",
+                		type: 'post',
+                		dataType:"json",
+                		data:{
+                			'beginTime' : startDate,
+                			'endTime' : endDate
+                		},
+                		success:function(data){
+                			$('#num9').html(data.num9);
+                			$('#num10').html(data.num10);
+                			$('#num11').html(data.num11 == null ? '0.00' : data.num11);
+                    	}
+                	}); 
+                },
+                summaryTotalRecharge(startDate, endDate){
+                	$.ajax({
+                		url: "/develop/chartUser/summaryTotalRecharge",
+                		type: 'post',
+                		dataType:"json",
+                		data:{
+                			'beginTime' : startDate,
+                			'endTime' : endDate
+                		},
+                		success:function(data){
+                			$('#num15').html(data.num15);
+                			$('#num16').html(data.num16);
+                			$('#num14').html(data.num14 == null ? '0.00' : data.num14);
+                    	}
+                	}); 
+                },
+                summaryTotalCash(startDate, endDate){
+                	$.ajax({
+                		url: "/develop/chartUser/summaryTotalCash",
+                		type: 'post',
+                		dataType:"json",
+                		data:{
+                			'beginTime' : startDate,
+                			'endTime' : endDate
+                		},
+                		success:function(data){
+                			$('#num18').html(data.num18);
+                			$('#num19').html(data.num19);
+                			$('#num17').html(data.num17 == null ? '0.00' : data.num17);
+                    	}
+                	}); 
+                },
+                summaryTotalUser(startDate, endDate){
+                	$.ajax({
+                		url: "/develop/chartUser/summaryTotalUser",
+                		type: 'post',
+                		dataType:"json",
+                		data:{
+                		},
+                		success:function(data){
+                			$('#num20').html(data.num20);
+                			$('#num21').html(data.num21 == null ? '0.00' : data.num21);
+                			$('#num22').html(data.num22 == null ? '0.00' : data.num22);
+                			$('#num23').html(data.num23 == null ? '0.00' : data.num23);
+                    	}
+                	}); 
+                },
+            },
+            mounted() {
+            	let that = this;
+                laydate.render({
+                    elem: '#test',
+                    range: ['#startTime', '#endTime'],
+                    done: function(value){
+                    	that.time = value;
+                    	that.startTime = value.split(' - ')[0];
+                    	that.endTime = value.split(' - ')[1];
+                        console.log("时间：",that.time);
+                        console.log("时间：",that.startTime);
+                        console.log("时间：",that.endTime);
+                    }
+                }); 
+            },
+            created: function(){
+                this.startTime = this.getOneDayTime();
+                this.endTime = this.getOneDayTime();
+                this.checkTab(0);
+                this.summaryTotal();
+            }
+        });
+        
+    </script>
+</body>
+</html>

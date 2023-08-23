@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.user.UserFeedBackMapper">
+
+	
+	<!-- 保存意见没反馈 -->
+	<insert id="addUserFeedBack" parameterType="java.util.Map" >
+		insert into t_user_feedback (
+			user_id,feedback_type,feedback_title,feedback_content,feedback_img,
+			contact_way,cre_date,cre_time)
+		values (
+			#{map.sys_user_id},#{map.feedback_type},#{map.feedback_title},#{map.feedback_content},#{map.feedback_img},
+			#{map.contact_way},#{map.cre_date},#{map.cre_time})
+	</insert>
+	
+	
+	<!-- 查询意见反馈列表 -->
+	<select id="getUserFeedBackList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			user_id,
+			feedback_type,
+			feedback_title,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date
+		FROM
+			t_user_feedback
+		<where>
+			user_id=#{map.sys_user_id}
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by id desc
+		LIMIT 0,10
+	</select>
+	
+	
+	<!-- 查询意见反馈列表 -->
+	<select id="getUserFeedBackDetail" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			user_id,
+			feedback_type,
+			feedback_title,
+			feedback_content,
+			feedback_img,
+			feedback_answer,
+			contact_way,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_user_feedback
+		where id=#{map.feed_back_id}
+	</select>
+	
+</mapper>

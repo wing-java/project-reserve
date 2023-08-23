@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('修改商品分类')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: bootstrap-fileinput-css" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-sysCategory-edit">
+       	<input type="hidden" id="category_id" name="category_id" th:value="${id}" readonly="readonly" >
+       	
+       	<div class="form-group">
+			<label class="col-sm-1 control-label">商品分类：</label>
+			<div class="col-sm-10">
+				<input class="form-control" type="text" name="category_name" id="category_name" >
+			</div>
+		</div>
+		
+	</form>
+</div>
+
+<div class="row">
+	<div class="col-sm-offset-5 col-sm-10">
+	    <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+	    <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+	</div>
+</div>
+
+
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-fileinput-js" />
+
+<script th:inline="javascript">
+$("#form-sysCategory-edit").validate({
+	rules:{
+		category_name:{
+			required:true
+		},
+	},
+	messages: {
+		category_name: {
+            required: "请输入商品分类"
+        },
+ 	},
+	focusCleanup: true
+});
+
+
+function submitHandler() {
+	if ($.validate.form()) {
+		$.operate.saveTab("/develop/sysCategory/edit", $('#form-sysCategory-edit').serialize());
+   	}
+}
+
+var id = [[${id}]]; 
+
+//查询参数信息
+$(function(){
+	$.ajax({
+		url: "/develop/sysCategory/getsysCategoryById",
+		type: 'post',
+		dataType:"json",
+		data:{
+			'id' : id,
+		},
+		success:function(data){
+			$("#category_name").val(data.category_name);
+    	}
+	}); 
+}) 
+
+</script>
+</body>
+</html>

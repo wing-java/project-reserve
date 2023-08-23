@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.develop.notice.mapper.SysNewsMapper">
+    
+    <!-- 查询公告列表 -->
+    <select id="getSysNewsList" parameterType="java.util.Map" resultType="java.util.Map" >
+        SELECT
+			id,
+			news_title,
+			news_cover,
+			news_content,
+			status,
+			create_by,
+			update_by,
+			remark,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_news_info
+        <where>
+			<if test="map.news_title != null and map.news_title != ''">
+				AND news_title like concat('%', #{map.news_title}, '%')
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND status = #{map.status}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+    </select>
+    
+    
+    <!-- 根据id查询新闻资讯详情 -->
+    <select id="getNewsById" parameterType="java.lang.String" resultType="java.util.Map" >
+        SELECT
+			id,
+			news_title,
+			news_cover,
+			news_content,
+			status,
+			create_by,
+			update_by,
+			remark,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(up_date, up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date
+		FROM
+			t_sys_news_info
+        where id = #{news_id}
+    </select>
+    
+    
+   	<!--  新增新闻资讯 -->
+    <insert id="addSysNews" parameterType="java.util.Map">
+        insert into t_sys_news_info (
+			<if test="map.news_title != null and map.news_title != '' ">news_title, </if>
+			<if test="map.news_cover != null and map.news_cover != '' ">news_cover, </if>
+			<if test="map.news_content != null and map.news_content != '' ">news_content, </if>
+			<if test="map.status != null and map.status != '' ">status, </if>
+			<if test="map.remark != null and map.remark != ''">remark,</if>
+ 			<if test="map.create_by != null and map.create_by != ''">create_by,</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">cre_date,</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">cre_time</if>
+ 		)values(
+			<if test="map.news_title != null and map.news_title != ''">#{map.news_title}, </if>
+			<if test="map.news_cover != null and map.news_cover != ''">#{map.news_cover}, </if>
+			<if test="map.news_content != null and map.news_content != ''">#{map.news_content}, </if>
+			<if test="map.status != null and map.status != ''">#{map.status}, </if>
+			<if test="map.remark != null and map.remark != ''">#{map.remark},</if>
+ 			<if test="map.create_by != null and map.create_by != ''">#{map.create_by},</if>
+ 			<if test="map.cre_date != null and map.cre_date != ''">#{map.cre_date},</if>
+ 			<if test="map.cre_time != null and map.cre_time != ''">#{map.cre_time}</if>
+		)
+    </insert>
+	 
+	 
+	<!--  修改新闻资讯 -->
+    <update id="updateSysNews" parameterType="java.util.Map">
+        update t_sys_news_info 
+        <set>
+            <if test="map.news_title != null and map.news_title != ''">news_title = #{map.news_title}, </if>
+            <if test="map.news_cover != null and map.news_cover != ''">news_cover = #{map.news_cover}, </if>
+            <if test="map.news_content != null and map.news_content != ''">news_content = #{map.news_content}, </if>
+            <if test="map.status != null and map.status != ''">status = #{map.status}, </if>
+            <if test="map.remark != null and map.remark != ''">remark = #{map.remark},</if>
+            <if test="map.update_by != null and map.update_by != ''">update_by = #{map.update_by},</if>
+            <if test="map.up_date != null and map.up_date != ''">up_date = #{map.up_date},</if>
+            <if test="map.up_time != null and map.up_time != ''">up_time = #{map.up_time}</if>
+        </set>
+        where id = #{map.news_id}
+    </update>
+	
+	
+	<!-- 删除新闻资讯 -->
+    <delete id="deleteSysNews" parameterType="String">
+        delete from t_sys_news_info where id=#{news_id}
+    </delete>
+    
+</mapper>

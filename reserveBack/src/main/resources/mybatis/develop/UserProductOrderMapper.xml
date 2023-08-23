@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.product.mapper.UserProductOrderMapper">
+
+	<!-- 查询用订单列表 -->
+	<select id="getUserProductOrderList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.order_no,
+			t.user_id,
+			t.goods_num,
+			t.cash_num,
+			t.order_pay_type,
+			t.pay_num,
+			t.pay_balance_num,
+			t.status,
+			t.del,
+			t.remark,
+			t.update_by,
+			t.product_id,
+			t.goods_price,
+			t.goods_name,
+			t.goods_show,
+			t.total_benefit1,
+			t.total_benefit2,
+			t.unclaimed_benefit,
+			t.unclaimed_days,
+			t.unclaimed_rate,
+			t.sharestock_num,
+			t.real_name,
+			t.is_end,
+			t.settle_status,
+			t.sharestock_no,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.pay_date, t.pay_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS pay_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.init_date1, t.init_time1),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date1,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.init_date2, t.init_time2),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date2,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_product_order_info t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.id != null and map.id != ''">
+				t.id = #{map.id}
+			</if>
+			<if test="map.order_no != null and map.order_no != ''">
+				AND t.order_no = #{map.order_no}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.settle_status != null and map.settle_status != ''">
+				AND t.settle_status = #{map.settle_status}
+			</if>
+			<if test="map.del != null and map.del != ''">
+				AND t.del = #{map.del}
+			</if>
+			<if test="map.product_id != null and map.product_id != ''">
+				AND t.product_id = #{map.product_id}
+			</if>
+			<if test="map.user_id != null and map.user_id != ''">
+				AND t.user_id = #{map.user_id}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 导出用订单 -->
+	<select id="selectUserProductOrderList" parameterType="java.util.Map" resultType="com.ruoyi.project.develop.product.domain.UserProductOrder" >
+		SELECT
+			t.id,
+			t.order_no,
+			t.user_id,
+			t.goods_num,
+			t.cash_num,
+			t.order_pay_type,
+			t.pay_num,
+			t.pay_balance_num,
+			t.status,
+			t.del,
+			t.remark,
+			t.update_by,
+			t.product_id,
+			t.goods_price,
+			t.goods_name,
+			t.goods_show,
+			t.total_benefit1,
+			t.total_benefit2,
+			t.unclaimed_benefit,
+			t.unclaimed_days,
+			t.unclaimed_rate,
+			t.sharestock_num,
+			t.real_name,
+			t.is_end,
+			t.settle_status,
+			t.sharestock_no,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.pay_date, t.pay_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS pay_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.init_date1, t.init_time1),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date1,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.init_date2, t.init_time2),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date2,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_product_order_info t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		<where>
+			<if test="map.id != null and map.id != ''">
+				t.id = #{map.id}
+			</if>
+			<if test="map.order_no != null and map.order_no != ''">
+				AND t.order_no = #{map.order_no}
+			</if>
+			<if test="map.status != null and map.status != ''">
+				AND t.status = #{map.status}
+			</if>
+			<if test="map.settle_status != null and map.settle_status != ''">
+				AND t.settle_status = #{map.settle_status}
+			</if>
+			<if test="map.del != null and map.del != ''">
+				AND t.del = #{map.del}
+			</if>
+			<if test="map.product_id != null and map.product_id != ''">
+				AND t.product_id = #{map.product_id}
+			</if>
+			<if test="map.user_id != null and map.user_id != ''">
+				AND t.user_id = #{map.user_id}
+			</if>
+			<if test="map.sys_user_account != null and map.sys_user_account != ''">
+				AND t1.sys_user_account = #{map.sys_user_account}
+			</if>
+			<if test="map.uid != null and map.uid != ''">
+				AND t1.uid = #{map.uid}
+			</if>
+			<if test="map.user_tel != null and map.user_tel != ''">
+				AND t1.user_tel like concat('%', #{map.user_tel}, '%')
+			</if>
+			<if test="map.user_email != null and map.user_email != ''">
+				AND t1.user_email like concat('%', #{map.user_email}, '%')
+			</if>
+			<if test="map.register_type != null and map.register_type != ''">
+				AND t1.register_type = #{map.register_type}
+			</if>
+			<!-- 开始时间检索 -->
+			<if test="map.beginTime != null and map.beginTime != ''">
+				AND t.cre_date &gt;= date_format(#{map.beginTime},'%Y%m%d')
+			</if>
+			<!-- 结束时间检索 -->
+			<if test="map.endTime != null and map.endTime != ''">
+				AND t.cre_date &lt;= date_format(#{map.endTime},'%Y%m%d')
+			</if>
+			<if test="map.memberId != 0">
+				AND (find_in_set(#{map.memberId}, t1.parent_chain) or t1.id = #{map.memberId})
+			</if>
+		</where>
+		<!-- 数据范围过滤 -->
+		${map.dataScope}
+	</select>
+	<!-- 根据编号查询订单详情 -->
+	<select id="getUserProductOrderById" parameterType="java.lang.String" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.order_no,
+			t.user_id,
+			t.goods_num,
+			t.cash_num,
+			t.order_pay_type,
+			t.pay_num,
+			t.pay_balance_num,
+			t.status,
+			t.del,
+			t.remark,
+			t.update_by,
+			t.product_id,
+			t.goods_price,
+			t.goods_name,
+			t.goods_show,
+			t.total_benefit1,
+			t.total_benefit2,
+			t.unclaimed_benefit,
+			t.unclaimed_days,
+			t.unclaimed_rate,
+			t.sharestock_num,
+			t.real_name,
+			t.is_end,
+			t.settle_status,
+			t.sharestock_no,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.pay_date, t.pay_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS pay_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.init_date1, t.init_time1),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date1,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.init_date2, t.init_time2),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date2,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_product_order_info t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		where t.id=#{id}
+	</select>
+	<!-- 根据订单号查询订单详情 -->
+	<select id="getUserProductOrderByProductOrderId" parameterType="java.lang.String" resultType="java.util.Map" >
+		SELECT
+			t.id,
+			t.order_no,
+			t.user_id,
+			t.goods_num,
+			t.cash_num,
+			t.order_pay_type,
+			t.pay_num,
+			t.pay_balance_num,
+			t.status,
+			t.del,
+			t.remark,
+			t.update_by,
+			t.product_id,
+			t.goods_price,
+			t.goods_name,
+			t.goods_show,
+			t.total_benefit1,
+			t.total_benefit2,
+			t.unclaimed_benefit,
+			t.unclaimed_days,
+			t.unclaimed_rate,
+			t.sharestock_num,
+			t.real_name,
+			t.is_end,
+			t.settle_status,
+			t.sharestock_no,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.up_date, t.up_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS up_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.pay_date, t.pay_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS pay_date,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.init_date1, t.init_time1),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date1,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.init_date2, t.init_time2),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS init_date2,
+			t1.sys_user_account,
+			t1.uid,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.nick_name
+		FROM
+			t_user_product_order_info t
+		LEFT JOIN t_user_info t1 ON t.user_id = t1.id
+		where t.order_no=#{order_no}
+	</select>
+	
+</mapper>

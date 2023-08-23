@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('分类列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: bootstrap-editable-css" />
+</head>
+<body class="gray-bg">
+	
+<!-- 系统参数列表 -->
+<div class="container-div ui-layout-center">
+	<div class="row">
+		
+		<!-- 最上面的搜索框 -->
+		<div class="col-sm-12 search-collapse">
+			<form id="user-form">
+				<div class="select-list">
+					<ul>
+						<li>
+							名称：<input type="text" name="category_name"/>
+						</li>
+						<li>
+							<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+						    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+						</li>
+					</ul>
+				</div>
+			</form>
+		</div>
+		
+		
+		<!-- 上面的各项增删改查导入导出操作 -->
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:sysCategory:export">
+	            <i class="fa fa-download"></i> 导出
+	        </a>
+        	<a class="btn btn-success" onclick="$.operate.addTab()" shiro:hasPermission="develop:sysCategory:add">
+                <i class="fa fa-plus"></i> 新增
+            </a>
+            <!-- 操作封装：批量删除信息 -->
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="develop:sysCategory:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+        </div>
+
+        
+        <!-- bootstrap表格数据部分 -->
+        <div class="col-sm-12 select-table table-striped">
+		    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+		</div>
+		
+	</div>
+</div>
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-table-editable-js" />
+<script th:inline="javascript">
+	//编辑
+	var editFlag = [[${@permission.hasPermi('develop:sysCategory:edit')}]];
+	//删除
+	var sysDelFlag = [[${@permission.hasPermi('develop:sysCategory:sysDel')}]];
+	
+	//前缀路径
+	var prefix = "/develop/sysCategory";
+	
+	var datas_sys_goods_type = [[${@dict.getType('sys_goods_type')}]];
+	
+	//初始化方法
+	$(function() {
+	   	//查询商品信息列表
+	    querySysCategoryList();
+	});
+
+		
+	//查询商品信息列表
+	function querySysCategoryList() {
+	    var options = {
+	        url: prefix + "/list",//URL列表路径
+	        createUrl: prefix + "/add",//新增路径
+	        updateUrl: prefix + "/edit/{id}",//编辑路径
+	        removeUrl: prefix + "/remove",//删除路径
+	        exportUrl: prefix + "/export",//导出路径
+	        modalName: "分类信息",//模块名称：用户
+	        showExport: true,
+	        sortName: 'id',
+          	sortOrder: 'desc',
+          	onEditableSave: onEditRankSave,
+	        //列信息
+	        columns: [{
+	            checkbox: true
+	        },
+	        {
+				field : 'id', 
+				title : '编号',
+				sortable: true,
+			},
+			{
+				field : 'rank', 
+				title : '排序',
+				editable: {
+					validate: function (value) { 
+						if ($.trim(value) == '') { 
+							return '排序号不能为空！'; 
+						} 
+						var regx = /^[0-9]*$/;
+						if(!regx.test(value)){
+							return '合法输入：数字';
+						}
+					}
+	            },
+				sortable: true
+			},
+			{
+				field : 'category_name', 
+				title : '名称'
+			},
+			{
+				title: '操作',
+	            align: 'center',
+	            formatter: function(value, row, index) {
+	            	//事件数组
+	                var actions = [];
+                	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i>修改</a> ');
+	              	actions.push('<a class="btn btn-danger btn-xs ' + sysDelFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\',\'1\')"><i class="fa fa-remove"></i>删除</a> ');
+	              	return actions.join('');
+	            }
+	        }]
+	    };
+	    //表格初始化
+	    $.table.init(options);
+	}
+	
+	/**
+	 * 行内编辑
+	 * @param field
+	 * @param row
+	 * @param oldValue
+	 * @param $el
+	 * @returns
+	 */
+	function onEditRankSave (field, row, oldValue, $el) {
+		$.ajax({
+	        type : "POST",
+	        url : '/develop/sysCategory/sort',
+	        data : row,
+	        dataType : 'json',
+	        cache : false,
+	        success : function(data) {
+	            if ("0" == data.code) {
+	            	layer.msg("操作成功",{icon:6,time : 1000},function(){
+	            		$.table.refresh();
+	            	});
+	            } else {
+	            	layer.msg(data.msg,{icon:5,time : 1000},function(){
+	            		$.table.refresh();
+	            	});
+	            }
+	        },
+	        error: function () {
+	        	layer.msg("编辑失败",{icon:5,time : 1000},function(){
+	        		$.table.refresh();
+	        	});
+	        },
+	        complete: function () {
+	            
+	        }
+	    });
+	}
+</script>
+</body>
+
+</html>

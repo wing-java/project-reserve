@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.product.SysProductMapper">
+	
+	<!-- 查询平台产品列表 -->
+	<select id="getSysProductList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id as product_id,
+			goods_name,
+			goods_show,
+			goods_navigation,
+			goods_stock_num,
+			goods_sales_num,
+			goods_price,
+			order_num,
+			sharestock_num,
+			cre_date,
+			cre_time
+		FROM
+			t_sys_product_info
+		<where>
+			goods_status = '09' 
+<!-- 			AND category_id = #{map.category_id} -->
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND order_num &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by order_num desc
+        LIMIT 0,20
+	</select>
+	
+	<!-- 查询产品详情 -->
+	<select id="getSysProductById" parameterType="java.util.Map" resultType="java.util.Map">
+		select
+			id as product_id,
+			goods_name,
+			goods_show,
+			goods_navigation,
+			goods_describe,
+			goods_stock_num,
+			goods_sales_num,
+			goods_price,
+			sharestock_num,
+			order_num,
+			cre_date,
+			cre_time
+		FROM
+			t_sys_product_info
+		where id = #{map.product_id}	
+	</select>
+	
+</mapper>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('商品列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: bootstrap-editable-css" />
+</head>
+<body class="gray-bg">
+	
+<!-- 系统参数列表 -->
+<div class="container-div ui-layout-center">
+	<div class="row">
+		
+		<!-- 最上面的搜索框 -->
+		<div class="col-sm-12 search-collapse">
+			<form id="user-form">
+				<div class="select-list">
+					<ul>
+						<li>
+							<input type="hidden" name="del_status" value="0" />
+							商品名称：<input type="text" name="goods_name"/>
+						</li>
+						<li>
+							商品状态：
+							<select name="goods_status" th:with="type=${@dict.getType('goods_info_goods_status')}">
+								<option value="">所有</option>
+								<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+							</select>
+						</li>
+						<li class="select-time">
+							<label>创建时间： </label>
+							<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+							<span>-</span>
+							<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+						</li>
+						<li>
+							<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+						    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+						</li>
+					</ul>
+				</div>
+			</form>
+		</div>
+		
+		
+		<!-- 上面的各项增删改查导入导出操作 -->
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:sysProduct:export">
+	            <i class="fa fa-download"></i> 导出
+	        </a>
+        	<a class="btn btn-success" onclick="$.operate.addTab()" shiro:hasPermission="develop:sysProduct:add">
+                <i class="fa fa-plus"></i> 新增
+            </a>
+            <a class="btn btn-danger" onclick="$.operate.sysDelAll('1');" shiro:hasPermission="develop:sysProduct:sysDel">
+	            <i class="fa fa-remove"></i> 删除
+	        </a>
+            <a class="btn btn-warning" onclick="$.operate.sysReleaseGoodsAll('09');" shiro:hasPermission="develop:sysProduct:sysRelease">
+	            <i class="fa fa-long-arrow-up"></i> 上架
+	        </a>
+            <a class="btn btn-primary" onclick="$.operate.sysReleaseGoodsAll('08');" shiro:hasPermission="develop:sysProduct:sysRelease">
+	            <i class="fa fa-long-arrow-down"></i> 下架
+	        </a>
+        </div>
+
+        
+        <!-- bootstrap表格数据部分 -->
+        <div class="col-sm-12 select-table table-striped">
+		    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+		</div>
+		
+	</div>
+</div>
+
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: bootstrap-table-editable-js" />
+<script th:inline="javascript">
+	//编辑
+	var editFlag = [[${@permission.hasPermi('develop:sysProduct:edit')}]];
+	//删除
+	var sysDelFlag = [[${@permission.hasPermi('develop:sysProduct:sysDel')}]];
+	//详情
+	var detailFlag = [[${@permission.hasPermi('develop:sysProduct:detail')}]];
+	//商品上下架
+	var sysReleaseFlag = [[${@permission.hasPermi('develop:sysProduct:sysRelease')}]];
+	
+	
+	//数据字典
+	var datas_goods_status = [[${@dict.getType('goods_info_goods_status')}]];
+
+	//前缀路径
+	var prefix = "/develop/sysProduct";
+	
+	//初始化方法
+	$(function() {
+	   	//查询商品信息列表
+	    querySysProductList();
+	});
+
+		
+	//查询商品信息列表
+	function querySysProductList() {
+	    var options = {
+	        url: prefix + "/list",//URL列表路径
+	        createUrl: prefix + "/add",//新增路径
+	        updateUrl: prefix + "/edit/{id}",//编辑路径
+	        removeUrl: prefix + "/remove",//删除路径
+	        exportUrl: prefix + "/export",//导出路径
+	        sysAuthReleaseUrl: prefix + "/sysRelease/{id}",//发布
+	        sysAuthDelUrl: prefix + "/sysDel/{id}",//删除
+	        modalName: "商品",//模块名称：用户
+	        showExport: true,
+	        sortName: 'id',
+          	sortOrder: 'desc',
+          	onEditableSave: onEditRankSave,
+	        //列信息
+	        columns: [{
+	            checkbox: true
+	        },
+	        {
+				field : 'id', 
+				title : '编号',
+				sortable: true,
+				formatter: function(value, row, index) {
+					return '<a href="javascript:void(0)" onclick="$.operate.detailGoods(\'' + row.id + '\')">' + value + '</a>';
+	            }
+			},
+			{
+				field : 'order_num', 
+				title : '排序',
+				editable: {
+					validate: function (value) { 
+						if ($.trim(value) == '') { 
+							return '排序号不能为空！'; 
+						} 
+						var regx = /^[0-9]*$/;
+						if(!regx.test(value)){
+							return '合法输入：数字';
+						}
+					}
+	            },
+				sortable: true
+			},
+			{
+				field : 'goods_show', 
+				title : '展示图',
+				formatter: function(value, row, index) {
+					return $.table.imageView(qiniu_domain+value);
+				}
+			},
+			{
+				field : 'goods_name', 
+				title : '名称',
+				align: 'center',
+			  	formatter: function(value, row, index) {
+			  		var goods_name_desc = $.table.tooltip(row.goods_name)
+			  		return goods_name_desc;
+			  	}
+			},
+			{
+				field : 'goods_price', 
+				title : '商品金额',
+				sortable: true
+			},
+			{
+				field : 'goods_sales_num', 
+				title : '销量',
+				sortable: true
+			},
+			{
+				field : 'goods_stock_num', 
+				title : '库存',
+				sortable: true
+			},
+			{
+				field : 'sharestock_num', 
+				title : '股权数量',
+				sortable: true
+			},
+			{
+				field : 'goods_status', 
+				title : '状态',
+				align: 'center',
+	            formatter: function(value, row, index) {
+	            	return $.table.selectDictLabel(datas_goods_status, value);
+	            }
+			},
+// 			{
+// 				field : 'category_name', 
+// 				title : '商品分类'
+// 			},
+			{
+				field : 'cre_date', 
+				title : '创建时间',
+				sortable: true
+			},
+			{
+				title: '操作',
+	            align: 'center',
+	            formatter: function(value, row, index) {
+	            	//事件数组
+	                var actions = [];
+	              	if(row.goods_status!='09' && row.del_status=='0'){
+	              		//未上架、未上架且未删除=====>编辑、新增明细、下架
+	                	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.editTab(\'' + row.id + '\')"><i class="fa fa-edit"></i>修改</a> ');
+		              	actions.push('<a class="btn btn-success btn-xs ' + sysReleaseFlag + '" href="javascript:void(0)" onclick="$.operate.sysReleaseGoods(\'' + row.id + '\', \'09\')"><i class="fa fa-long-arrow-up"></i>上架</a> ');
+		              	actions.push('<a class="btn btn-danger btn-xs ' + sysDelFlag + '" href="#" onclick="$.operate.sysDel(\'' + row.id + '\',\'1\')"><i class="fa fa-remove"></i>删除</a> ');
+	              	}else{
+	              		//已上架====>下架
+	              		actions.push('<a class="btn btn-danger btn-xs ' + sysReleaseFlag + '" href="javascript:void(0)" onclick="$.operate.sysReleaseGoods(\'' + row.id + '\', \'08\')"><i class="fa fa-long-arrow-down"></i>下架</a> ');
+	              	}
+	              	return actions.join('');
+	            }
+	        },
+			/* {
+				field : 'up_date', 
+				title : '更新时间',
+				sortable: true
+			}, */
+			/* {
+				field : 'update_by', 
+				title : '更新人'
+			} */]
+	    };
+	    //表格初始化
+	    $.table.init(options);
+	}
+	
+	/**
+	 * 行内编辑
+	 * @param field
+	 * @param row
+	 * @param oldValue
+	 * @param $el
+	 * @returns
+	 */
+	function onEditRankSave (field, row, oldValue, $el) {
+		$.ajax({
+	        type : "POST",
+	        url : '/develop/sysProduct/sort',
+	        data : row,
+	        dataType : 'json',
+	        cache : false,
+	        success : function(data) {
+	            if ("0" == data.code) {
+	            	layer.msg("操作成功",{icon:6,time : 1000},function(){
+	            		$.table.refresh();
+	            	});
+	            } else {
+	            	layer.msg(data.msg,{icon:5,time : 1000},function(){
+	            		$.table.refresh();
+	            	});
+	            }
+	        },
+	        error: function () {
+	        	layer.msg("编辑失败",{icon:5,time : 1000},function(){
+	        		$.table.refresh();
+	        	});
+	        },
+	        complete: function () {
+	            
+	        }
+	    });
+	}
+	
+</script>
+</body>
+
+</html>

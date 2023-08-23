@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.longecological.mapper.wallet.UserRollMapper">
+	
+	
+	<!-- 记录转账订单 -->
+	<insert id="addUserRoll" parameterType="java.util.Map" >
+		insert into t_user_roll (
+			order_id,roll_type,out_user_id,in_user_id,in_user_account,
+			roll_num,roll_charge,charge_rate,charge_min,cre_date,cre_time)
+		values (
+			#{map.op_order_no},#{map.roll_type},#{map.out_user_id},#{map.in_user_id},#{map.in_user_account},
+			#{map.roll_num},#{map.roll_charge},#{map.charge_rate},#{map.charge_min},#{map.up_date},#{map.up_time})
+	</insert>
+	
+	
+	<!-- 查询转出订单记录 --> 
+	<select id="getUserRollOutList" resultType="java.util.HashMap" parameterType="java.util.HashMap" >
+		SELECT
+			t.id,
+			t.order_id,
+			t.roll_type,
+			t.in_user_id AS user_id,
+			t.out_user_id,
+			t.in_user_id,
+			CONCAT("-", CAST(t.roll_num AS CHAR)) AS roll_num,
+			CAST(t.roll_charge AS CHAR) AS roll_charge,
+			CAST(t.charge_rate AS CHAR) AS charge_rate,
+			CAST(t.charge_min AS CHAR) AS charge_min,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.head_photo,
+			t1.sys_user_account,
+			t1.nick_name,
+			#{map.sys_user_id} as sys_user_id
+		FROM
+			t_user_roll t
+		LEFT JOIN t_user_info t1 ON t.in_user_id = t1.id
+		<where>
+			t.out_user_id = #{map.sys_user_id}
+			<if test="map.roll_type != null and map.roll_type != '' " >
+        		AND roll_type=#{map.roll_type}
+      		</if>
+      		<if test="map.last_id != null and map.last_id != '' " >
+        		 AND t.id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by t.id desc
+      	LIMIT 0,10
+	</select>
+	
+	
+	<!-- 查询转入订单记录  -->
+	<select id="getUserRollInList" resultType="java.util.HashMap" parameterType="java.util.HashMap" >
+		SELECT
+			t.id,
+			t.order_id,
+			t.roll_type,
+			t.out_user_id AS user_id,
+			t.out_user_id,
+			t.in_user_id,
+			CONCAT("+", CAST(t.roll_num AS CHAR)) AS roll_num,
+			CAST(t.roll_charge AS CHAR) AS roll_charge,
+			CAST(t.charge_rate AS CHAR) AS charge_rate,
+			CAST(t.charge_min AS CHAR) AS charge_min,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(t.cre_date, t.cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i:%s'
+			) AS cre_date,
+			t1.register_type,
+			t1.user_tel,
+			t1.user_email,
+			t1.head_photo,
+			t1.sys_user_account,
+			t1.nick_name,
+			#{map.sys_user_id} as sys_user_id
+		FROM
+			t_user_roll t
+		LEFT JOIN t_user_info t1 ON t.out_user_id = t1.id
+		<where>
+			t.in_user_id = #{map.sys_user_id}
+			<if test="map.roll_type != null and map.roll_type != '' " >
+        		AND roll_type=#{map.roll_type}
+      		</if>
+      		<if test="map.last_id != null and map.last_id != '' " >
+        		 AND t.id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by t.id desc
+      	LIMIT 0,10
+	</select>
+	
+	
+</mapper>

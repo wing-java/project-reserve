@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.project.develop.task.mapper.UserBenefitMapper">
+
+	<!-- 查询待汇总流水列表 -->
+	<select id="getBenefitRecordAll" resultType="java.util.Map">
+		select * from t_benefit_record_all
+	</select>
+	
+	<!-- 更新总汇总流水 -->
+	<update id="updateUserBenefitAll" parameterType="java.util.Map">
+		update t_summary_user_benefit_all
+		   set ${map.column} = ${map.column} + #{map.benefit},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where user_id = #{map.user_id}
+	</update>
+	
+	<!-- 查询每日汇总 -->
+	<select id="getUserBenefitEveryday" parameterType="java.lang.String" resultType="int">
+		select count(1) from t_summary_user_benefit_everyday where user_id = #{user_id} and cre_date = #{date} 
+	</select>
+	
+	<!-- 新增每日汇总 -->
+	<insert id="addUserBenefitEveryday" parameterType="java.util.Map">
+		insert into t_summary_user_benefit_everyday(user_id, cre_date, ${map.column}) values(#{map.user_id}, #{map.date}, #{map.benefit})
+	</insert>
+	
+	<!-- 更新每日汇总 -->
+	<update id="updateUserBenefitEveryday" parameterType="java.util.Map">
+		update t_summary_user_benefit_everyday
+		   set ${map.column} = ${map.column} + #{map.benefit}
+		 where user_id = #{map.user_id}
+		   and cre_date = #{map.date}
+	</update>
+	
+	<!-- 删除待汇总流水 -->
+	<delete id="deleteUserBenefit" parameterType="java.lang.String">
+		delete from t_benefit_record_all where id = #{id}
+	</delete>
+	
+</mapper>

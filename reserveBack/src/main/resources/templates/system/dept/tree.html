@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('部门树选择')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<th:block th:include="include :: ztree-css" />
+</head>
+<style>
+	body{height:auto;font-family: "Microsoft YaHei";}
+	button{font-family: "SimSun","Helvetica Neue",Helvetica,Arial;}
+</style>
+
+<body class="hold-transition box box-main">
+	
+	<!-- 树节点id=部门id -->
+	<input id="treeId"   name="treeId"    type="hidden" th:value="${dept.deptId}"/>
+	<!-- 树节点名称=部门名称 -->
+	<input id="treeName" name="treeName"  type="hidden" th:value="${dept.deptName}"/>
+	
+	<!-- 搜索框区域 -->
+	<div class="wrapper"><div class="treeShowHideButton" onclick="$.tree.toggleSearch();">
+		<!-- 是否显示搜索区域，默认显示 -->
+		<label id="btnShow" title="显示搜索" style="display:none;">︾</label>
+		<label id="btnHide" title="隐藏搜索">︽</label>
+	</div>
+	<div class="treeSearchInput" id="search">
+		<!-- 搜索框关键字 -->
+		<label for="keyword">关键字：</label><input type="text" class="empty" id="keyword" maxlength="50">
+		<!-- 封装方法：搜索子节点 -->
+		<button class="btn" id="btn" onclick="$.tree.searchNode()"> 搜索 </button>
+	</div>
+	
+	<!-- 树节点区域 -->
+	<div class="treeExpandCollapse">
+		<!-- 封装方法：树节点展开 -->
+		<a href="#" onclick="$.tree.expand()">展开</a> /
+		<!-- 封装方法：树节点折叠 -->
+		<a href="#" onclick="$.tree.collapse()">折叠</a>
+	</div>
+	<!-- 显示树节点的地方 -->
+	<div id="tree" class="ztree treeselect"></div>
+	</div>
+	
+	
+	<th:block th:include="include :: footer" />
+	<th:block th:include="include :: ztree-js" />
+	
+	<script th:inline="javascript">
+		/* 初始方法：加载部门列表树数据 */
+		$(function() {
+			var url = ctx + "system/dept/treeData";
+			var options = {
+		        url: url,
+		        expandLevel: 2,
+		        onClick : zOnClick
+		    };
+			$.tree.init(options);
+		});
+		
+		
+		//点击事件
+		function zOnClick(event, treeId, treeNode) {
+		    var treeId = treeNode.id;
+		    var treeName = treeNode.name;
+		  	//节点id赋值搜索
+		    $("#treeId").val(treeId);
+		  	//节点名称赋值搜索
+		    $("#treeName").val(treeName);
+		}
+	</script>
+</body>
+</html>

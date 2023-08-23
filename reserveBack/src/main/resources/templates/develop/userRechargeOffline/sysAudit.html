@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('提币结果处理')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+	<base th:href="${#request.getContextPath()}+'/'">
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-userRechargeOffline-sysAudit">
+		
+		<div class="form-group">
+			<label class="col-sm-3 control-label">请输入操作备注：</label>
+			<div class="col-sm-8">
+				<input type="hidden" name="recharge_ids" id="recharge_ids" th:value="${id}">
+				<input type="hidden" name="status" id="status" th:value="${operParam}">
+				<textarea class="form-control" name="remark" id="remark" placeholder="请输入操作备注"></textarea>
+			</div>
+		</div>
+		
+	</form>
+</div>
+
+
+<th:block th:include="include :: footer" />
+
+<script th:inline="javascript">
+
+$("#form-userRechargeOffline-sysAudit").validate({
+	rules:{
+		/* remark: {
+	        required: true
+      	} */
+	},
+	messages: {
+        /* remark: {
+            required: "请输入操作备注"
+        } */
+ 	},
+	focusCleanup: true
+});
+
+function submitHandler() {
+   if ($.validate.form()) {
+   		$.operate.save("/develop/userRechargeOffline/sysAudit", $('#form-userRechargeOffline-sysAudit').serialize());
+   }
+}
+</script>
+	
+</body>
+
+</html>

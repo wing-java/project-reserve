@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.longecological.mapper.user.UserInfoMapper">
+
+	<!-- 根据id查询用户账户信息 -->
+	<select id="getUserInfoById" parameterType="java.lang.String" resultType="java.util.Map" >
+		SELECT * FROM t_user_info where id = #{user_id}
+	</select>
+	<!-- 根据sys_user_account查询账户信息 -->
+	<select id="getUserInfoByUserAccount" parameterType="java.lang.String" resultType="java.util.Map" >
+		SELECT
+			id,
+			uid,
+			uid2,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			nick_name,
+			login_password,
+			pay_password,
+			head_photo,
+			status,
+			referer_id,
+			referer_num,
+			under_num,
+			algebra,
+			parent_chain,
+			cre_date,
+			cre_time
+		FROM
+			t_user_info
+		 where sys_user_account=#{sys_user_account}
+	</select>
+	<!-- 根据nick_name查询账户信息 -->
+	<select id="getUserInfoByNickName" parameterType="java.lang.String" resultType="java.util.Map" >
+		SELECT
+			id,
+			uid,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			nick_name,
+			login_password,
+			pay_password,
+			head_photo,
+			status,
+			referer_id,
+			referer_num,
+			under_num,
+			algebra,
+			parent_chain,
+			cre_date,
+			cre_time
+		FROM
+			t_user_info
+		 where nick_name=#{nick_name}
+	</select>
+	<!-- 根据UID查询用户账户信息 -->
+	<select id="getUserInfoByUid" parameterType="java.lang.String" resultType="java.util.Map" >
+		SELECT
+			id,
+			uid,
+			uid2,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			nick_name,
+			login_password,
+			pay_password,
+			head_photo,
+			status,
+			referer_id,
+			referer_num,
+			under_num,
+			algebra,
+			parent_chain,
+			cre_date,
+			cre_time
+		FROM
+			t_user_info
+		 where uid2=#{uid}
+	</select>
+	<!-- 根据账号查询用户账户信息 -->
+	<select id="getUserInfoByUserAccountTel" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			uid,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			nick_name,
+			login_password,
+			pay_password,
+			head_photo,
+			status,
+			referer_id,
+			referer_num,
+			under_num,
+			algebra,
+			parent_chain,
+			cre_date,
+			cre_time
+		FROM
+			t_user_info
+		<where>
+      		<!-- 手机号 -->
+			<if test="map.register_type == 1 " >
+        		user_tel = #{map.user_account}
+      		</if>
+      		<!-- 邮箱 -->
+      		<if test="map.register_type == 2 " >
+        		AND user_email = #{map.user_account}
+      		</if>
+      		<!-- 业务类型为忘记密码，必须匹配用户账号 -->
+      		<if test="map.bus_type != null and map.bus_type != '' and map.bus_type == 'FrontForgetPass' " >
+        		AND sys_user_account = #{map.sys_user_account}
+      		</if>
+		</where>
+	</select>
+	<!-- 通过用户ID查询用户基础信息放入缓存 -->
+	<select id="getUserInfoCacheById" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+			id,
+			uid,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			nick_name,
+			login_password,
+			pay_password,
+			head_photo,
+			status,
+			referer_id,
+			algebra,
+			parent_chain,
+			auth_status,
+			cre_date,
+			cre_time
+		FROM
+			t_user_info
+		where id = #{user_id}
+	</select>
+	<!-- 通过用户ID实时查询用户信息 -->
+	<select id="getRealUserInfoById" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+			t.id,
+			t.uid,
+			t.uid2,
+			t.sys_user_account,
+			t.register_type,
+			t.user_tel,
+			t.user_email,
+			t.nick_name,
+			t.head_photo,
+			t.status,
+			t.referer_id,
+			t.referer_num,
+			t.under_num,
+			t.algebra,
+			t.parent_chain,
+			t.pay_password,
+			t.person_performance,
+			t.team_performance,
+			t.is_valid,
+			t.real_name,
+			t.auth_status,
+			t1.balance_num,
+			t1.sharestock_num,
+			t1.total_benefit,
+			t.cre_date,
+			t.cre_time
+		FROM
+			t_user_info t
+		left join t_user_wallet t1 on t.id = t1.user_id
+		where t.id = #{user_id}
+	</select>
+	<!-- 实时查询用户钱包信息 -->
+	<select id="getUserWalletInfo" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+			balance_num,
+			sharestock_num,
+			total_benefit
+		FROM
+			t_user_wallet
+		where user_id = #{user_id}
+	</select>
+	
+	
+	<!-- 记录用户登录日志 -->
+	<insert id="addUserLoginInfo" parameterType="java.util.Map">
+		insert into t_user_login_log (user_id, ipaddr, login_location, browser, os, login_time)
+		values (#{map.user_id}, #{map.ipaddr}, #{map.login_location}, #{map.browser}, #{map.os}, sysdate())
+	</insert>
+	<!-- 更新用户设备信息 -->
+	<update id="updateUserDeviceInfo" parameterType="java.util.Map" >
+		update t_user_info
+			set device_no=#{map.device_no}
+		where id=#{map.user_id} and device_no is null;
+	</update>
+	<!-- 更新用户版本信息 -->
+	<update id="updateUserVersionInfo" parameterType="java.util.Map" >
+		update t_user_info
+			set device_type=#{map.device_type}, 
+				version_no=#{map.version_no}, app_version=#{map.app_version}
+		where id=#{map.user_id}
+	</update>
+	<!-- 记录用户异常日志 -->
+	<insert id="addUserErrorOperLog" parameterType="java.util.Map">
+		insert into t_user_error_oper_log 
+			(user_id, ipaddr, login_location, browser, os, login_time,
+			device_type, device_no, version_no, app_version)
+		values 
+			(#{map.user_id}, #{map.ipaddr}, #{map.login_location}, #{map.browser}, #{map.os}, sysdate(),
+			 #{map.device_type}, #{map.device_no}, #{map.version_no}, #{map.app_version})
+	</insert>
+	<!-- 更新所有父级的伞下人数 -->
+	<update id="updateParentUnderNum" parameterType="java.util.Map" >
+		UPDATE t_user_info
+			SET under_num=under_num+1, up_date=#{map.cre_date}, up_time=#{map.cre_time}
+		WHERE find_in_set(id,#{map.parent_chain})
+	</update>
+	<!-- 更新父级直推人数 -->
+	<update id="updateUserReferNum" parameterType="java.util.Map">
+		update t_user_info set referer_num=referer_num+1, up_date=#{map.cre_date}, up_time=#{map.cre_time}
+		where id=#{map.referer_id}
+	</update>
+	<!-- 用户注册 -->
+	<insert id="saveUserInfo" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="map.id" >
+		insert into t_user_info (
+			sys_user_account,uid,uid2,
+			<if test="map.user_tel != null and map.user_tel != '' " >
+	      		user_tel,
+	      	</if>
+	      	<if test="map.user_email != null and map.user_email != '' " >
+	      		user_email,
+	      	</if>
+	      	<if test="map.sex != null and map.sex != '' " >
+	      		sex,
+	      	</if>
+	      	<if test="map.device_type != null and map.device_type != '' " >
+	      		device_type,
+	      	</if>
+	      	<if test="map.device_no != null and map.device_no != '' " >
+	      		device_no,
+	      	</if>
+	      	<if test="map.version_no != null and map.version_no != '' " >
+	      		version_no,
+	      	</if>
+	      	<if test="map.app_version != null and map.app_version != '' " >
+	      		app_version,
+	      	</if>
+	      	<if test="map.referer_id != null and map.referer_id != '' " >
+	      		referer_id,
+	      	</if>
+	      	<if test="map.algebra != null and map.algebra != '' " >
+	      		algebra,
+	      	</if>
+	      	<if test="map.parent_chain != null and map.parent_chain != '' " >
+	      		parent_chain,
+	      	</if>
+	      	<if test="map.real_name != null and map.real_name != '' " >
+	      		real_name,
+	      	</if>
+			nick_name,register_type,login_password,pay_password,head_photo,
+			cre_date,cre_time)
+		values (
+			#{map.sys_user_account},#{map.uid},#{map.uid2},
+			<if test="map.user_tel != null and map.user_tel != '' " >
+	      		#{map.user_tel},
+	      	</if>
+	      	<if test="map.user_email != null and map.user_email != '' " >
+	      		#{map.user_email},
+	      	</if>
+	      	<if test="map.sex != null and map.sex != '' " >
+	      		#{map.sex},
+	      	</if>
+	      	<if test="map.device_type != null and map.device_type != '' " >
+	      		#{map.device_type},
+	      	</if>
+	      	<if test="map.device_no != null and map.device_no != '' " >
+	      		#{map.device_no},
+	      	</if>
+	      	<if test="map.version_no != null and map.version_no != '' " >
+	      		#{map.version_no},
+	      	</if>
+	      	<if test="map.app_version != null and map.app_version != '' " >
+	      		#{map.app_version},
+	      	</if>
+	      	<if test="map.referer_id != null and map.referer_id != '' " >
+	      		#{map.referer_id},
+	      	</if>
+	      	<if test="map.algebra != null and map.algebra != '' " >
+	      		#{map.algebra},
+	      	</if>
+	      	<if test="map.parent_chain != null and map.parent_chain != '' " >
+	      		#{map.parent_chain},
+	      	</if>
+	      	<if test="map.real_name != null and map.real_name != '' " >
+	      		#{map.real_name},
+	      	</if>
+			#{map.nick_name},#{map.register_type},#{map.login_password},#{map.pay_password},#{map.head_photo},
+			#{map.cre_date},#{map.cre_time})
+	</insert>
+	<!-- 更新用户资料（头像） -->
+	<update id="updateUserInfo" parameterType="java.util.Map" >
+		update t_user_info
+		<set>
+			<if test="map.sys_user_account != null and map.sys_user_account != '' " >
+	      		sys_user_account = #{map.sys_user_account},
+	      	</if>
+	      	<if test="map.nick_name != null and map.nick_name != '' " >
+	      		nick_name = #{map.nick_name},
+	      	</if>
+			<if test="map.head_photo != null and map.head_photo != '' " >
+	      		head_photo = #{map.head_photo},
+	      	</if>
+	      	<if test="map.sex != null and map.sex != '' " >
+	      		sex = #{map.sex},
+	      	</if>
+	      	up_date = #{map.up_date}, up_time = #{map.up_time}
+		</set>
+		where id=#{map.sys_user_id}
+	</update>
+	
+	
+	<!-- 更新用户登录密码 -->
+	<update id="updateUserLoginPass" parameterType="java.util.Map" >
+		update t_user_info set login_password=#{map.login_password}
+			where id=#{map.sys_user_id}
+	</update>
+	<!-- 更新用户交易密码 -->
+	<update id="updateUserPayPass" parameterType="java.util.Map" >
+		update t_user_info set pay_password=#{map.pay_password}
+			where id=#{map.sys_user_id}
+	</update>
+	<!-- 更新用户登录密码并锁定绑定注册类型 -->
+	<update id="updateUserLoginPassRegisterType" parameterType="java.util.Map" >
+		update t_user_info set login_password=#{map.login_password},register_type=#{map.register_type}
+			where id=#{map.sys_user_id}
+	</update>
+	<!-- 修改用户手机号 -->
+	<update id="updateUserTel" parameterType="java.util.Map" >
+		update t_user_info 
+			set user_tel=#{map.sys_user_account},
+				sys_user_account=#{map.sys_user_account}
+		where id=#{map.sys_user_id}
+	</update>
+	
+	
+	<!-- 查询冻结用户信息 -->
+	<select id="getUserFreezeCacheById" parameterType="java.lang.String" resultType="java.util.Map">
+		select * from t_user_frozen where user_id = #{user_id}
+	</select>
+	<!-- 查询该手机号注册人数 -->
+	<select id="getRegisterNumByUserTel" parameterType="java.lang.String" resultType="java.lang.Integer" >
+		select count(*) from t_user_info where user_tel=#{user_tel}
+	</select>
+	<!-- 查询该邮箱注册人数 -->
+	<select id="getRegisterNumByUserEmail" parameterType="java.lang.String" resultType="java.lang.Integer" >
+		select count(*) from t_user_info where user_email=#{user_email}
+	</select>
+	
+	
+	<!-- 查询伞下指定代数的用户数量 -->
+	<select id="getUnderTeamNumByAlgebra" parameterType="java.lang.String" resultType="java.lang.String" >
+		SELECT
+			count(*)
+		FROM
+			t_user_info
+		WHERE
+			FIND_IN_SET(#{user_id}, parent_chain)
+		AND algebra - #{user_algebra} = #{algebra_num}
+	</select>
+	<!-- 查询伞下指定代数的用户列表 -->
+	<select id="getUnderTeamListByAlgebra" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			referer_id,
+			uid,
+			nick_name,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			head_photo,
+			status,
+			referer_num,
+			under_num,
+			person_performance,
+			team_performance,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i'
+			) AS cre_date
+		FROM
+			t_user_info
+		<where>
+			FIND_IN_SET(#{map.user_id}, parent_chain)
+			AND algebra - #{map.user_algebra} = #{map.algebra_num}
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by id desc
+		LIMIT 0,30	
+	</select>
+	<!-- 查询用户直推团队列表 -->
+	<select id="getUserReferList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			id,
+			uid,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			nick_name,
+			head_photo,
+			status,
+			referer_id,
+			referer_num,
+			under_num,
+			algebra,
+			parent_chain,
+			person_performance,
+			team_performance,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i'
+			) AS cre_date
+		FROM
+			t_user_info t
+		<where>
+			t.referer_id=#{map.sys_user_id}
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND t.id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by t.id desc
+		LIMIT 0,30
+	</select>
+	<!-- 查询用户间推团队列表 -->
+	<select id="getUserIndirectList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			id,
+			referer_id,
+			uid,
+			nick_name,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			head_photo,
+			status,
+			referer_num,
+			under_num,
+			person_performance,
+			team_performance,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i'
+			) AS cre_date
+		FROM
+			t_user_info
+		<where>
+			FIND_IN_SET(#{map.sys_user_id}, parent_chain)
+			and referer_id!=#{map.sys_user_id}
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by id desc
+		LIMIT 0,30
+	</select>
+	<!-- 查询用户伞下团队列表 -->
+	<select id="getUserTeamList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			id,
+			referer_id,
+			uid,
+			nick_name,
+			sys_user_account,
+			register_type,
+			user_tel,
+			user_email,
+			head_photo,
+			status,
+			referer_num,
+			under_num,
+			person_performance,
+			team_performance,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i'
+			) AS cre_date
+		FROM
+			t_user_info
+		<where>
+			FIND_IN_SET(#{map.sys_user_id}, parent_chain)
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by id desc
+		LIMIT 0,30
+	</select>
+	<select id="getUserSupervisorInfo" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			register_type,
+			user_email,
+			user_tel,
+			head_photo,
+			nick_name,
+			status
+		FROM
+			t_user_info 
+		WHERE sys_user_account = #{map.in_user_account}
+	</select>
+	<!-- 根据设备号查询用户数量 -->
+	<select id="getUserDeviceNoNum" parameterType="java.util.Map" resultType="java.lang.Integer" >
+		select count(*) from t_user_info
+		<where>
+			device_no=#{map.device_no}
+			<if test="map.user_id != null and map.user_id != '' ">
+				and id != #{map.user_id}
+			</if>
+		</where>
+	</select>
+	<!-- 更新用户余额钱包-->
+	<update id="updateUserBalanceNum" parameterType="java.util.Map" >
+		update t_user_info 
+			set balance_num=balance_num+#{map.balance_num},
+				op_type=#{map.op_type},
+				op_order_no=#{map.op_order_no},
+				up_date=#{map.up_date},up_time=#{map.up_time}
+			where id = #{map.user_id} 
+				and balance_num+#{map.balance_num} >= 0
+	</update>
+	<!-- 根据手机号查询用户信息 -->
+	<select id="getUserByTel" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+			id,
+			uid,
+			register_type,
+			user_email,
+			user_tel,
+			head_photo,
+			nick_name,
+			status
+		FROM
+			t_user_info 
+		WHERE user_tel = #{user_tel}
+	</select>
+	<!-- 更新文票积分 -->
+	<update id="updateUserTicketNum" parameterType="java.util.Map">
+		update t_user_info 
+			set ticket_num=ticket_num+#{map.ticket_num},
+				op_type=#{map.op_type},
+				op_order_no=#{map.op_order_no},
+				up_date=#{map.up_date},up_time=#{map.up_time}
+			where id = #{map.user_id} 
+				and ticket_num+#{map.ticket_num} >= 0
+	</update>
+	<!-- 查询头部信息 -->
+	<select id="getUserTeamInfo" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+			t.id,
+			t.referer_num,
+			t.under_num,
+			(select count(1) from t_user_info t1 where find_in_set(t.id, t1.parent_chain) and t1.algebra=t.algebra+1) as first_num,
+			(select count(1) from t_user_info t1 where find_in_set(t.id, t1.parent_chain) and t1.algebra=t.algebra+2) as second_num,
+			(select count(1) from t_user_info t1 where find_in_set(t.id, t1.parent_chain) and t1.algebra=t.algebra+3) as third_num,
+			(select count(1) from t_user_info t1 where find_in_set(t.id, t1.parent_chain) and t1.algebra=t.algebra+1 and t1.person_performance > 0) as active_first_num,
+			(select count(1) from t_user_info t1 where find_in_set(t.id, t1.parent_chain) and t1.algebra=t.algebra+2 and t1.person_performance > 0) as active_second_num,
+			(select count(1) from t_user_info t1 where find_in_set(t.id, t1.parent_chain) and t1.algebra=t.algebra+3 and t1.person_performance > 0) as active_third_num,
+			(select count(1) from t_user_info t1 where find_in_set(t.id, t1.parent_chain) and t1.algebra>=t.algebra+1 and t1.algebra&lt;=t.algebra+3) as total_num,
+			IFNULL((select sum(person_performance) from t_user_info t1 where find_in_set(t.id, t1.parent_chain) and t1.algebra>=t.algebra+1 and t1.algebra&lt;=t.algebra+3),0.00) as total_performance
+		FROM
+			t_user_info t 
+		WHERE
+			t.id = #{user_id}
+	</select>
+	
+	<!-- 添加钱包 -->
+	<insert id="addUserWallet" parameterType="java.lang.String">
+		insert into t_user_wallet(user_id) values(#{user_id})
+	</insert>
+	
+	<!-- 添加总流水 -->
+	<insert id="addSummaryUserBenefit" parameterType="java.lang.String">
+		 insert into t_summary_user_benefit_all(user_id) values(#{user_id})
+	</insert>
+	
+	<!-- 更新个人业绩 -->
+	<update id="updatePersonPerformance" parameterType="java.util.Map">
+		update t_user_info
+		   set person_performance = person_performance + #{map.performance},
+		       is_valid='1',
+		       up_date = #{map.date},
+		       up_time = #{map.time}
+		 where id = #{map.user_id}
+	</update>
+	
+	<!-- 更新上级业绩 -->
+	<update id="updateTeamPerformance" parameterType="java.util.Map">
+		update t_user_info
+		   set team_performance = team_performance + #{map.performance},
+		       up_date = #{map.date},
+		       up_time = #{map.time}
+		 where find_in_set(id, #{map.parent_chain})
+	</update>
+	
+	<!-- 查询实名信息 -->
+	<select id="getUserReal" parameterType="java.lang.String" resultType="java.util.Map">
+		select * from t_user_real where user_id = #{user_id}
+	</select>
+	
+	<!-- 添加实名 -->
+	<insert id="addUserReal" parameterType="java.util.Map">
+		insert into t_user_real
+		(
+			user_id,
+			name,
+			id_card,
+			card_photo,
+			status,
+			cre_date,
+			cre_time
+		)
+		values
+		(
+			#{map.user_id},
+			#{map.name},
+			#{map.id_card},
+			#{map.card_photo},
+			#{map.status},
+			#{map.cre_date},
+			#{map.cre_time}
+		)
+	</insert>
+	
+	<!-- 更新实名 -->
+	<update id="updateUserReal" parameterType="java.util.Map">
+		update t_user_real
+		   set name = #{map.name},
+		       id_card = #{map.id_card},
+		       card_photo = #{map.card_photo},
+		       status = #{map.status},
+		       note =#{map.note},
+		       up_date = #{map.up_date},
+		       up_time = #{map.up_time}
+		 where user_id = #{map.user_id}
+	</update>
+	
+	<!-- 更新实名状态 -->
+	<update id="updateUserAuthStatus" parameterType="java.util.Map">
+		update t_user_info
+		   set auth_status = #{map.auth_status}
+		 where id = #{map.id}
+	</update>
+	
+	<!-- 查询会员推荐奖励 -->
+	<select id="getUserByTeamBenefit" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+			first_benefit+second_benefit+third_benefit as total_benefit,
+			first_benefit,
+			second_benefit,
+			third_benefit,
+			IFNULL(( SELECT sum( benefit ) FROM t_user_reward_to_algebra WHERE user_id = #{user_id} AND cre_date = DATE_FORMAT( NOW(), '%Y%m%d' )), 0.00 ) AS today_benefit 
+		FROM
+			t_user_wallet 
+		WHERE
+			user_id = #{user_id}
+	</select>
+	
+	<!--  -->
+	<select id="getUserRealByIdCard" parameterType="java.util.Map" resultType="int">
+		select count(1) from t_user_real where id_card = #{map.id_card} and user_id &lt;&gt; #{map.sys_user_id}
+	</select>
+	
+</mapper>

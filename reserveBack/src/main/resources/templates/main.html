@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--360浏览器优先以webkit内核解析-->
+    <title>储备计划介绍</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link href="../static/css/font-awesome.min.css" th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link href="../static/css/main/animate.min.css" th:href="@{/css/main/animate.min.css}" rel="stylesheet"/>
+    <link href="../static/css/main/style.min862f.css" th:href="@{/css/main/style.min862f.css}" rel="stylesheet"/>
+</head>
+
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+    	
+    	 <!-- 钱包实时统计 -->
+    	<div class="row">
+    		<div class="col-sm-2" style="width: auto;">
+              	<div class="panel panel-primary">
+                  	<div class="panel-heading">余额</div>
+                  	<div class="panel-body">
+                     	<h1 class="text-navy" id="total_balance_num" >0.00</h1>
+                  	</div>
+              	</div>
+          	</div>
+          	<div class="col-sm-2" style="width: auto;">
+              	<div class="panel panel-primary">
+                  	<div class="panel-heading">股权</div>
+                  	<div class="panel-body">
+                     	<h1 class="text-navy" id="total_sharestock_num" >0.00</h1>
+                  	</div>
+              	</div>
+          	</div>
+          	<div class="col-sm-2" style="width: auto;">
+              	<div class="panel panel-primary">
+                  	<div class="panel-heading">总收益</div>
+                  	<div class="panel-body">
+                     	<h1 class="text-navy" id="total_total_benefit" >0.00</h1>
+                  	</div>
+              	</div>
+          	</div>
+       	</div>    
+    
+        <!-- 实时注册图表 -->
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>折线图</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="echarts" id="echarts-line-chart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>柱状图</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="echarts" id="echarts-bar-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: peity-js" />
+    <th:block th:include="include :: sparkline-js" />
+    
+    <th:block th:include="include :: echarts-js" />
+    <script type="text/javascript">
+	    $(function(){
+	    	/* 平台钱包统计 */
+// 	    	platformPurse();
+			/* 用户注册量实时统计分析 */
+// 			userRegister();
+		})
+	  	//数据处理
+		function dealAmount(obj,num) {
+			var result=0;
+			if(obj!=null&&obj!=""&&obj!="undefined"){
+				result=obj;
+			}
+			return parseFloat(result).toFixed(num);
+		}
+		//平台钱包总量统计
+	    function platformPurse(){
+	    	$.ajax({
+				url:"/develop/chartUser/platformPurse",
+				type:"post",
+				dataType:"json",
+				data:{},
+				success:function(data){
+					$("#total_balance_num").html(dealAmount(data.total_balance_num,2));
+					$("#total_sharestock_num").html(dealAmount(data.total_sharestock_num,2));
+					$("#total_total_benefit").html(dealAmount(data.total_total_benefit,2));
+				},
+				error:function(){
+					alert("error");
+				}
+			});
+	    }
+		//用户注册量实时统计
+		function userRegister(){
+			$.ajax({
+				url:"/develop/chartUser/userRegister",
+				type:"post",
+				dataType:"json",
+				data:{},
+				success:function(data){
+					//用户注册量实时统计数据处理折线图渲染
+					userRegisterLineDeal(data);
+					//用户注册量实时统计数据处理柱状图渲染
+					userRegisterBarDeal(data);
+				},
+				error:function(){
+					alert("error");
+				}
+			});
+		}
+	  	//用户注册量实时统计数据处理折线图渲染
+	    function userRegisterLineDeal(data){
+	    	var xAxisData = [];
+	    	var seriesData = [];
+	    	for(var i=0;i<data.length;i++){
+				xAxisData.push(data[i].cre_date);
+				seriesData.push(data[i].register_num);
+			}
+	    	var lineChart = echarts.init(document.getElementById("echarts-line-chart"));
+	        var lineoption = {
+	            title : {
+	           		text: '用户每日注册量统计',//主标题文本，不支持使用\n换行
+				    subtext: '用户注册量折线图',//副标题文本，支持使用\n换行
+				   	x:'left'
+	            },
+	            tooltip : {
+	                trigger: 'axis',//触发类型：数据项图形触发
+	                formatter: "{a} <br/>{b} : {c} ",//提示框浮层内容格式器，支持字符串模板和回调函数两种形式。
+		        	axisPointer: {
+			            type: 'cross',
+			            label: {
+			            	backgroundColor: '#6a7985'
+			            }
+			        }
+	            },
+	            legend: {
+	                data:['注册量']
+	            },
+	            toolbox : {
+			        feature: {//各工具配置项
+			            dataView: {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+			            saveAsImage: {show: true}//保存为图片
+			        }
+			    },
+	            grid:{
+	                x:40,
+	                x2:40,
+	                y2:24
+	            },
+	            calculable : true,
+	            xAxis : [
+	                {
+	                    type : 'category',
+	                    boundaryGap : false,
+	                    data : xAxisData
+	                }
+	            ],
+	            yAxis : [
+	                {
+	                    type : 'value',
+	                    axisLabel : {
+	                        formatter: '{value} 人'
+	                    }
+	                }
+	            ],
+	            series : [
+	                {
+	                    name:'实时注册量',
+	                    type:'line',
+	                    data: seriesData,
+	                    markPoint : {
+	                        data : [
+	                            {type : 'max', name: '最大值'},
+	                            {type : 'min', name: '最小值'}
+	                        ]
+	                    },
+	                    markLine : {
+	                        data : [
+	                            {type : 'average', name: '平均值'}
+	                        ]
+	                    }
+	                }
+	            ]
+	        };
+	        lineChart.setOption(lineoption);
+	        $(window).resize(lineChart.resize);
+	    }
+	  	//用户注册量实时统计数据处理柱状图渲染
+	  	function userRegisterBarDeal(data){
+	  		var xAxisData = [];
+	    	var seriesData = [];
+	    	for(var i=0;i<data.length;i++){
+				xAxisData.push(data[i].cre_date);
+				seriesData.push(data[i].register_num);
+			}
+	    	var barChart = echarts.init(document.getElementById("echarts-bar-chart"));
+	        var baroption = {
+	            title : {
+	            	text: '用户每日注册量统计',//主标题文本，不支持使用\n换行
+				    subtext: '用户注册量柱状图',//副标题文本，支持使用\n换行
+			        x:'left'
+	            },
+	            tooltip : {
+	                trigger: 'axis',//触发类型：数据项图形触发
+			        formatter: "{a} <br/>{b} : {c} ",//提示框浮层内容格式器，支持字符串模板和回调函数两种形式。
+		        	axisPointer: {
+			            type: 'cross',
+			            label: {
+			            	backgroundColor: '#6a7985'
+			            }
+			        }
+	            },
+	            legend: {
+	                data:['注册量']
+	            },
+	            toolbox : {
+			        feature: {//各工具配置项
+			            dataView: {show: true, readOnly: false},//数据视图工具，可以展现当前图表所用的数据，编辑后可以动态更新。
+			            saveAsImage: {show: true}//保存为图片
+			        }
+			    },
+	            grid:{
+	                x:30,
+	                x2:40,
+	                y2:24
+	            },
+	            calculable : true,
+	            xAxis : [
+	                {
+	                    type : 'category',
+	                    data : xAxisData
+	                }
+	            ],
+	            yAxis : [
+	                {
+	                    type : 'value'
+	                }
+	            ],
+	            series : [
+	                {
+	                    name:'注册量',
+	                    type:'bar',
+	                    data:seriesData,
+	                    markPoint : {
+	                        data : [
+	                            {type : 'max', name: '最大值'},
+	                            {type : 'min', name: '最小值'}
+	                        ]
+	                    },
+	                    markLine : {
+	                        data : [
+	                            {type : 'average', name: '平均值'}
+	                        ]
+	                    }
+	                }
+	            ]
+	        };
+	        barChart.setOption(baroption);
+	        window.onresize = barChart.resize;
+	  	}
+    
+    </script>
+    
+</body>
+</html>

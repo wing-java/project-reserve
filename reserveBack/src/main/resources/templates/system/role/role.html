@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('角色列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统角色列表 -->
+	<div class="container-div">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="role-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								角色名称：<input type="text" name="roleName"/>
+							</li>
+							<li>
+								权限字符：<input type="text" name="roleKey"/>
+							</li>
+							<li>
+								角色状态：
+								<select name="status" th:with="type=${@dict.getType('sys_normal_disable')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+		
+		
+			<!-- 上面的各项增删改查导入导出操作 -->
+			<div class="btn-group-sm" id="toolbar" role="group">
+				<!-- 操作封装：新增 -->
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:role:add">
+	                <i class="fa fa-plus"></i> 新增
+	            </a>
+	            <!-- 操作封装：修改 -->
+	            <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:role:edit">
+		            <i class="fa fa-edit"></i> 修改
+		        </a>
+		        <!-- 操作封装：删除 -->
+				<a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:role:remove">
+		            <i class="fa fa-remove"></i> 删除
+		        </a>
+		        <!-- 操作封装：导出 -->
+		        <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:role:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+	        
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+	
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//编辑
+		var editFlag = [[${@permission.hasPermi('system:role:edit')}]];
+		//删除
+		var removeFlag = [[${@permission.hasPermi('system:role:remove')}]];
+		
+		//前缀路径
+		var prefix = ctx + "system/role";
+		
+
+		$(function() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        createUrl: prefix + "/add",//新增路径
+		        updateUrl: prefix + "/edit/{id}",//编辑路径
+		        removeUrl: prefix + "/remove",//删除路径
+		        exportUrl: prefix + "/export",//导出路径
+		        sortName: "roleSort",//排序字段
+		        modalName: "角色",//模块名称
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+		            field: 'roleId',
+		            title: '角色编号'
+		        },
+		        {
+		            field: 'roleName',
+		            title: '角色名称',
+		            sortable: true
+		        },
+		        {
+		            field: 'roleKey',
+		            title: '权限字符',
+		            sortable: true
+		        },
+		        {
+		            field: 'roleSort',
+		            title: '显示顺序',
+		            sortable: true
+		        },
+		        {
+		        	visible: editFlag == 'hidden' ? false : true,//编辑标志显示状态
+		        	title: '角色状态',
+		        	align: 'center',
+		        	formatter: function (value, row, index) {
+		        		return statusTools(row);//状态工具显示
+		        	}
+		        },
+		        {
+		            field: 'createTime',
+		            title: '创建时间',
+		            sortable: true
+		        },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	//事件数组
+		            	var actions = [];
+		            	//编辑按钮：修改信息
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.roleId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+		                //分配数据权限按钮
+		            	actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="authDataScope(\'' + row.roleId + '\')"><i class="fa fa-check-square-o"></i>数据权限</a> ');
+		                //分配用户按钮
+		                actions.push('<a class="btn btn-info btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="authUser(\'' + row.roleId + '\')"><i class="fa fa-user"></i>分配用户</a> ');
+		                //删除按钮
+		                actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.roleId + '\')"><i class="fa fa-remove"></i>删除</a> ');
+		                return actions.join('');
+		            }
+		        }]
+		    };
+		  	//表格初始化
+		    $.table.init(options);
+		});
+		
+		
+		/* 角色管理-分配数据权限 */
+		function authDataScope(roleId) {
+		    var url = prefix + '/authDataScope/' + roleId;
+		 	// 弹出层指定宽度
+		    $.modal.open("分配数据权限", url);
+		}
+		
+		
+		/* 角色管理-分配用户 */
+		function authUser(roleId) {
+		    var url = prefix + '/authUser/' + roleId;
+		    $.modal.openTab("分配用户", url);
+		}
+		
+		
+		/* 角色状态显示 */
+		function statusTools(row) {
+			//如果状态为1（停用），显示停用状态，和具有开启事件
+		    if (row.status == 1) {
+    			return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.roleId + '\')"></i> ';
+    		} else {
+    			//否则状态为0（可用），显示可用状态，和具有关闭事件
+    			return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.roleId + '\')"></i> ';
+    		}
+		}
+		
+		
+		/* 角色管理-停用 */
+		function disable(roleId) {
+			//弹出确认层，发送post请求到后台
+			$.modal.confirm("确认要停用角色吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 1 });
+		    })
+		}
+
+		
+		/* 角色管理启用 */
+		function enable(roleId) {
+			//弹出确认层，发送post请求到后台
+			$.modal.confirm("确认要启用角色吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "roleId": roleId, "status": 0 });
+		    })
+		}
+	</script>
+</body>
+</html>

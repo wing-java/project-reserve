@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="include :: header('系统版本列表')" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+<body class="gray-bg">
+	
+	<!-- 系统参数列表 -->
+	<div class="container-div ui-layout-center">
+		<div class="row">
+			
+			<!-- 最上面的搜索框 -->
+			<div class="col-sm-12 search-collapse">
+				<form id="user-form">
+					<div class="select-list">
+						<ul>
+							<li>
+								版本号：<input type="text" name="version_no"/>
+							</li>
+							<li>
+								是否强制更新：
+								<select name="status" th:with="type=${@dict.getType('sys_version_info_status')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								设备类型：
+								<select name="status" th:with="type=${@dict.getType('user_info_device_type')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="beginTime"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="endTime"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+			
+			<!-- 上面的各项增删改查导入导出操作 -->
+	        <div class="btn-group-sm" id="toolbar" role="group">
+	           <!-- 操作封装：添加信息，以tab页展现 -->
+	        	<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="develop:sysVersion:add">
+	                <i class="fa fa-plus"></i> 新增
+	            </a>
+	            <!-- 操作封装：修改信息，以tab页展现 -->
+	            <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="develop:sysVersion:edit">
+		            <i class="fa fa-edit"></i> 修改
+		        </a>
+		         <!-- 操作封装：批量删除信息 -->
+	            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="develop:sysVersion:remove">
+	                <i class="fa fa-remove"></i> 删除
+	            </a>
+		        <!-- 表格：导出数据 -->
+	            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="develop:sysVersion:export">
+		            <i class="fa fa-download"></i> 导出
+		        </a>
+	        </div>
+
+	        
+	        <!-- bootstrap表格数据部分 -->
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+			
+		</div>
+	</div>
+	
+	<th:block th:include="include :: footer" />
+	<script th:inline="javascript">
+		//编辑
+		var editFlag = [[${@permission.hasPermi('develop:sysVersion:edit')}]];	
+		//删除
+		var removeFlag = [[${@permission.hasPermi('develop:sysVersion:remove')}]];
+		
+		//数据字典
+		var datas_status = [[${@dict.getType('sys_version_info_status')}]];
+		var datas_device_type = [[${@dict.getType('user_info_device_type')}]];
+	
+		//前缀路径
+		var prefix = "/develop/sysVersion";
+		
+		//初始化方法
+		$(function() {
+		   	//查询系统版本列表
+		    querySysVersionList();
+		});
+
+		
+		//查询系统版本列表
+		function querySysVersionList() {
+		    var options = {
+		        url: prefix + "/list",//URL列表路径
+		        createUrl: prefix + "/add",//新增路径
+		        updateUrl: prefix + "/edit/{id}",//编辑路径
+		        removeUrl: prefix + "/remove",//删除路径
+		        exportUrl: prefix + "/export",//导出路径
+		        modalName: "系统版本",//模块名称：用户
+		        showExport: true,
+		        sortName: 'id',
+	          	sortOrder: 'desc',
+		        //列信息
+		        columns: [{
+		            checkbox: true
+		        },
+		        {
+					field : 'id', 
+					title : '编号',
+					sortable: true
+				},
+				{
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	//事件数组
+		                var actions = [];
+		            	//编辑按钮：修改信息，以tab页展现
+		                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+		              	//删除按钮：删除信息
+		            	actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a> ');
+		            	return actions.join('');
+		            }
+		        },
+				{
+					field : 'version_no', 
+					title : '版本号'
+				},
+				{
+					field : 'version_url', 
+					title : '版本链接'
+				},
+				{
+					field : 'status', 
+					title : '是否强制更新',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_status, value);
+		            }
+				},
+				{
+					field : 'device_type', 
+					title : '设备类型',
+					align: 'center',
+		            formatter: function(value, row, index) {
+		            	return $.table.selectDictLabel(datas_device_type, value);
+		            }
+				},
+				{
+					field : 'note', 
+					title : '更新备注',
+					align: 'center',
+				  	formatter: function(value, row, index) {
+				      	return $.table.tooltip(value);
+				  	}
+				},
+				{
+					field : 'remark', 
+					title : '操作备注',
+					align: 'center',
+				  	formatter: function(value, row, index) {
+				      	return $.table.tooltip(value);
+				  	}
+				},
+				{
+					field : 'cre_date', 
+					title : '创建时间',
+					sortable: true
+				},
+				{
+					field : 'create_by', 
+					title : '创建人'
+				},
+				{
+					field : 'up_date', 
+					title : '更新时间',
+					sortable: true
+				},
+				{
+					field : 'update_by', 
+					title : '更新人'
+				}]
+		    };
+		    //表格初始化
+		    $.table.init(options);
+		}
+	</script>
+</body>
+</html>

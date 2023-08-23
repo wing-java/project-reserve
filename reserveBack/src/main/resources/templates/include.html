@@ -1,0 +1,550 @@
+<!-- 通用CSS -->
+<head th:fragment=header(title)>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<title th:text="${title}"></title>
+	<link rel="shortcut icon" href="favicon.ico">
+	<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+	<link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+	<!-- bootstrap-table 表格插件样式 -->
+	<link th:href="@{/ajax/libs/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet"/>
+	<link th:href="@{/css/animate.css}" rel="stylesheet"/>
+	<link th:href="@{/css/style.css}" rel="stylesheet"/>
+	<link th:href="@{/ruoyi/css/ry-ui.css}" rel="stylesheet"/>
+</head>
+
+<!-- 通用JS -->
+<div th:fragment="footer">
+	<script th:src="@{/js/jquery.min.js}"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	<!-- bootstrap-table 表格插件 -->
+	<script th:src="@{/ajax/libs/bootstrap-table/bootstrap-table.min.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/locale/bootstrap-table-zh-CN.min.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.min.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/columns/bootstrap-table-fixed-columns.js}"></script>
+	<!-- jquery-validate 表单验证插件 -->
+	<script th:src="@{/ajax/libs/validate/jquery.validate.min.js}"></script>
+	<script th:src="@{/ajax/libs/validate/messages_zh.min.js}"></script>
+	<script th:src="@{/ajax/libs/validate/jquery.validate.extend.js}"></script>
+	<!-- jquery-validate 表单树插件 -->
+	<script th:src="@{/ajax/libs/bootstrap-treetable/bootstrap-treetable.js}"></script>
+	<!-- jquery-export 表格导出插件 -->
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/export/bootstrap-table-export.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/export/tableExport.js}"></script>
+	<!-- 遮罩层 -->
+	<script th:src="@{/ajax/libs/blockUI/jquery.blockUI.js}"></script>
+    <script th:src="@{/ajax/libs/iCheck/icheck.min.js}"></script>
+	<script th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+	<script th:src="@{/ajax/libs/layui/layui.js}"></script>
+	<script th:src="@{/ruoyi/js/common.js?v=4.1.0}"></script>
+	<script th:src="@{/ruoyi/js/ry-ui.js?v=4.1.0}"></script>
+	<script th:inline="javascript"> 
+		var ctx = [[@{/}]]; 
+		var qiniu_domain = "https://www.avjbb.com";
+// 		var qiniu_domain = "http://54.179.77.123:18082";
+		
+		//初始化时间
+		function intiTime(){
+			/**
+			* 获取本周、本季度、本月、上月的开始日期、结束日期
+			*/
+			var now = new Date(); //当前日期 
+			var nowDayOfWeek = now.getDay(); //今天本周的第几天 
+			var nowDay = now.getDate(); //当前日 
+			var nowMonth = now.getMonth(); //当前月 
+			var nowYear = now.getYear(); //当前年 
+			nowYear += (nowYear < 2000) ? 1900 : 0; //
+			var lastMonthDate = new Date(); //上月日期
+			lastMonthDate.setDate(1);
+			lastMonthDate.setMonth(lastMonthDate.getMonth()-1);
+			var lastYear = lastMonthDate.getYear();
+			var lastMonth = lastMonthDate.getMonth();
+			/**
+			 * 日期格式化转换
+			 */
+			function formatDate(date) { 
+				var myyear = date.getFullYear(); 
+				var mymonth = date.getMonth()+1; 
+				var myweekday = date.getDate(); 
+				if(mymonth < 10){ 
+					mymonth = "0" + mymonth; 
+				} 
+				if(myweekday < 10){ 
+					myweekday = "0" + myweekday; 
+				} 
+				return (myyear+"-"+mymonth + "-" + myweekday); 
+			} 
+			/**
+			 * 获得某月的天数
+			 */
+			function getMonthDays(myMonth){ 
+				var monthStartDate = new Date(nowYear, myMonth, 1); 
+				var monthEndDate = new Date(nowYear, myMonth + 1, 1); 
+				var days = (monthEndDate - monthStartDate)/(1000 * 60 * 60 * 24); 
+				return days; 
+			} 
+			//开始日期
+			var monthStartDate = new Date(nowYear, nowMonth, 1); 
+			//结束日期
+			var monthEndDate = new Date(nowYear, nowMonth, getMonthDays(nowMonth));
+				
+			$('#startTime').val(formatDate(monthStartDate));
+			$('#endTime').val(formatDate(monthEndDate));
+		}
+		
+		
+		//文件上传：新增
+		function initFileInputAdd(inputId,photoArray,description,maxFileCount){
+			//初始化fileinput控件（第一次初始化）
+		    $("#fileinput-demo-"+inputId+"").fileinput({
+		    	dropZoneTitle : description,
+		    	'theme': 'explorer-fas',
+		    	'uploadUrl': '/develop/upload/localPhotopUpload',//上传的地址
+		    	showRemove:false,
+		    	//allowedFileExtensions : ['jpg', 'png','gif'],//接收的文件后缀,
+		    	allowedFileExtensions : ['jpg', 'png','gif','mp4','rmvb','avi','rm','avi'],//接收的文件后缀,
+		        uploadAsync:true,//false 同步上传，后台用数组接收，true 异步上传，每次上传一个file,会调用多次接口
+		        removeFromPreviewOnError:true, //当选择的文件不符合规则时，例如不是指定后缀文件、大小超出配置等，选择的文件不会出现在预览框中，只会显示错误信息
+		        maxFileSize: 1024*500,//单位为kb，如果为0表示不限制文件大小
+		        maxFileCount: maxFileCount,//表示允许同时上传的最大文件个数
+		        validateInitialCount:true,
+		        overwriteInitial: false,
+		        initialPreviewAsData: true,
+		        msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+		        /* layoutTemplates :{
+		            actionDelete:'', //去除上传预览的缩略图中的删除图标
+		            actionUpload:'',//去除上传预览缩略图中的上传图片；
+		            //actionZoom:''   //去除上传预览缩略图中的查看详情预览的缩略图标。
+		       } */
+		    })
+		       .on("fileuploaded", function(event, data, previewId, index) {
+		       	data=data.response;
+		       	if(data.code=='0'){
+			       	photoArray.push({ FileName: data.url, KeyID: previewId })
+		       	}else{
+		       		layer.msg(data.msg,{icon:5,time : 1000});
+		       	}
+		   	})
+		    .on('fileerror', function(event, data, msg) {  //一个文件上传失败
+		       	alert('文件上传失败！'+msg);
+		   	})
+		    .on("filesuccessremove", function (event, data, previewId, index) { 
+		    	photoArray.remove(data);
+		    	console.log(photoArray);
+			})
+		}
+		
+		//文件上传：修改
+		function initFileInputEdit(initialArray,initialPreviewArray,initialPreviewConfigArray,inputId,photoArray,description,maxFileCount){
+			//初始化fileinput控件（第一次初始化）
+		    $("#fileinput-demo-"+inputId+"").fileinput({
+		    	dropZoneTitle : description,
+		    	'theme': 'explorer-fas',
+		    	'uploadUrl': '/develop/upload/localPhotopUpload',//上传的地址
+		    	showRemove:false,
+		    	allowedFileExtensions : ['jpg', 'png','gif'],//接收的文件后缀,
+		        uploadAsync:true,//false 同步上传，后台用数组接收，true 异步上传，每次上传一个file,会调用多次接口
+		        removeFromPreviewOnError:true, //当选择的文件不符合规则时，例如不是指定后缀文件、大小超出配置等，选择的文件不会出现在预览框中，只会显示错误信息
+		        maxFileSize: 1024*500,//单位为kb，如果为0表示不限制文件大小
+		        maxFileCount: maxFileCount,//表示允许同时上传的最大文件个数
+		        validateInitialCount:true,
+		        overwriteInitial: false,
+		        initialPreviewAsData: true,
+		        initialPreview: initialPreviewArray,
+		       	initialPreviewConfig: initialPreviewConfigArray,
+		        msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+		        /* layoutTemplates :{
+		            actionDelete:'', //去除上传预览的缩略图中的删除图标
+		            actionUpload:'',//去除上传预览缩略图中的上传图片；
+		            //actionZoom:''   //去除上传预览缩略图中的查看详情预览的缩略图标。
+		       } */
+		    })
+		    .on("fileuploaded", function(event, data, previewId, index) {
+		       	data=data.response;
+		       	if(data.code=='0'){
+		       		photoArray.push({ FileName: data.url, KeyID: previewId });
+		       		console.log(photoArray);
+		       		//$("#"+inputId+"").val($("#"+inputId+"").val()+data.url+",");
+		       	}else{
+		       		layer.msg(data.msg,{icon:5,time : 1000});
+		       	}
+		   	})
+		    .on('fileerror', function(event, data, msg) {  //一个文件上传失败
+		       	alert('文件上传失败！'+msg);
+		   	})
+		   	.on("filesuccessremove", function (event, data, previewId, index) { 
+		    	photoArray.remove(data);
+			})
+			.on('filepredelete', function(event, key) {
+				initialArray.removeInitData(key);
+			})
+		}
+		
+		//文件上传：显示
+		function initFileInputDetail(initialArray,inputId,maxFileCount){
+		  	//初始化fileinput控件（第一次初始化）
+		    $("#fileinput-demo-"+inputId+"").fileinput({
+		        'theme': 'explorer-fas',
+		        allowedFileExtensions : ['jpg', 'png','gif'],//接收的文件后缀,
+		        uploadAsync:true,//采用同步上传
+		        maxFileCount: maxFileCount,//表示允许同时上传的最大文件个数
+		        validateInitialCount:true,
+		        overwriteInitial: false,
+		        initialPreviewAsData: true,
+		        showUpload: false, //是否显示上传按钮
+		        showRemove: false, //是否显示删除按钮
+		        showBrowse: false,//是否显示移除按钮
+		        showCaption:false,//是否显示标题
+		        initialPreview: initialArray,
+		        layoutTemplates :{
+		            actionDelete:'', //去除上传预览的缩略图中的删除图标
+		            actionUpload:'',//去除上传预览缩略图中的上传图片；
+		            //actionZoom:''   //去除上传预览缩略图中的查看详情预览的缩略图标。
+		       }
+		    })
+		}
+		
+		/**
+		 * 兼容视频格式回显
+		 */
+		function initFileInputEditVideo(initialArray,initialPreviewArray,initialPreviewConfigArray,inputId,photoArray,description,maxFileCount){
+			//初始化fileinput控件（第一次初始化）
+		    $("#fileinput-demo-"+inputId+"").fileinput({
+		    	dropZoneTitle : description,
+		    	'theme': 'explorer-fas',
+		    	'uploadUrl': '/develop/upload/localPhotopUpload',//上传的地址
+		    	showRemove:false,
+		    	allowedFileExtensions : ['jpg', 'png','gif','mp4','rmvb','avi','rm','avi'],//接收的文件后缀,
+		        uploadAsync:true,//false 同步上传，后台用数组接收，true 异步上传，每次上传一个file,会调用多次接口
+		        removeFromPreviewOnError:true, //当选择的文件不符合规则时，例如不是指定后缀文件、大小超出配置等，选择的文件不会出现在预览框中，只会显示错误信息
+		        maxFileSize: 1024*500,//单位为kb，如果为0表示不限制文件大小
+		        maxFileCount: maxFileCount,//表示允许同时上传的最大文件个数
+		        validateInitialCount:true,
+		        msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+		        /* layoutTemplates :{
+		            actionDelete:'', //去除上传预览的缩略图中的删除图标
+		            actionUpload:'',//去除上传预览缩略图中的上传图片；
+		            //actionZoom:''   //去除上传预览缩略图中的查看详情预览的缩略图标。
+		       } */
+		        previewFileType: ['image', 'html', 'text', 'video', 'audio', 'flash'],
+		        allowedPreviewTypes: ['image','video', 'audio'],
+		        overwriteInitial: false,
+		        initialPreviewAsData: true,
+		        initialPreviewFileType: 'image', //'html', 'text', 'video', 'audio', 'flash', 'object'],
+		        initialPreviewShowDelete:true,
+		        initialPreview:initialPreviewArray,
+		        initialPreviewConfig:initialPreviewConfigArray
+		    })
+		    .on("fileuploaded", function(event, data, previewId, index) {
+		       	data=data.response;
+		       	if(data.code=='0'){
+		       		photoArray.push({ FileName: data.url, KeyID: previewId });
+		       		console.log(photoArray);
+		       		//$("#"+inputId+"").val($("#"+inputId+"").val()+data.url+",");
+		       	}else{
+		       		layer.msg(data.msg,{icon:5,time : 1000});
+		       	}
+		   	})
+		    .on('fileerror', function(event, data, msg) {  //一个文件上传失败
+		       	alert('文件上传失败！'+msg);
+		   	})
+		   	.on("filesuccessremove", function (event, data, previewId, index) { 
+		    	photoArray.remove(data);
+			})
+			.on('filepredelete', function(event, key) {
+				initialArray.removeInitData(key);
+			})
+		}
+		
+		/**
+		 * 兼容视频格式
+		 */
+		function getHaveSetPhotoArrayVideo(photoDataArray, photoDataPreviewArray, photoDataPreviewConfigArray, photoUrls){
+			var photoUrlArray = photoUrls.split(",");
+			for(var i=0;i<photoUrlArray.length;i++){
+				var photo_url = photoUrlArray[i].split("?")[0]
+				photoDataArray.push(photoUrlArray[i]);
+				photoDataPreviewArray.push(qiniu_domain+photo_url);
+				
+				var o=new Object();
+			   	o.caption = photo_url ;
+			   	o.filename = photo_url;
+			   	o.url = '/develop/upload/delUploadPic';
+			   	o.key = photoUrlArray[i];
+			   	
+			   	if(photo_url==null||photo_url.indexOf(".")==-1){
+			        o.type="image";
+			        o.filetype="image/"+fileTyp;
+			    }
+			   	var fileTyp=photo_url.split(".")[1];
+			    if(["bmp", "gif", "jpg", "jpeg", "png"].join(",").indexOf(fileTyp) !=-1){
+			       o.type="image";
+			       o.filetype="image/"+fileTyp;
+			    }
+			    if(["mp3"].join(",").indexOf(fileTyp) !=-1){
+			       o.type="audio";
+			       o.filetype="audio/"+fileTyp;
+			    }
+			    if(["swf", "flv" , "mp4","wav", "wma", "wmv", "mid", "avi", "mpg",
+			        "rm", "rmvb"].join(",").indexOf(fileTyp) !=-1 ){
+			       o.type="video";
+			       o.filetype="video/"+fileTyp;
+			    }
+			    photoDataPreviewConfigArray.push(o);
+			}
+		}
+		
+		//获取已有图片的路径数组：带删除操作
+		function getHaveSetPhotoArray(photoDataArray, photoDataPreviewArray, photoDataPreviewConfigArray, photoUrls){
+			var photoUrlArray = photoUrls.split(",");
+			for(var i=0;i<photoUrlArray.length;i++){
+				photoDataArray.push(photoUrlArray[i]);
+				photoDataPreviewArray.push(qiniu_domain+photoUrlArray[i]);
+				photoDataPreviewConfigArray.push({caption:photoUrlArray[i], filename:photoUrlArray[i], url:'/develop/upload/delUploadPic', key:photoUrlArray[i]});
+			}
+		}
+		
+		//获取已有图片的路径数组：不带删除操作
+		function getHaveSetPhotoArrayView(photoDataPreviewArray, photoUrls){
+			var photoUrlArray = photoUrls.split(",");
+			for(var i=0;i<photoUrlArray.length;i++){
+				photoDataPreviewArray.push(qiniu_domain+photoUrlArray[i]);
+			}
+		}
+
+		//拼接数组图片路径（新增）
+		function getArrayPhotoUrls(photoArray){
+			var str = "";
+			for(var i=0;i<photoArray.length;i++){
+				if(i!=photoArray.length-1){
+					str += photoArray[i].FileName+",";
+				}else{
+					str += photoArray[i].FileName;
+				}
+			}
+			return str;
+		}
+		
+		//获得最后的图片路径（修改）
+		function getAllPhotosUrl(initialArray, photoArray){
+			var str = "";
+			for(var i=0;i<initialArray.length;i++){
+				if(i!=initialArray.length-1){
+					str += initialArray[i]+",";
+				}else{
+					str += initialArray[i];
+				}
+			}
+			for(var i=0;i<photoArray.length;i++){
+				if(initialArray.length>0 && i==0){
+					if(i!=photoArray.length-1){
+						str += ","+photoArray[i].FileName+",";
+					}else{
+						str += ","+photoArray[i].FileName;
+					}
+				}else{
+					if(i!=photoArray.length-1){
+						str += photoArray[i].FileName+",";
+					}else{
+						str += photoArray[i].FileName;
+					}
+				}
+			}
+			console.log(str);
+			return str;
+		}
+		
+		
+		//找到某个元素在数组中的位置
+		Array.prototype.indexOfAddData = function(val) {
+			for (var i = 0; i < this.length; i++) {
+				if (this[i].KeyID == val) return i;
+			}
+			return -1;
+		};
+
+		//移除某个元素
+		Array.prototype.remove = function(val) {
+			var index = this.indexOfAddData(val);
+			if (index > -1) this.splice(index, 1);
+		};
+		
+		//找到某个元素在数组中的位置
+		Array.prototype.indexOfInitData = function(val) {
+			for (var i = 0; i < this.length; i++) {
+				if (this[i] == val) return i;
+			}
+			return -1;
+		};
+
+		//移除某个元素
+		Array.prototype.removeInitData = function(val) {
+			var index = this.indexOfInitData(val);
+			if (index > -1) this.splice(index, 1);
+		};
+		
+		//订单支付方式
+		function getOrderPayType(order_pay_type){
+			if(order_pay_type=='01'){
+				return '支付宝';
+			}else if(order_pay_type=='02'){
+				return '微信';
+			}else if(order_pay_type=='03'){
+				return '余额';
+			}
+		}
+		
+	</script>
+</div>
+
+<!-- ztree树插件 -->
+<div th:fragment="ztree-css">
+    <link th:href="@{/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="ztree-js">
+    <script th:src="@{/ajax/libs/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
+</div>
+
+<!-- select2下拉框插件 -->
+<div th:fragment="select2-css">
+    <link th:href="@{/ajax/libs/select2/select2.min.css}" rel="stylesheet"/>
+    <link th:href="@{/ajax/libs/select2/select2-bootstrap.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="select2-js">
+    <script th:src="@{/ajax/libs/select2/select2.min.js}"></script>
+</div>
+
+<!-- bootstrap-select下拉框插件 -->
+<div th:fragment="bootstrap-select-css">
+    <link th:href="@{/ajax/libs/bootstrap-select/bootstrap-select.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="bootstrap-select-js">
+    <script th:src="@{/ajax/libs/bootstrap-select/bootstrap-select.js}"></script>
+</div>
+
+<!-- datetimepicker日期和时间插件 -->
+<div th:fragment="datetimepicker-css">
+    <link th:href="@{/ajax/libs/datapicker/bootstrap-datetimepicker.min.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="datetimepicker-js">
+    <script th:src="@{/ajax/libs//datapicker/bootstrap-datetimepicker.min.js}"></script>
+</div>
+
+<!-- My97DatePicker日期和时间插件 -->
+<div th:fragment="wdatePicker-js">
+    <script th:src="@{/ajax/libs/My97DatePicker/4.8/WdatePicker.js}"></script>
+</div>
+
+<!-- 地址插件 -->
+<div th:fragment="area-js">
+    <script th:src="@{/js/area.js}"></script>
+</div>
+
+<!-- ui布局插件 -->
+<div th:fragment="layout-latest-css">
+    <link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="layout-latest-js">
+    <script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+</div>
+
+<!-- summernote富文本编辑器插件 -->
+<div th:fragment="summernote-css">
+    <link th:href="@{/ajax/libs/summernote/summernote.css}" rel="stylesheet"/>
+	<link th:href="@{/ajax/libs/summernote/summernote-bs3.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="summernote-js">
+    <script th:src="@{/ajax/libs/summernote/summernote.min.js}"></script>
+	<script th:src="@{/ajax/libs/summernote/summernote-zh-CN.js}"></script>
+</div>
+
+<!-- cropbox图像裁剪插件 -->
+<div th:fragment="cropbox-css">
+    <link th:href="@{/ajax/libs/cropbox/cropbox.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="cropbox-js">
+    <script th:src="@{/ajax/libs/cropbox/cropbox.js}"></script>
+</div>
+
+<!-- jasny功能扩展插件 -->
+<div th:fragment="jasny-bootstrap-css">
+    <link th:href="@{/ajax/libs/jasny/jasny-bootstrap.min.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="jasny-bootstrap-js">
+    <script th:src="@{/ajax/libs/jasny/jasny-bootstrap.min.js}"></script>
+</div>
+
+<!-- fileinput文件上传插件 -->
+<div th:fragment="bootstrap-fileinput-css">
+    <link th:href="@{/ajax/libs/bootstrap-fileinput/fileinput.min.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="bootstrap-fileinput-js">
+    <script th:src="@{/ajax/libs/bootstrap-fileinput/fileinput.min.js}"></script>
+</div>
+
+<!-- duallistbox双列表框插件 -->
+<div th:fragment="bootstrap-duallistbox-css">
+    <link th:href="@{/ajax/libs/duallistbox/bootstrap-duallistbox.min.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="bootstrap-duallistbox-js">
+    <script th:src="@{/ajax/libs/duallistbox/bootstrap-duallistbox.min.js}"></script>
+</div>
+
+<!-- suggest搜索自动补全 -->
+<div th:fragment="bootstrap-suggest-js">
+    <script th:src="@{/ajax/libs/suggest/bootstrap-suggest.min.js}"></script>
+</div>
+
+<!-- typeahead搜索自动补全 -->
+<div th:fragment="bootstrap-typeahead-js">
+    <script th:src="@{/ajax/libs/typeahead/bootstrap3-typeahead.min.js}"></script>
+</div>
+
+<!-- jsonview格式化和语法高亮JSON格式数据查看插件 -->
+<div th:fragment="jsonview-css">
+    <link th:href="@{/ajax/libs/jsonview/jquery.jsonview.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="jsonview-js">
+    <script th:src="@{/ajax/libs/jsonview/jquery.jsonview.js}"></script>
+</div>
+
+<!-- jquery.steps表单向导插件 -->
+<div th:fragment="jquery-steps-css">
+    <link th:href="@{/ajax/libs/staps/jquery.steps.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="jquery-steps-js">
+    <script th:src="@{/ajax/libs/staps/jquery.steps.min.js}"></script>
+</div>
+
+<!-- ECharts百度统计图表插件 -->
+<div th:fragment="echarts-js">
+    <script th:src="@{/ajax/libs/report/echarts/echarts-all.js}"></script>
+</div>
+
+<!-- peity图表组合插件 -->
+<div th:fragment="peity-js">
+    <script th:src="@{/ajax/libs/report/peity/jquery.peity.min.js}"></script>
+</div>
+
+<!-- sparkline线状图插件 -->
+<div th:fragment="sparkline-js">
+    <script th:src="@{/ajax/libs/report/sparkline/jquery.sparkline.min.js}"></script>
+</div>
+
+<!-- 表格拖拽插件 -->
+<div th:fragment="bootstrap-table-reorder-js">
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/reorder/bootstrap-table-reorder.js}"></script>
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/reorder/jquery.tablednd.js}"></script>
+</div>
+
+<!-- 表格行内编辑插件 -->
+<div th:fragment="bootstrap-editable-css">
+    <link th:href="@{/ajax/libs/bootstrap-table/extensions/editable/bootstrap-editable.css}" rel="stylesheet"/>
+</div>
+<div th:fragment="bootstrap-table-editable-js">
+	<script th:src="@{/ajax/libs/bootstrap-table/extensions/editable/bootstrap-editable.min.js}"></script>
+    <script th:src="@{/ajax/libs/bootstrap-table/extensions/editable/bootstrap-table-editable.js}"></script>
+</div>

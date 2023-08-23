@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="include :: header('新增通知公告')" />
+	<th:block th:include="include :: cropbox-css" />
+	<th:block th:include="include :: summernote-css" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+</head>
+
+<body class="white-bg">
+    
+   <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+       
+       <form class="form-horizontal m" id="form-sysContract-add">
+		
+		<div class="form-group">
+            <label class="col-sm-2 control-label">合同类型：</label>
+            <div class="col-sm-10">
+                <div class="input-group" style="width: 100%">
+             		<select name="contract_type" class="form-control m-b" th:with="type=${@dict.getType('sys_contract_contract_type')}" required>
+            			<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+        			</select>
+                </div>
+            </div>
+        </div>
+		
+		<div class="form-group">	
+			<label class="col-sm-2 control-label">合同标题：</label>
+			<div class="col-sm-10">
+				<input id="contract_title" name="contract_title" class="form-control" type="text" placeholder="请输入合同标题" required >
+			</div>
+		</div>
+		
+		<div class="form-group">	
+			<label class="col-sm-2 control-label">合同内容：</label>
+			<div class="col-sm-10">
+			    <input id="contract_content" name="contract_content" type="hidden">
+			   	<!--  富文本区域 -->
+			    <div class="summernote"></div>
+			</div>
+		</div>
+		
+		<div class="form-group">	
+               <label class="col-sm-2 control-label">备注：</label>
+               <div class="col-sm-10">
+                   <textarea class="form-control" name="remark" id="remark" placeholder="请输入备注" ></textarea>
+               </div>
+           </div>
+		
+	</form>
+</div>
+
+<div class="row" style="margin-bottom: 100px">
+	<div class="col-sm-offset-5 col-sm-10">
+	    <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+	    <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+	</div>
+</div>
+	
+<th:block th:include="include :: footer" />
+<th:block th:include="include :: summernote-js" />
+    
+<script type="text/javascript">
+//URL前缀
+var prefix = ctx + "develop/sysContract";
+
+$('.summernote').summernote({
+   	placeholder: '请输入合同内容',
+	height : 250,
+	lang : 'zh-CN',
+	callbacks: {
+		//重写图片上传方法
+        onImageUpload: function (files) {
+           sendFile(files[0], this);
+        }
+   	}
+});
+   
+
+$("#form-sysContract-add").validate({
+	focusCleanup: true
+});
+
+function submitHandler() {
+ 	if ($.validate.form()) {
+       	//使用summernote初始化富文本编辑器：设置采用默认
+       	var sHTML = $('.summernote').summernote('code');
+		$("#contract_content").val(sHTML);
+		
+		if($("#contract_type").val()==""){
+			layer.msg("请选择合同类型",{icon:5,time : 1000});
+			return;
+		}else if($("#contract_title").val()==""){
+			layer.msg("请输入合同标题",{icon:5,time : 1000});
+			return;
+		}else if($("#contract_content").val()==""){
+			layer.msg("请输入合同内容",{icon:5,time : 1000});
+			return;
+		}else{
+			$.operate.saveTab(prefix + "/add", $('#form-sysContract-add').serialize());
+		}
+  	}
+}
+</script>
+</body>
+</html>

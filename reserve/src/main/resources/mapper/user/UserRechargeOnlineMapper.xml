@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.longecological.mapper.user.UserRechargeOnlineMapper">
+	
+	<!-- 保存用户线上充值记录 -->
+	<insert id="insertUserRechargeOnline" parameterType="java.util.Map">
+		insert into t_user_recharge_online
+		(order_no, user_id, recharge_type, account_type,
+		status, recharge_num, cre_date, cre_time, is_first, channel_type)
+		values
+		(#{map.order_no}, #{map.user_id}, #{map.recharge_type}, #{map.account_type},
+		#{map.status}, #{map.recharge_num}, #{map.cre_date}, #{map.cre_time}, #{map.is_first}, #{map.channel_type})
+	</insert>
+	
+	<!-- 查询用户线上充值记录列表 -->
+	<select id="getUserRechargeOnlineList" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			order_no,
+			out_trade_no,
+			user_id,
+			recharge_type,
+			account_type,
+			recharge_num,
+			status,
+			trade_status,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i'
+			) AS cre_date
+		FROM
+			t_user_recharge_online
+		<where>
+			user_id=#{map.sys_user_id}
+			AND status not in (00,02)
+			<if test="map.last_id != null and map.last_id != '' " >
+        		 AND id &lt; #{map.last_id}
+      		</if>
+		</where>
+		order by id desc
+		LIMIT 0,10
+	</select>
+	
+	
+	<!-- 查询用户线上充值详情 -->
+	<select id="getUserRechargeOnlineDetail" parameterType="java.util.Map" resultType="java.util.Map" >
+		SELECT
+			id,
+			order_no,
+			out_trade_no,
+			user_id,
+			recharge_type,
+			account_type,
+			recharge_num,
+			status,
+			trade_status,
+			DATE_FORMAT(
+				STR_TO_DATE(
+					CONCAT(cre_date, cre_time),
+					'%Y%m%d%H%i%s'
+				),
+				'%Y-%m-%d %H:%i'
+			) AS cre_date
+		FROM
+			t_user_recharge_online
+		where id=#{map.recharge_id}
+	</select>
+	
+	<select id="getUserRechargeNum" parameterType="java.lang.String" resultType="int">
+		select count(1) from t_user_recharge_online where user_id = #{user_id} and status = '09'
+	</select>
+	
+</mapper> 
