@@ -6,7 +6,7 @@ spring:
         druid:
             # \u4e3b\u5e93\u6570\u636e\u6e90
             master:
-                url: jdbc:mysql://10.170.0.9:3306/reserve?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
+                url: jdbc:mysql://34.96.248.161:3306/reserve?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull
                 username: root
                 password: bkasufuV8a
             # \u4ece\u5e93\u6570\u636e\u6e90
@@ -53,12 +53,12 @@ spring:
                     config:
                         multi-statement-allow: true
     redis:
-        host: 10.170.0.9
+        host: 34.96.248.161
         port: 6379
         password: BVjauda614c
         database: 0
 rocketmq:
-    name-server: 10.170.0.9:9876
+    name-server: 34.96.248.161:9876
     producer:
         group: proGroupBack-reserve
         send-message-timeout: 3000

@@ -417,8 +417,7 @@
 			<artifactId>rocketmq-spring-boot-starter</artifactId>
 			<version>2.2.0</version>
 		</dependency>
-		
-		
+
 		<!--webjars版本定位器 用于省略版本号-->
 		<!-- <dependency>
             <groupId>org.webjars</groupId>

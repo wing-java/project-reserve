@@ -59,7 +59,7 @@ spring:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
   profiles: 
-    active: pro
+    active: dev
   # \u6587\u4ef6\u4e0a\u4f20
   servlet:
      multipart:

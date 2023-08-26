@@ -28,5 +28,10 @@ public class RocketMqConstants {
 	 * 
 	 */
 	public static final String order_benefit_year_topic = "orderBenefitYearTopic-reserve";
+
+	/**
+	 * 测试主题
+	 */
+	public static final String test_topic = "testTopic-reserve";
 	
 }

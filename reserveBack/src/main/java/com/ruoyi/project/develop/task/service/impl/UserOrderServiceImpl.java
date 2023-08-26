@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import com.ruoyi.common.utils.time.TimeUtil;
 import com.ruoyi.project.develop.task.mapper.UserOrderMapper;
 import com.ruoyi.project.develop.task.service.UserOrderService;
 
+@Slf4j
 @Service
 public class UserOrderServiceImpl implements UserOrderService {
 	
@@ -28,6 +30,7 @@ public class UserOrderServiceImpl implements UserOrderService {
 	@Override
 	public void dealUserOrder() {
 		//查询阶段收益
+		log.info(" 查询阶段收益定时任务执行+++++++++++");
 		List<Map<String, Object>> list1 = userOrderMapper.getUserOrderDayBenefitList();
 		if(list1!=null && list1.size()>0) {
 			for(Map<String, Object> obj : list1) {
