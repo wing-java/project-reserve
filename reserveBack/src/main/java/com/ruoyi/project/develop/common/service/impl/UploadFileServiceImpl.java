@@ -22,6 +22,8 @@ import com.ruoyi.project.develop.common.domain.R;
 import com.ruoyi.project.develop.common.service.QiNiuService;
 import com.ruoyi.project.develop.common.service.UploadFileService;
 
+import javax.annotation.Resource;
+
 
 /**
  * 文件上传
@@ -34,11 +36,12 @@ public class UploadFileServiceImpl implements UploadFileService {
 	Configuration cfg = new Configuration(); // zong1() 代表华北地区
 	UploadManager uploadManager = new UploadManager(cfg);
 	
-	@Autowired
+	@Resource
 	private QiNiuService qiNiuService;
-	
-	@Autowired
-	RedisUtils redisUtils;
+
+	@Resource
+	private RedisUtils redisUtils;
+
 
 	
 	/**
